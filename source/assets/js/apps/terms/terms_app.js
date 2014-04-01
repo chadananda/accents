@@ -1,18 +1,21 @@
 Accents.module("TermsApp", function(TermsApp, App, Backbone, Marionette, $, _){
-
-  Accents.Router = Marionette.AppRouter.extend({
-    appRoutes: {
-      "terms": "addTerm",
-      "": "addTerm"
-    }
-  });
-
   var API = {
-    addTerm: function(){
-      TermsApp.List.Controller.addTerm();
-      Accents.execute("set:active:header", "addterm");
-    },
+    termsList: function(){
+      if( App.user.isLoggedIn() ){
+        TermsApp.Controller.termsList();
+      }else{
+        App.trigger("login");
+      }
+    }
   };
 
+  App.on("list:term", function(){
+    App.navigate("terms");
+    API.termsList();
+  });
+
+  App.addInitializer(function(){
+    new TermsApp.Router({controller: API});
+  });
 
 });

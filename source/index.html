@@ -100,6 +100,23 @@
     <h2> No Terms </h2>
 </script>
 
+<!-- replaces #login-template -->
+<script type="text/template" id="login-template">
+    <div id="addword-input-form">
+        <div class="form-inline">
+            <div class="form-group">
+                <div class="alert alert-error" style="display:none"/>
+                <table class="add-word-form">
+                    <tr><td colspan="3"><label for="add-word" class=""> Sign In </label></td></tr>
+                    <tr><td class="term"><input type="text" id="user"  class="form-control" placeholder="User" ></td>
+                            <td class="term"><input type="password" id="password"  class="form-control" placeholder="Password"></td>
+                            <td class="button"><button type="submit" class="btn btn-lg btn-primary active" id="login-btn">Sign In</button></td>
+                </table>
+            </div>
+        </div>
+    </div>
+</script>
+
 
 
 <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.7.1/modernizr.min.js"></script>
@@ -127,11 +144,25 @@
 
 <script src="./assets/js/app.js"  charset="utf-8" ></script>
 <script src="./assets/js/common/utils.js"  charset="utf-8" ></script>
-
 <!-- entities -->
 <script src="./assets/js/entities/terms.js"  charset="utf-8" ></script>
-
+<script src="./assets/js/entities/login.js"  charset="utf-8" ></script>
 <!-- apps -->
+<script src="./assets/js/apps/header/views/header_views.js"  charset="utf-8" ></script>
+<script src="./assets/js/apps/header/controllers/list_controller.js"  charset="utf-8" ></script>
+<script src="./assets/js/apps/header/header_app.js"  charset="utf-8" ></script>
+
+<script src="./assets/js/apps/terms/views/term_views.js"  charset="utf-8" ></script>
+<script src="./assets/js/apps/terms/controllers/terms_controller.js"  charset="utf-8" ></script>
+<script src="./assets/js/apps/terms/routes/terms.js"  charset="utf-8" ></script>
+<script src="./assets/js/apps/terms/terms_app.js"  charset="utf-8" ></script>
+
+<script src="./assets/js/apps/login/views/login_views.js"  charset="utf-8" ></script>
+<script src="./assets/js/apps/login/controllers/login_controller.js"  charset="utf-8" ></script>
+<script src="./assets/js/apps/login/routes/login.js"  charset="utf-8" ></script>
+<script src="./assets/js/apps/login/login_app.js"  charset="utf-8" ></script>
+
+
 
 
 <script type="text/javascript" charset="utf-8" >
