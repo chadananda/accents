@@ -13,12 +13,12 @@ Accents.module("TermsApp.Views", function(Views, Accents, Backbone, Marionette, 
         rendered_word: '#rendered-word',
     },
     addTerm: function () {
-       //console.log('Adding new term: ', this.ui.term.val(), this.ui.ref.val());
+       console.log('Adding new term: ', this.ui.term.val(), this.ui.ref.val());
        var newTerm = new Accents.Entities.Term({
             id: Accents.Utils.genUUID('xxxxxxxxxx'),
             term: this.ui.term.val(),
             ref   : this.ui.ref.val(),
-            user : Accents.user,
+            user : Accents.user.get('user'),
             type: 'term'
        });
         this.collection.add(newTerm);
@@ -76,6 +76,9 @@ Accents.module("TermsApp.Views", function(Views, Accents, Backbone, Marionette, 
     template: '#terms-list-table-template',
     itemView: Views.TermView,
     itemViewContainer: 'tbody',
+    collectionEvents: {
+        "change reset add remove": "render"
+    },
   });
 
   // table of terms at bottom

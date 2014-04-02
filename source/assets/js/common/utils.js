@@ -58,6 +58,7 @@ Accents.module("Utils", function(Utils, App, Backbone, Marionette, $, _)  {
 
     Utils.randomTerm = function() {
         return {
+            _id: Utils.genUUID('xxxxxxxxxx'),
             id: Utils.genUUID('xxxxxxxxxx'),
             term: _.shuffle([ 'Bahá', 'Abhá', 'Shoghi', 'Effendi', 'Báb', 'Quddús', 'Mulla', 'Ḥusayn' ])[0],
             ref: _.shuffle(['GPB', 'GWB', 'KIQ', 'SWA', 'HW', 'SAQ'])[0] + ', pg. ' + Math.floor(Math.random()*300),

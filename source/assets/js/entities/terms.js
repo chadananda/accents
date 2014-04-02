@@ -2,27 +2,26 @@ Accents.module("Entities", function(Entities, App, Backbone, Marionette, $, _){
 
     //Backbone.sync = BackbonePouch.sync(defaults);
     //Backbone.Model.prototype.idAttribute = '_id';
-    /*
+    
     Backbone.sync =  BackbonePouch.sync({
-      db: PouchDB('termsdb'),
-      fetch: 'allDocs',
-      listen: true,
-      options: {
-
-      }
+      db: PouchDB('termsdb')
+      //fetch: 'allDocs',
+      //listen: true
     });
     Backbone.Model.prototype.idAttribute = '_id';
 
-    */
+    
 
     Entities.Term = Backbone.Model.extend({
-        defaults: {
+        idAttribute: '_id',
+
+        defaults: function(){  
+         return  {
           term: "",
           ref: "",
           user: ""
+          }
         },
-
-        url: "termsdb",
 
         validate: function(attrs, options) {
           var errors = {};
@@ -57,16 +56,19 @@ Accents.module("Entities", function(Entities, App, Backbone, Marionette, $, _){
 
     Entities.Terms = Backbone.Collection.extend({
         model: Entities.Term,
-        url: "termsdb",
-        comparator: 'term',
-        add: function (model, collection, options) {
-            console.log(model);
+        pouch: {
+          listen: true,
+          fetch: 'allDocs',
+          changes: {
+            include_docs: true
+          }
         },
-        localStorage: new Backbone.LocalStorage("termsdb"),
+        comparator: 'term',
+
+        parse: function(result) {
+          return _.pluck(result.rows, 'doc');
+        }
     });
-
-
-
 
     Entities.fakeTerms = function(collection){
        console.log('Called Entities.initializeTerms');
