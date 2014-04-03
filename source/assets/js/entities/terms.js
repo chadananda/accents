@@ -15,6 +15,7 @@ Accents.module("Entities", function(Entities, App, Backbone, Marionette, $, _){
 
         defaults: function(){
          return  {
+          type: "term",
           term: "",
           ref: "",
           user: ""
@@ -54,13 +55,6 @@ Accents.module("Entities", function(Entities, App, Backbone, Marionette, $, _){
 
     Entities.Terms = Backbone.Collection.extend({
         model: Entities.Term,
-        pouch: {
-          listen: true,
-          fetch: 'allDocs',
-          changes: {
-            include_docs: true
-          }
-        },
         comparator: 'term',
 
         parse: function(result) {
@@ -74,6 +68,17 @@ Accents.module("Entities", function(Entities, App, Backbone, Marionette, $, _){
             collection.create(Accents.Utils.randomTerm());
         }
     };
+
+    var API = {
+      getTermEntities: function(){
+        return App.db.allDocs({include_docs: true, descending: true});
+      }
+    };
+
+    App.reqres.setHandler("term:entities", function(){
+      return API.getTermEntities();
+    });
+
 
 
 /*

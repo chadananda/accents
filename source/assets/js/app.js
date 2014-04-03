@@ -18,7 +18,7 @@ Accents.getCurrentRoute = function(){
 
 // wire up application
 Accents.addInitializer(function () {
-  Accents.db = new PouchDB('term');
+  Accents.db = new PouchDB('termsdb');
   //Initialization fake user
   Accents.db.get('guest-user', function(err, doc){
     if(err){ 

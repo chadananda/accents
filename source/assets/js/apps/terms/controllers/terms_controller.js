@@ -2,9 +2,12 @@ Accents.module("TermsApp", function(TermsApp, Accents, Backbone, Marionette, $, 
   TermsApp.Controller = {
     termsList: function(){
       Accents.terms = new Accents.Entities.Terms();
-      Accents.terms.fetch();
-      // maincontent controller, show add screen
       var addLayout = new TermsApp.Views.AddTermMainLayout();
+      //Accents.terms.fetch();
+      var term_list_defer = Accents.request("term:entities");
+
+
+    // maincontent controller, show add screen
       addLayout.on('show', function(view){
         addLayout.add_term_form.show(new TermsApp.Views.AddTermFormView({ collection: Accents.terms }));
         addLayout.add_remove_links.show(new TermsApp.Views.TempLinksView({ collection: Accents.terms }));
@@ -17,11 +20,20 @@ Accents.module("TermsApp", function(TermsApp, Accents, Backbone, Marionette, $, 
         addLayout.add_terms_list.show(termsListLayout);
       });
 
+      term_list_defer.then(function(data){
+        console.log(data)
+        _.each(data.rows, function(row){
+          if(row.doc && row.doc.type && row.doc.type == 'term'){
+            Accents.terms.add(row.doc);
+          }
+        });
+
+        Accents.main.show(addLayout);
+      });
 
       // replace with layout
       // then move to navbar controller
       //Accents.navbar.show(new NavLinksBoss({  })); // replace this with layout
-      Accents.main.show(addLayout);
     }
   };
 });
