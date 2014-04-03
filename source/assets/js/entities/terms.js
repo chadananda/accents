@@ -2,25 +2,23 @@ Accents.module("Entities", function(Entities, App, Backbone, Marionette, $, _){
 
     //Backbone.sync = BackbonePouch.sync(defaults);
     //Backbone.Model.prototype.idAttribute = '_id';
-    
+
     Backbone.sync =  BackbonePouch.sync({
       db: PouchDB('termsdb')
-      //fetch: 'allDocs',
-      //listen: true
     });
     Backbone.Model.prototype.idAttribute = '_id';
 
-    
+
 
     Entities.Term = Backbone.Model.extend({
-        idAttribute: '_id',
+        //idAttribute: '_id', // redundant
 
-        defaults: function(){  
+        defaults: function(){
          return  {
           term: "",
           ref: "",
           user: ""
-          }
+          };
         },
 
         validate: function(attrs, options) {
@@ -72,16 +70,7 @@ Accents.module("Entities", function(Entities, App, Backbone, Marionette, $, _){
 
     Entities.fakeTerms = function(collection){
        console.log('Called Entities.initializeTerms');
-       /*
-       var terms = [
-            { id: Accents.Utils.genUUID(), term: "Ḥusayn", ref: "DB pg 1", user: "Chad" },
-            { id: Accents.Utils.genUUID(), term: "_Shay_kh", ref: "DB pg 2", user: "Chad" },
-            { id: Accents.Utils.genUUID(), term: "Aḥmad", ref: "DB pg 3", user: "Chad" }
-        ];
-        terms.forEach(function(term){
-            collection.create(term);
-        }); */
-        for (var i=0; i<100; i++) {
+        for (var i=0; i<10; i++) {
             collection.create(Accents.Utils.randomTerm());
         }
     };
