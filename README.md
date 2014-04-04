@@ -6,6 +6,7 @@ Transliterated terminology collection and auto-replace project
 ### Next Steps:
 
 1. Continous 2-way sync data with remote CouchDB (it should be like one or two lines of code)
+    2.  https://diacritics.iriscouch.com/
 1. Validation rules (both fields required, only one word on first field)
 1. As-you-type search for matching first field, show count of matches
 1. As-you type show list of similar terms directly below (terms that are the same after removal of diacritics)
