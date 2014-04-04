@@ -14,10 +14,18 @@ Accents.module("TermsApp.Views", function(Views, Accents, Backbone, Marionette, 
     },
     addTerm: function () {
        console.log('Adding new term: ', this.ui.term.val(), this.ui.ref.val());
+       if(this.ui.term.val() == "" ){
+         alert("Error: Term is required!");
+         return;
+       }
+       if(this.ui.ref.val() == "" ){
+         alert("Error: Ref is required!");
+         return;
+       }
        var newTerm = new Accents.Entities.Term({
             id: Accents.Utils.genUUID('xxxxxxxxxx'),
             term: this.ui.term.val(),
-            ref   : this.ui.ref.val(),
+            ref: this.ui.ref.val(),
             user : Accents.user.get('user'),
             type: 'term'
        });
