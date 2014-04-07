@@ -14,14 +14,6 @@ Accents.module("TermsApp.Views", function(Views, Accents, Backbone, Marionette, 
     },
     addTerm: function () {
        console.log('Adding new term: ', this.ui.term.val(), this.ui.ref.val());
-       if(this.ui.term.val() == "" ){
-         alert("Error: Term is required!");
-         return;
-       }
-       if(this.ui.ref.val() == "" ){
-         alert("Error: Ref is required!");
-         return;
-       }
        var newTerm = new Accents.Entities.Term({
             id: Accents.Utils.genUUID('xxxxxxxxxx'),
             term: this.ui.term.val(),
@@ -29,16 +21,22 @@ Accents.module("TermsApp.Views", function(Views, Accents, Backbone, Marionette, 
             user : Accents.user.get('user'),
             type: 'term'
        });
-        this.collection.add(newTerm);
-        newTerm.save({}, {
-            error: function(model, response) {
-                console.log(response.responseText);
-            }
-        });
-        this.ui.term.val('');
-        this.ui.ref.val('');
-        this.ui.rendered_word.empty();
-        this.ui.term.focus();
+        var errors = newTerm.validate();
+        if( _.isEmpty(errors) ){
+          this.collection.add(newTerm);
+          newTerm.save({}, {
+              error: function(model, response) {
+                  console.log(response.responseText);
+              }
+          });
+          this.ui.term.val('');
+          this.ui.ref.val('');
+          this.ui.rendered_word.empty();
+          this.ui.term.focus();
+        }else{ 
+	  if( errors.term ){  this.ui.term.parent().addClass("has-error"); }
+	  if( errors.term ){  this.ui.ref.parent().addClass("has-error"); }
+	}
     },
     updateTerm: function () {
        var pos = this.ui.term[0].selectionStart;

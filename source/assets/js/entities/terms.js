@@ -22,16 +22,16 @@ Accents.module("Entities", function(Entities, App, Backbone, Marionette, $, _){
           };
         },
 
-        validate: function(attrs, options) {
+        validate: function() {
           var errors = {};
-          if (! attrs.term) {
+          if (! this.attributes.term) {
             errors.term = "can't be blank";
           }
-          if (! attrs.ref) {
+          if (! this.attributes.ref) {
             errors.ref = "can't be blank";
           }
           else{
-            if (attrs.term.length < 2) {
+            if (this.attributes.term.length < 2) {
               errors.term = "is too short";
             }
           }

@@ -54,15 +54,34 @@
 <script type="text/template" id="add-term-form-template">
     <div id="addword-input-form">
         <div class="form-inline">
-            <div class="form-group">
-                <table class="add-word-form">
-                    <tr><td colspan="3"><label for="add-word" class=""> Add New Word </label></td></tr>
-                    <tr><td class="term"><input type="text" id="add-word" name="add-word" class="form-control" placeholder="New Transliterated Term" ></td>
-                            <td class="ref"><input type="text" id="book-ref" name="book-acr" class="form-control" placeholder="Book Ref"></td>
-                            <td class="button"><button type="submit" class="btn btn-lg btn-primary active" id="addform-btn"><i class="fa fa-plus"></i> &nbsp;Add Word</button></td>
-                    <tr><td id="rendered-word"></td><td class="ref-example">e.g. Iqan pg 72</td><td></td></tr>
-                </table>
-            </div>
+            <table class="add-word-form">
+                <tr>
+			<td colspan="3">
+				<label for="add-word" class=""> Add New Word </label>
+			</td>
+		</tr>
+                <tr>
+			<td class="term">
+            			<div class="form-group" style="width: 100%;">
+					<input type="text" id="add-word" name="add-word" class="form-control" placeholder="New Transliterated Term" >
+
+            			</div>
+			</td>
+                        <td class="ref">
+            			<div class="form-group ">
+					<input type="text" id="book-ref" name="book-acr" class="form-control" placeholder="Book Ref">
+				</div>
+			</td>
+                        <td class="button">
+				<button type="submit" class="btn btn-lg btn-primary active" id="addform-btn"><i class="fa fa-plus"></i> &nbsp;Add Word</button>
+			</td>
+		</tr>
+                <tr>
+			<td id="rendered-word"></td>
+			<td class="ref-example">e.g. Iqan pg 72</td>
+			<td></td>
+		</tr>
+            </table>
         </div>
     </div>
 </script>
