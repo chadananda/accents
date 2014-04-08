@@ -14,6 +14,23 @@ Accents.module("Utils", function(Utils, App, Backbone, Marionette, $, _)  {
         word = word.replace(/\`A/g, 'Á');
         word = word.replace(/\`I/g, 'Í');
         word = word.replace(/\`U/g, 'Ú');
+        
+        // double letter based vowels. 
+        // Don't use where you expect non-transliterated words
+        word = word.replace(/aa/g, 'á');
+        word = word.replace(/ii/g, 'í');
+        word = word.replace(/uu/g, 'ú');
+        word = word.replace(/AA/g, 'Á');
+        word = word.replace(/II/g, 'Í');
+        word = word.replace(/UU/g, 'Ú'); 
+        word = word.replace(/áa/g, 'a');
+        word = word.replace(/íi/g, 'i');
+        word = word.replace(/úu/g, 'u');
+        word = word.replace(/ÁA/g, 'A');
+        word = word.replace(/ÍI/g, 'I');
+        word = word.replace(/ÚU/g, 'U');        
+        
+        
         // dot-unders
         word = word.replace(/\.H/g, 'Ḥ');
         word = word.replace(/\.h/g, 'ḥ');
