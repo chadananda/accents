@@ -33,7 +33,7 @@ Accents.module("TermsApp.Views", function(Views, Accents, Backbone, Marionette, 
        });
         var errors = validateTerm.validate();
         if( _.isEmpty(errors) ){
-          var termValues = newTerm.get("term").split(" ");
+          var termValues = validateTerm.get("term").split(" ");
           _.each(termValues, function(termV){
               var savedModel = new Accents.Entities.Term({
                   id: Accents.Utils.genUUID('xxxxxxxxxx'),

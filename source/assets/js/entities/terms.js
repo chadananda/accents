@@ -4,7 +4,7 @@ Accents.module("Entities", function(Entities, App, Backbone, Marionette, $, _){
     //Backbone.Model.prototype.idAttribute = '_id';
 
     Backbone.sync =  BackbonePouch.sync({
-      db: PouchDB('termsdb')
+      db: PouchDB('accents')
     });
     Backbone.Model.prototype.idAttribute = '_id';
 

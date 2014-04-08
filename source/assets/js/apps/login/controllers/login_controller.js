@@ -3,6 +3,7 @@ Accents.module("LoginApp", function(LoginApp, Accents, Backbone, Marionette, $, 
     login: function(){
       loginView = new LoginApp.Views.LoginView();
       Accents.main.show( loginView );
+      Accents.trigger("sync");
     }
   };
 
