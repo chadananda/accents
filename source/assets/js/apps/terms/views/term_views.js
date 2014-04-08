@@ -2,6 +2,7 @@ Accents.module("TermsApp.Views", function(Views, Accents, Backbone, Marionette, 
   // form for adding terms
   Views.AddTermFormView = Backbone.Marionette.ItemView.extend({
     template: '#add-term-form-template',
+    currentAlertView: null,
     events: {
          'click button': 'addTerm',
          'change #add-word': 'updateTerm',
@@ -12,41 +13,78 @@ Accents.module("TermsApp.Views", function(Views, Accents, Backbone, Marionette, 
         ref: '#book-ref',
         rendered_word: '#rendered-word',
     },
+
+    onRender: function(){
+      if(Accents.TermsApp.refValue){
+        this.ui.ref.val( Accents.TermsApp.refValue );
+      }
+    },
+
     addTerm: function () {
        console.log('Adding new term: ', this.ui.term.val(), this.ui.ref.val());
-       var newTerm = new Accents.Entities.Term({
-            id: Accents.Utils.genUUID('xxxxxxxxxx'),
+       var self = this;
+       if( this.currentAlertView ){
+         this.currentAlertView.remove();
+       }
+       var validateTerm = new Accents.Entities.Term({
             term: this.ui.term.val(),
             ref: this.ui.ref.val(),
             user : Accents.user.get('user'),
-            type: 'term'
        });
-        var errors = newTerm.validate();
+        var errors = validateTerm.validate();
         if( _.isEmpty(errors) ){
-          this.collection.add(newTerm);
-          newTerm.save({}, {
-              error: function(model, response) {
-                  console.log(response.responseText);
-              }
+          var termValues = newTerm.get("term").split(" ");
+          _.each(termValues, function(termV){
+              var savedModel = new Accents.Entities.Term({
+                  id: Accents.Utils.genUUID('xxxxxxxxxx'),
+                  term: termV,
+                  ref: self.ui.ref.val(),
+                  user : Accents.user.get('user'),
+                  type: 'term'
+              });
+              self.collection.add(savedModel);
+              savedModel.save({}, {
+                  error: function(model, response) {
+                      console.log(response.responseText);
+                  }
+              });
           });
           this.ui.term.val('');
           this.ui.ref.val('');
           this.ui.rendered_word.empty();
           this.ui.term.focus();
         }else{ 
-	  if( errors.term ){  this.ui.term.parent().addClass("has-error"); }
-	  if( errors.term ){  this.ui.ref.parent().addClass("has-error"); }
+          this.showErrors(errors);
 	}
     },
-    updateTerm: function () {
-       var pos = this.ui.term[0].selectionStart;
-       var term = this.ui.term.val();
-       var part = Accents.Utils.renderGlyph2UTF(term.slice(0, pos));
-       this.ui.term.val(part + term.slice(pos));
-       this.ui.term[0].selectionStart = part.length;
-       this.ui.term[0].selectionEnd = part.length;
-       // temporarily display HTML version below since we cannot display underscores in input
-       this.ui.rendered_word.html(Accents.Utils.renderTypedTerm(this.ui.term.val()));
+    updateTerm: function (e) {
+      if(e.keyCode == 13){
+        this.addTerm();
+      }else{
+        var pos = this.ui.term[0].selectionStart;
+        var term = this.ui.term.val();
+        var part = Accents.Utils.renderGlyph2UTF(term.slice(0, pos));
+        this.ui.term.val(part + term.slice(pos));
+        this.ui.term[0].selectionStart = part.length;
+        this.ui.term[0].selectionEnd = part.length;
+        // temporarily display HTML version below since we cannot display underscores in input
+        this.ui.rendered_word.html(Accents.Utils.renderTypedTerm(this.ui.term.val()));
+      }
+    },
+
+    showErrors: function(errors){
+      var _errors =[];
+      if(errors.term){
+        _errors.push("Term: " + errors.term);
+      }
+      if(errors.ref){
+        _errors.push("Ref: " + errors.ref);
+      }
+      this.currentAlertView = new Views.AlertView( {model: new Backbone.Model({errors: _errors}) } );
+      //this.$(".form-inline").prepend("<div>"+ _errors  +"</ul>");
+      this.$(".alert-container").html(this.currentAlertView.render().el);
+      if( errors.term ){  this.ui.term.parent().addClass("has-error"); }
+      if( errors.term ){  this.ui.ref.parent().addClass("has-error"); }
     }
   });
 
@@ -117,6 +155,19 @@ Accents.module("TermsApp.Views", function(Views, Accents, Backbone, Marionette, 
     regions: {
       add_term_list_total: "#terms-total",
       add_term_list_table: "#terms-table"
+    }
+  });
+
+  Views.AlertView =  Backbone.Marionette.ItemView.extend({
+    template: "#alert-template",
+
+    events:{
+      "click .close": "close"
+    },
+
+    close: function(e){
+      console.log("Lets remove");
+      this.remove();
     }
   });
 

@@ -21,12 +21,14 @@ Accents.module("TermsApp", function(TermsApp, Accents, Backbone, Marionette, $, 
       });
 
       term_list_defer.then(function(data){
-        console.log(data)
+	var lastRefValue = "";
         _.each(data.rows, function(row){
           if(row.doc && row.doc.type && row.doc.type == 'term'){
             Accents.terms.add(row.doc);
+            lastRefValue = row.doc.ref;
           }
         });
+        TermsApp.refValue = lastRefValue;
 
         Accents.main.show(addLayout);
       });

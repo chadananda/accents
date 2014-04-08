@@ -54,6 +54,7 @@
 <script type="text/template" id="add-term-form-template">
     <div id="addword-input-form">
         <div class="form-inline">
+            <div class="alert-container"></div>
             <table class="add-word-form">
                 <tr>
 			<td colspan="3">
@@ -84,6 +85,16 @@
             </table>
         </div>
     </div>
+</script>
+
+<!-- alert template -->
+<script type="text/template" id="alert-template">
+	<div class="alert alert-danger">
+		<a class="close" href="#" data-dismiss="alert">x</a>
+		<ul>
+			<% _.each(errors, function(error){%> <li> <%= error %> </li>  <%});%>
+		<ul>
+	</div>
 </script>
 
 <!-- replaces #add-remove-links -->
