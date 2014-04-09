@@ -19,7 +19,6 @@ Accents.getCurrentRoute = function(){
 // wire up application
 Accents.addInitializer(function () {
   Accents.db = new PouchDB('accents');
-  //Accents.remoteCouch = 'http://admin:terms@accents.iriscouch.com/termsdb';
   Accents.remoteCouch = 'http://guest-user:12345@diacritics.iriscouch.com/accents';
   //Initialization fake user
   Accents.db.get('guest-user', function(err, doc){
@@ -29,15 +28,12 @@ Accents.addInitializer(function () {
   });
   
   Accents.user = new Accents.Entities.Login();
-  // if (Accents.terms.length === 0) { Accents.Entities.initializeTerms(Accents.terms); }
 });
 
-var syncError = function(error){ console.log(error); };
-
 Accents.on("sync", function(){
-  var opts = {live: true, complete: syncError};
-  Accents.db.replicate.to(Accents.remoteCouch, opts);
-  Accents.db.replicate.from(Accents.remoteCouch, opts);
+  var opts = {live: true};
+  Accents.db.replicate.to(Accents.remoteCouch, opts, function(err, data){ console.log(err); console.log(data); });
+  Accents.db.replicate.from(Accents.remoteCouch, opts, function(err, data){ console.log(err); console.log(data); });
 });
 
 
