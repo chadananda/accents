@@ -134,13 +134,14 @@
 <script type="text/template" id="login-template">
     <div id="addword-input-form">
         <div class="form-inline">
+            <div class="alert-container"></div>
             <div class="form-group">
                 <div class="alert alert-error" style="display:none"/>
                 <table class="add-word-form">
                     <tr><td colspan="3"><label for="add-word" class=""> Sign In </label></td></tr>
                     <tr><td class="term"><input type="text" id="user"  class="form-control" placeholder="User" ></td>
                             <td class="term"><input type="password" id="password"  class="form-control" placeholder="Password"></td>
-                            <td class="button"><button type="submit" class="btn btn-lg btn-primary active" id="login-btn">Sign In</button></td>
+                            <td class="button"><button type="submit" data-loading-text="Wait..."  class="btn btn-lg btn-primary active" id="login-btn">Sign In</button></td>
                 </table>
             </div>
         </div>

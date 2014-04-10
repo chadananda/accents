@@ -166,7 +166,6 @@ Accents.module("TermsApp.Views", function(Views, Accents, Backbone, Marionette, 
     },
 
     close: function(e){
-      console.log("Lets remove");
       this.remove();
     }
   });
