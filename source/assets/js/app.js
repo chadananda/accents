@@ -21,15 +21,14 @@ Accents.addInitializer(function () {
   Accents.db = new PouchDB('accents');
   Accents.remoteDb = 'accents';
   Accents.domainRemoteDb = 'diacritics.iriscouch.com';
-  //Accents.remoteCouch = 'http://guest-user:12345@diacritics.iriscouch.com/accents';
-  //Initialization fake user
-  /*Accents.db.get('guest-user', function(err, doc){
-    if(err){ 
-      Accents.db.put( {password: "12345"}, 'guest-user', function(err, res){ if(err) console.log('error') }) ;
-    };
-  });*/
-  
-  Accents.user = new Accents.Entities.Login();
+  var user = {};
+  if(typeof(Storage)!=="undefined"){
+    var userSession = sessionStorage.getItem( "session-user" );
+    if(userSession){
+      user = $.parseJSON(userSession);
+    }
+  }
+  Accents.user = new Accents.Entities.Login(user);
 });
 
 onCompleteSync = function(){ Accents.trigger("list:term") };

@@ -24,36 +24,27 @@ Accents.module("LoginApp.Views", function(Views, Accents, Backbone, Marionette, 
 
       btn.button('loading');
       Accents.remote = new PouchDB(urlConnection, function(error){
-        btn.button('reset');
         if(error){
-          self.showLoginError();
+          self.showLoginError(error.message);
+          btn.button('reset');
         }else{
-          Accents.user.set({user: user, loggedIn: true});
+          Accents.user.set({user: user, loggedIn: true, startDate: new Date()});
+          if(typeof(Storage)!=="undefined"){
+            if(Accents.user){
+              sessionStorage.setItem("session-user", JSON.stringify(Accents.user.toJSON()) );
+            }
+          }
           Accents.trigger("sync");
-          //Accents.trigger('list:term');
         }
-        console.log(error);
       });
-      /*Accents.db.query(function(doc, emit){
-        if(doc._id === myId && doc.password === password){
-          emit(doc);
-        }
-      }, function(err, results) {  
-        if(results.rows.length > 0){
-          Accents.user.set({user: myId, loggedIn: true});
-          Accents.trigger('list:term');
-        }else{
-          self.ui.alert.html("Credentials are not valid").show();
-        }
-      });*/
-
     },
 
-    showLoginError: function(){
-      var _errors =["Name or password is incorrect"];
+    showLoginError: function(message){
+      var _errors =[message || "Something went wrong, try again"];
       this.currentAlertView = new Accents.TermsApp.Views.AlertView( {model: new Backbone.Model({errors: _errors}) } );
       this.$(".alert-container").html(this.currentAlertView.render().el);
     }
+
   });
 
 });
