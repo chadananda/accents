@@ -16,6 +16,7 @@ Accents.module("TermsApp", function(TermsApp, Accents, Backbone, Marionette, $, 
         termsListLayout.on('show', function(view){
             termsListLayout.add_term_list_table.show(new TermsApp.Views.TermsView({ collection: Accents.terms }));
             termsListLayout.add_term_list_total.show(new TermsApp.Views.TotalTermsView({ collection: Accents.terms }));
+            termsListLayout.add_term_filtered_table.show(new TermsApp.Views.FilteredTermsView({ collection: Accents.terms }));
         });
         addLayout.add_terms_list.show(termsListLayout);
       });

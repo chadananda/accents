@@ -108,25 +108,56 @@
 
 <!-- replaces #terms-list -->
 <script type="text/template" id="terms-list-layout-template">
-    <div id="terms-total"></div>
-    <div id="terms-table"></div>
+    <ul class="nav nav-tabs">
+      <li class="active"><a href="#list-all" data-toggle="tab">All</a></li>
+      <li><a href="#search" data-toggle="tab" disabled="disabled" >Filtered</a></li>
+    </ul>
+
+    <div class="tab-content">
+      <div class="tab-pane active" id="list-all">
+        <div id="terms-total"></div>
+        <div id="terms-table"></div>
+      </div>
+
+      <div class="tab-pane" id="search">
+        <div id="terms-filtered-table"></div>
+      </div>
+    </div>    
 </script>
- <script type="text/template" id="terms-list-table-template">
+
+<script type="text/template" id="terms-list-table-template">
     <table class="table table-striped">
         <thead><tr> <th>id</th>  <th>Suggestion</th>   <th>Reference</th> <th>Contributor</th> </tr></thead>
         <tbody></tbody>
     </table>
 </script>
+
+<script type="text/template" id="terms-filtered-list-table-template">
+    <table class="table table-striped">
+        <thead><tr> <th>Term</th> <th>Count</th> </tr></thead>
+        <tbody></tbody>
+    </table>
+</script>
+
+
  <script type="text/template" id="term-list-item-template">
     <td class="id"><%= id  %></td>
     <td class="term"><%= Accents.Utils.ilm2HTML( term )  %></td>
     <td class="ref"><%=  ref  %></td>
     <td class="user"><%=  user  %></td>
 </script>
+
+ <script type="text/template" id="term-filtered-list-item-template">
+    <td class="term"><%= term %></td>
+    <td class="count"><%= count %></td>
+</script>
+
+
 <script type="text/template" id="term-list-total-template">
     Terms Collected: <%=  total_count  %>
 </script>
- <script type="text/template" id="no-terms-template">
+
+<script type="text/template" id="no-terms-template">
     <h2> No Terms </h2>
 </script>
 

@@ -69,6 +69,8 @@ Accents.module("TermsApp.Views", function(Views, Accents, Backbone, Marionette, 
         this.ui.term[0].selectionEnd = part.length;
         // temporarily display HTML version below since we cannot display underscores in input
         this.ui.rendered_word.html(Accents.Utils.renderTypedTerm(this.ui.term.val()));
+   
+        Accents.trigger("filter:terms", term);
       }
     },
 
@@ -116,13 +118,43 @@ Accents.module("TermsApp.Views", function(Views, Accents, Backbone, Marionette, 
     }*/
   });
 
+  Views.FilteredTermView = Backbone.Marionette.ItemView.extend({
+    template: '#term-filtered-list-item-template',
+    tagName: 'tr'
+  });
+
+
   Views.TermsView = Backbone.Marionette.CompositeView.extend({
     template: '#terms-list-table-template',
     itemView: Views.TermView,
     itemViewContainer: 'tbody',
     collectionEvents: {
         "change reset add remove": "render"
+    }
+  });
+
+  Views.FilteredTermsView = Backbone.Marionette.CompositeView.extend({
+    template: '#terms-filtered-list-table-template',
+    itemView: Views.FilteredTermView,
+    itemViewContainer: 'tbody',
+    collectionEvents: {
+        "reset add remove": "render"
     },
+
+    initialize: function(){
+      var groupedObject = this.collection.countBy("term");
+      var array = [];
+      for(object in groupedObject ){
+        array.push({term: object, count: groupedObject[object]});
+      }
+      this.collection = new Backbone.Collection(array);
+      Accents.on("filter:terms", this.filterTerms);  
+    },
+
+    filterTerms: function(term){
+      console.log("Lets filter terms: " + term );
+    }
+
   });
 
   // table of terms at bottom
@@ -154,7 +186,8 @@ Accents.module("TermsApp.Views", function(Views, Accents, Backbone, Marionette, 
     template: '#terms-list-layout-template',
     regions: {
       add_term_list_total: "#terms-total",
-      add_term_list_table: "#terms-table"
+      add_term_list_table: "#terms-table",
+      add_term_filtered_table: "#terms-filtered-table"
     }
   });
 
