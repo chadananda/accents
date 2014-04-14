@@ -152,6 +152,16 @@ Accents.module("TermsApp.Views", function(Views, Accents, Backbone, Marionette, 
     },
 
     filterTerms: function(term){
+      var text = term || ""
+      var patt = new RegExp(text, 'i');
+      $("#terms-filtered-table table tbody tr").each(function(){					
+        if( patt.test( $(this).find('td.term').text() )){
+          $(this).css("display", "");
+        }else{
+          $(this).css( "display", "none" );
+          return true;
+        }
+      });
       console.log("Lets filter terms: " + term );
     }
 
