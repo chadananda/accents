@@ -198,7 +198,16 @@ Accents.module("TermsApp.Views", function(Views, Accents, Backbone, Marionette, 
       add_term_list_total: "#terms-total",
       add_term_list_table: "#terms-table",
       add_term_filtered_table: "#terms-filtered-table"
+    },
+  
+    initialize: function(){
+      Accents.on("filter:terms", this.selectFilteredTab);
+    },
+
+    selectFilteredTab: function(term){
+      $('#myTab a:last').tab('show');     
     }
+
   });
 
   Views.AlertView =  Backbone.Marionette.ItemView.extend({
