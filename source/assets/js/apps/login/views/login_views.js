@@ -2,6 +2,8 @@ Accents.module("LoginApp.Views", function(Views, Accents, Backbone, Marionette, 
   Views.LoginView = Backbone.Marionette.ItemView.extend({
     template: '#login-template',
 
+    currentAlertView: null,
+
     events:{
       'click button': 'login'
     },
@@ -13,24 +15,36 @@ Accents.module("LoginApp.Views", function(Views, Accents, Backbone, Marionette, 
       alert: '.alert'
     },
 
-    login: function(){
+    login: function(e){
       var self = this;
-      var myId = this.ui.userInput.val();
+      var user = this.ui.userInput.val();
       var password = this.ui.passwordInput.val();
-      Accents.db.query(function(doc, emit){
-        if(doc._id === myId && doc.password === password){
-          emit(doc);
-        }
-      }, function(err, results) {  
-        if(results.rows.length > 0){
-          Accents.user.set({user: myId, loggedIn: true});
-          Accents.trigger('list:term');
+      var urlConnection = "http://" + user + ":" + password + "@" + Accents.domainRemoteDb + "/" + Accents.remoteDb;
+      var btn = $(e.currentTarget);
+
+      btn.button('loading');
+      Accents.remote = new PouchDB(urlConnection, function(error){
+        if(error){
+          self.showLoginError(error.message);
+          btn.button('reset');
         }else{
-          self.ui.alert.html("Credentials are not valid").show();
+          Accents.user.set({user: user, loggedIn: true, startDate: new Date()});
+          if(typeof(Storage)!=="undefined"){
+            if(Accents.user){
+              sessionStorage.setItem("session-user", JSON.stringify(Accents.user.toJSON()) );
+            }
+          }
+          Accents.trigger("sync");
         }
       });
+    },
 
+    showLoginError: function(message){
+      var _errors =[message || "Something went wrong, try again"];
+      this.currentAlertView = new Accents.TermsApp.Views.AlertView( {model: new Backbone.Model({errors: _errors}) } );
+      this.$(".alert-container").html(this.currentAlertView.render().el);
     }
+
   });
 
 });
