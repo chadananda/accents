@@ -19,25 +19,25 @@ Accents.getCurrentRoute = function(){
 // wire up application
 Accents.addInitializer(function () {
   Accents.db = new PouchDB('accents');
-  //Accents.remoteCouch = 'http://admin:terms@accents.iriscouch.com/termsdb';
-  Accents.remoteCouch = 'http://guest-user:12345@diacritics.iriscouch.com/accents';
-  //Initialization fake user
-  Accents.db.get('guest-user', function(err, doc){
-    if(err){ 
-      Accents.db.put( {password: "12345"}, 'guest-user', function(err, res){ if(err) console.log('error') }) ;
-    };
-  });
-  
-  Accents.user = new Accents.Entities.Login();
-  // if (Accents.terms.length === 0) { Accents.Entities.initializeTerms(Accents.terms); }
+  Accents.remoteDb = 'accents';
+  Accents.domainRemoteDb = 'diacritics.iriscouch.com';
+  var user = {};
+  if(typeof(Storage)!=="undefined"){
+    var userSession = sessionStorage.getItem( "session-user" );
+    if(userSession){
+      user = $.parseJSON(userSession);
+    }
+  }
+  Accents.user = new Accents.Entities.Login(user);
 });
 
-var syncError = function(error){ console.log(error); };
+onCompleteSync = function(){ Accents.trigger("list:term") };
 
 Accents.on("sync", function(){
-  var opts = {live: true, complete: syncError};
-  Accents.db.replicate.to(Accents.remoteCouch, opts);
-  Accents.db.replicate.from(Accents.remoteCouch, opts);
+  var opts = {live: true, complete: onCompleteSync };
+  var urlConnection = "http://" + Accents.domainRemoteDb + "/" + Accents.remoteDb;
+  Accents.db.replicate.to(urlConnection, opts, function(err, data){ console.log(err); console.log(data); });
+  Accents.db.replicate.from(urlConnection, opts, function(err, data){ console.log(err); console.log(data); });
 });
 
 
