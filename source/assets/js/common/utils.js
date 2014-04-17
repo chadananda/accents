@@ -53,6 +53,30 @@ Accents.module("Utils", function(Utils, App, Backbone, Marionette, $, _)  {
         return word;
     };
 
+    Utils.dotUndersRevert = function (word) {
+        // vowels
+        word = word.replace(/\á/g, 'a');
+        word = word.replace(/\í/g, 'i');
+        word = word.replace(/\ú/g, 'ú');
+        word = word.replace(/\Á/g, 'A');
+        word = word.replace(/\Í/g, 'I');
+        word = word.replace(/\Ú/g, 'U');
+        
+        // dot-unders
+        word = word.replace(/\Ḥ/g, 'H');
+        word = word.replace(/\ḥ/g, 'h');
+        word = word.replace(/\Ḍ/g, 'D');
+        word = word.replace(/\ḍ/g, 'd');
+        word = word.replace(/\Ṭ/g, 'T');
+        word = word.replace(/\ṭ/g, 't');
+        word = word.replace(/\Ẓ/g, 'Z');
+        word = word.replace(/\ẓ/g, 'z');
+        word = word.replace(/\Ṣ/g, 'S');
+        word = word.replace(/\ṣ/g, 's');
+
+        return word;
+    };
+
     var lineUnder2HTML= function (word) {
         word = word.replace(/_([s|d|z|t|g|k|c][h])/ig, "<u>$1</u>");
         return word;

@@ -127,7 +127,7 @@
 
 <script type="text/template" id="terms-list-table-template">
     <table class="table table-striped">
-        <thead><tr> <th>id</th>  <th>Suggestion</th>   <th>Reference</th> <th>Contributor</th> </tr></thead>
+        <thead><tr> <th>id</th>  <th>Suggestion</th>   <th>Reference</th> <th>Contributor</th> <th></th> </tr></thead>
         <tbody></tbody>
     </table>
 </script>
@@ -145,6 +145,7 @@
     <td class="term"><%= Accents.Utils.ilm2HTML( term )  %></td>
     <td class="ref"><%=  ref  %></td>
     <td class="user"><%=  user  %></td>
+    <td class="action"><button type="button" class="btn btn-danger btn-xs remove"><span class="glyphicon glyphicon-remove"></span></button></td>
 </script>
 
  <script type="text/template" id="term-filtered-list-item-template">
