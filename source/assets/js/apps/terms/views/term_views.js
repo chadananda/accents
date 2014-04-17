@@ -111,11 +111,17 @@ Accents.module("TermsApp.Views", function(Views, Accents, Backbone, Marionette, 
   Views.TermView = Backbone.Marionette.ItemView.extend({
     template: '#term-list-item-template',
     tagName: 'tr',
-    /*templateHelpers: {
-        ilm2html: function() {
-            return Accents.Utils.ilm2HTML(this.term);
-        }
-    }*/
+
+    events: {
+      'click .remove': 'removeTerm'
+    },
+
+    removeTerm: function(){
+      if( confirm('Are you sure?')){
+        this.model.destroy();
+      }
+    }
+
   });
 
   Views.FilteredTermView = Backbone.Marionette.ItemView.extend({
@@ -155,7 +161,8 @@ Accents.module("TermsApp.Views", function(Views, Accents, Backbone, Marionette, 
       var text = term || ""
       var patt = new RegExp(text, 'i');
       $("#terms-filtered-table table tbody tr").each(function(){					
-        if( patt.test( $(this).find('td.term').text() )){
+        var text = $(this).find('td.term').text();
+        if( patt.test( Accents.Utils.dotUndersRevert(text)) || patt.test(text) ){
           $(this).css("display", "");
         }else{
           $(this).css( "display", "none" );
