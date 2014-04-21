@@ -1,0 +1,23 @@
+{
+  "name": "Interminable Accents",
+  "description": "This project attempts to address that fundamental problem by building an authoritative dictionary of correctly spelled terms and names.",
+  "main": "index.html",
+  "version": "0.0.1",
+  "keywords": [ "codeaholics", "node-webkit", "grunt-node-webkit-builder" ],
+  "window": {
+    "title": "Interminable Accents",
+    "toolbar": false,
+    "frame": false,
+    "show": true,
+    "width": 800,
+    "height": 600,
+    "position": "mouse",
+    "min_width": 400,
+    "min_height": 200,
+    "max_width": 1024,
+    "max_height": 800
+  },
+  "webkit": {
+    "plugin": true
+  }
+}
