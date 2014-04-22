@@ -157,6 +157,10 @@ Accents.module("TermsApp.Views", function(Views, Accents, Backbone, Marionette, 
       Accents.on("filter:terms", this.filterTerms);  
     },
 
+    onClose: function(){
+      Accents.off("filter:terms", this.filterTerms);
+    },
+
     filterTerms: function(term){
       var text = term || ""
       var patt = new RegExp(text, 'i');

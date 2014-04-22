@@ -13,12 +13,18 @@ Accents.module("TermsApp", function(TermsApp, Accents, Backbone, Marionette, $, 
         addLayout.add_remove_links.show(new TermsApp.Views.TempLinksView({ collection: Accents.terms }));
 
         var termsListLayout = new TermsApp.Views.TermsListLayout();
+        var filteredListView = new TermsApp.Views.FilteredTermsView({ collection: Accents.terms });
         termsListLayout.on('show', function(view){
             termsListLayout.add_term_list_table.show(new TermsApp.Views.TermsView({ collection: Accents.terms }));
             termsListLayout.add_term_list_total.show(new TermsApp.Views.TotalTermsView({ collection: Accents.terms }));
-            termsListLayout.add_term_filtered_table.show(new TermsApp.Views.FilteredTermsView({ collection: Accents.terms }));
+            termsListLayout.add_term_filtered_table.show(filteredListView);
             Accents.terms.on('change remove', function(){
-              termsListLayout.add_term_filtered_table.show(new TermsApp.Views.FilteredTermsView({ collection: Accents.terms }));
+              filteredListView.off();
+              termsListLayout.add_term_filtered_table.close();
+              filteredListView.remove();
+              var tmp = new TermsApp.Views.FilteredTermsView({ collection: Accents.terms });
+              termsListLayout.add_term_filtered_table.show(tmp);
+	      filteredListView = tmp;
             });
         });
         addLayout.add_terms_list.show(termsListLayout);
