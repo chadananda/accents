@@ -7,6 +7,7 @@ Accents.module("TermsApp.Views", function(Views, Accents, Backbone, Marionette, 
          'click button': 'addTerm',
          'change #add-word': 'updateTerm',
          'keyup #add-word': 'updateTerm',
+         'keyup #book-ref': 'chekTerm'
     },
     ui: {
         term: '#add-word',
@@ -17,6 +18,12 @@ Accents.module("TermsApp.Views", function(Views, Accents, Backbone, Marionette, 
     onRender: function(){
       if(Accents.TermsApp.refValue){
         this.ui.ref.val( Accents.TermsApp.refValue );
+      }
+    },
+
+    chekTerm: function(e){
+      if(e.keyCode == 13){
+        this.addTerm();
       }
     },
 
@@ -34,29 +41,33 @@ Accents.module("TermsApp.Views", function(Views, Accents, Backbone, Marionette, 
         var errors = validateTerm.validate();
         if( _.isEmpty(errors) ){
           var termValues = validateTerm.get("term").split(" ");
+          Accents.TermsApp.refValue = this.ui.ref.val();
           _.each(termValues, function(termV){
-              var savedModel = new Accents.Entities.Term({
-                  id: Accents.Utils.genUUID('xxxxxxxxxx'),
-                  term: termV,
-                  ref: self.ui.ref.val(),
-                  user : Accents.user.get('user'),
-                  type: 'term'
-              });
-              self.collection.add(savedModel);
-              savedModel.save({}, {
-                  error: function(model, response) {
-                      console.log(response.responseText);
-                  }
-              });
+              if(termV.trim() != "" ){
+                var savedModel = new Accents.Entities.Term({
+                    id: Accents.Utils.genUUID('xxxxxxxxxx'),
+                    term: termV,
+                    ref: self.ui.ref.val(),
+                    user : Accents.user.get('user'),
+                    type: 'term'
+                });
+                self.collection.add(savedModel);
+                savedModel.save({}, {
+                    error: function(model, response) {
+                        console.log(response.responseText);
+                    }
+                });
+              }
           });
+          this.showSuccess();
           this.ui.term.val('');
-          this.ui.ref.val('');
           this.ui.rendered_word.empty();
           this.ui.term.focus();
         }else{ 
           this.showErrors(errors);
 	}
     },
+
     updateTerm: function (e) {
       if(e.keyCode == 13){
         this.addTerm();
@@ -69,9 +80,20 @@ Accents.module("TermsApp.Views", function(Views, Accents, Backbone, Marionette, 
         this.ui.term[0].selectionEnd = part.length;
         // temporarily display HTML version below since we cannot display underscores in input
         this.ui.rendered_word.html(Accents.Utils.renderTypedTerm(this.ui.term.val()));
-   
+
+        if( this.ui.ref.val() == "" && Accents.TermsApp.refValue){
+          this.ui.ref.val( Accents.TermsApp.refValue );
+        }
+ 
         Accents.trigger("filter:terms", term);
       }
+    },
+
+    showSuccess: function(){
+      var _errors =[];
+      _errors.push("The word(s) have been Added");
+      this.currentAlertView = new Views.AlertView( {model: new Backbone.Model({errors: _errors, type: "success"}) } );
+      this.$(".alert-container").html(this.currentAlertView.render().el);
     },
 
     showErrors: function(errors){
@@ -82,7 +104,7 @@ Accents.module("TermsApp.Views", function(Views, Accents, Backbone, Marionette, 
       if(errors.ref){
         _errors.push("Ref: " + errors.ref);
       }
-      this.currentAlertView = new Views.AlertView( {model: new Backbone.Model({errors: _errors}) } );
+      this.currentAlertView = new Views.AlertView( {model: new Backbone.Model({errors: _errors, type: "danger"}) } );
       //this.$(".form-inline").prepend("<div>"+ _errors  +"</ul>");
       this.$(".alert-container").html(this.currentAlertView.render().el);
       if( errors.term ){  this.ui.term.parent().addClass("has-error"); }

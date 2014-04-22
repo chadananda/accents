@@ -96,7 +96,7 @@
 
 <!-- alert template -->
 <script type="text/template" id="alert-template">
-	<div class="alert alert-danger">
+	<div class="alert alert-<%= type %>">
 		<a class="close" href="#" data-dismiss="alert">x</a>
 		<ul>
 			<% _.each(errors, function(error){%> <li> <%= error %> </li>  <%});%>
@@ -156,7 +156,7 @@
 </script>
 
  <script type="text/template" id="term-filtered-list-item-template">
-    <td class="term"><%= term %></td>
+    <td class="term"><%= Accents.Utils.ilm2HTML( term )  %></td>
     <td class="count"><%= count %></td>
 </script>
 

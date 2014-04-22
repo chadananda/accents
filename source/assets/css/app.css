@@ -66,9 +66,9 @@ table td.ref-example {font-size: 10pt; color: gray; font-style: italic; }
     width: 300px;
 }
 
-#terms-table td.term {
+td.term {
   font-size: 14pt;
- }
+}
 #terms-table td.id {
   font-size: 9pt; color: silver;
 
