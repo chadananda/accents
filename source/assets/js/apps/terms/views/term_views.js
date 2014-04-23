@@ -113,6 +113,7 @@ Accents.module("TermsApp.Views", function(Views, Accents, Backbone, Marionette, 
   });
 
   // temporary add/remove links
+  /*
   Views.TempLinksView = Backbone.Marionette.ItemView.extend({
     template: '#temp-links-template',
     events: {
@@ -128,6 +129,7 @@ Accents.module("TermsApp.Views", function(Views, Accents, Backbone, Marionette, 
         Accents.Entities.fakeTerms(this.collection);
     },
   });
+*/
 
   // table of terms at bottom
   Views.TermView = Backbone.Marionette.ItemView.extend({

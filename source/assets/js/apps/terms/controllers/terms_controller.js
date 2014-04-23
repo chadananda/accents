@@ -10,7 +10,7 @@ Accents.module("TermsApp", function(TermsApp, Accents, Backbone, Marionette, $, 
     // maincontent controller, show add screen
       addLayout.on('show', function(view){
         addLayout.add_term_form.show(new TermsApp.Views.AddTermFormView({ collection: Accents.terms }));
-        addLayout.add_remove_links.show(new TermsApp.Views.TempLinksView({ collection: Accents.terms }));
+        //addLayout.add_remove_links.show(new TermsApp.Views.TempLinksView({ collection: Accents.terms }));
 
         var termsListLayout = new TermsApp.Views.TermsListLayout();
         var filteredListView = new TermsApp.Views.FilteredTermsView({ collection: Accents.terms });
