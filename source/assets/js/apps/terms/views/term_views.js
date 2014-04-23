@@ -85,7 +85,7 @@ Accents.module("TermsApp.Views", function(Views, Accents, Backbone, Marionette, 
           this.ui.ref.val( Accents.TermsApp.refValue );
         }
  
-        Accents.trigger("filter:terms", term);
+        Accents.trigger("filter:terms", Accents.Utils.renderTypedTerm(this.ui.term.val()));
       }
     },
 
@@ -188,9 +188,10 @@ Accents.module("TermsApp.Views", function(Views, Accents, Backbone, Marionette, 
     filterTerms: function(term){
       var text = term || ""
       var patt = new RegExp(text, 'i');
+      var patt2 = new RegExp(Accents.Utils.dotUndersRevert(text), 'i');
       $("#terms-filtered-table table tbody tr").each(function(){					
         var text = $(this).find('td.term').text();
-        if( patt.test( Accents.Utils.dotUndersRevert(text)) || patt.test(text) ){
+        if( patt2.test( Accents.Utils.dotUndersRevert(text)) || patt.test(text) ){
           $(this).css("display", "");
         }else{
           $(this).css( "display", "none" );
