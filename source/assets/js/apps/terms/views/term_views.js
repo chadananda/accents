@@ -87,8 +87,10 @@ Accents.module("TermsApp.Views", function(Views, Accents, Backbone, Marionette, 
         if( this.ui.ref.val() == "" && Accents.TermsApp.refValue){
           this.ui.ref.val( Accents.TermsApp.refValue );
         }
+
+        text_to_filter = this.ui.term.val().replace("_", "");
  
-        Accents.trigger("filter:terms", Accents.Utils.renderTypedTerm( this.ui.term.val().replace("_", "")  ));
+        Accents.trigger("filter:terms", Accents.Utils.renderTypedTerm( text_to_filter  ));
       }
     },
 

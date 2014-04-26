@@ -57,7 +57,7 @@ Accents.module("Utils", function(Utils, App, Backbone, Marionette, $, _)  {
         // vowels
         word = word.replace(/\á/g, 'a');
         word = word.replace(/\í/g, 'i');
-        word = word.replace(/\ú/g, 'ú');
+        word = word.replace(/\ú/g, 'u');
         word = word.replace(/\Á/g, 'A');
         word = word.replace(/\Í/g, 'I');
         word = word.replace(/\Ú/g, 'U');
@@ -73,6 +73,10 @@ Accents.module("Utils", function(Utils, App, Backbone, Marionette, $, _)  {
         word = word.replace(/\ẓ/g, 'z');
         word = word.replace(/\Ṣ/g, 'S');
         word = word.replace(/\ṣ/g, 's');
+
+        word = word.replace(/\’/g, '');
+        word = word.replace(/\‘/g, '');
+        word = word.replace(/\-/g, '');
 
         return word;
     };

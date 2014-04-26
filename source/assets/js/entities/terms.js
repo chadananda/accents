@@ -56,10 +56,18 @@ Accents.module("Entities", function(Entities, App, Backbone, Marionette, $, _){
     Entities.Terms = Backbone.Collection.extend({
         model: Entities.Term,
         comparator: 'term',
+        sort_key: "term",
 
         parse: function(result) {
           return _.pluck(result.rows, 'doc');
-        }
+        },
+
+       comparator: function(a, b){
+         a = Accents.Utils.dotUndersRevert( a.get(this.sort_key) );
+         b = Accents.Utils.dotUndersRevert( b.get(this.sort_key) );
+         return a > b ?  1 : a < b ? -1 : 0;
+       }
+
     });
 
     Entities.fakeTerms = function(collection){

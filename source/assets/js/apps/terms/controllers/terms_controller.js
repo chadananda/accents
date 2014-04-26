@@ -39,7 +39,7 @@ Accents.module("TermsApp", function(TermsApp, Accents, Backbone, Marionette, $, 
           }
         });
         TermsApp.refValue = lastRefValue;
-
+        Accents.terms.sort();
         Accents.main.show(addLayout);
       });
 
