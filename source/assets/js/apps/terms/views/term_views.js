@@ -53,6 +53,9 @@ Accents.module("TermsApp.Views", function(Views, Accents, Backbone, Marionette, 
                 });
                 self.collection.add(savedModel);
                 savedModel.save({}, {
+                    success: function(model, response){
+                      Accents.db.post(model.toJSON(), function(err, d){ console.log(err); console.log(d);  });
+                    },
                     error: function(model, response) {
                         console.log(response.responseText);
                     }
@@ -142,7 +145,11 @@ Accents.module("TermsApp.Views", function(Views, Accents, Backbone, Marionette, 
 
     removeTerm: function(){
       if( confirm('Are you sure?')){
-        this.model.destroy();
+        this.model.destroy({
+          success: function(model, response){
+            Accents.db.remove(model.toJSON(), function(error, data){ console.log(error); console.log(data); });
+          }
+        });
       }
     }
 

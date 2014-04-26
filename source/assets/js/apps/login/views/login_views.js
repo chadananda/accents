@@ -41,7 +41,7 @@ Accents.module("LoginApp.Views", function(Views, Accents, Backbone, Marionette, 
 
     showLoginError: function(message){
       var _errors =[message || "Something went wrong, try again"];
-      this.currentAlertView = new Accents.TermsApp.Views.AlertView( {model: new Backbone.Model({errors: _errors}) } );
+      this.currentAlertView = new Accents.TermsApp.Views.AlertView( {model: new Backbone.Model({errors: _errors, type: "danger"}) } );
       this.$(".alert-container").html(this.currentAlertView.render().el);
     }
 
