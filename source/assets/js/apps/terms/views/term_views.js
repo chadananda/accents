@@ -97,6 +97,9 @@ Accents.module("TermsApp.Views", function(Views, Accents, Backbone, Marionette, 
       _errors.push("The word(s) have been Added");
       this.currentAlertView = new Views.AlertView( {model: new Backbone.Model({errors: _errors, type: "success"}) } );
       this.$(".alert-container").html(this.currentAlertView.render().el);
+
+      this.ui.term.parent().removeClass("has-error");
+      this.ui.ref.parent().removeClass("has-error");
     },
 
     showErrors: function(errors){
