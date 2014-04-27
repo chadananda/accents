@@ -1,5 +1,15 @@
 Accents.module("Utils", function(Utils, App, Backbone, Marionette, $, _)  {
 
+   var commonErrors = function (word) {
+        // vowels
+        word = word.replace(/Husayn/, 'Ḥusayn');
+        word = word.replace(/Hasan/, 'Ḥasan');
+        word = word.replace(/Muhammad/, 'Muḥammad');
+        
+        
+        return word;
+    };  
+
     var dotUnders = function (word) {
         // vowels
         word = word.replace(/\^a/g, 'á');
@@ -135,6 +145,7 @@ Accents.module("Utils", function(Utils, App, Backbone, Marionette, $, _)  {
     Utils.renderGlyph2UTF = function (term) {  // should be a comma or whitespace delimited file.
         term = smartQuotes(term);
         term = dotUnders(term);
+        term = commonErrors(term);
         return term;
     };
     Utils.ilm2HTML = function (term) { // this only needs to render line unders, the rest is already part of ilm UTF-8
