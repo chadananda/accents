@@ -15,8 +15,8 @@ Accents.module("Utils", function(Utils, App, Backbone, Marionette, $, _)  {
         word = word.replace(/Tihr[a|á]n/, 'Ṭihrán'); 
         word = word.replace(/Yahy[a|á]/, 'Yaḥyá'); 
         word = word.replace(/Sult[a|á]n/, 'Sulṭán'); 
-        word = word.replace(/^ulama[a|á]/, '‘ulamá'); 
-        word = word.replace(/^Ulama[a|á]/, '‘Ulamá'); 
+        word = word.replace(/^ulam[a|á]/, '‘ulamá'); 
+        word = word.replace(/^Ulam[a|á]/, '‘Ulamá'); 
         
         return word;
     };  
