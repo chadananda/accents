@@ -5,7 +5,7 @@ Accents.module("Utils", function(Utils, App, Backbone, Marionette, $, _)  {
         word = word.replace(/Husayn/, 'Ḥusayn');
         word = word.replace(/Hasan/, 'Ḥasan');
         word = word.replace(/Muhammad/, 'Muḥammad');
-        
+        word = word.replace(/Ham[i|í]d/, 'Ḥamíd');       
         
         return word;
     };  
