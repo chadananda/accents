@@ -17,6 +17,11 @@ Accents.getCurrentRoute = function(){
 };
 
 // wire up application
+var onCompleteSync = function(){ 
+  Accents.trigger("list:term") 
+  setTimeout(sync,10000);
+};
+
 Accents.addInitializer(function () {
   Accents.db = new PouchDB('accents');
   Accents.remoteDb = 'accents';
@@ -24,11 +29,7 @@ Accents.addInitializer(function () {
 
   Accents.db.changes({continuous: true, onChange: function(change){ console.log(change); } });
 
-  var opts = {continuous: true, complete: onCompleteSync };
-  var urlConnection = "http://" + Accents.domainRemoteDb + "/" + Accents.remoteDb;
-  PouchDB.replicate('accents', urlConnection, opts, function(err, data){ console.log(err); console.log(data); });
-  PouchDB.replicate(urlConnection, 'accents', opts, function(err, data){ console.log(err); console.log(data); });
-
+  sync();
 
   var user = {};
   if(typeof(Storage)!=="undefined"){
@@ -40,12 +41,16 @@ Accents.addInitializer(function () {
   Accents.user = new Accents.Entities.Login(user);
 });
 
-var onCompleteSync = function(){ Accents.trigger("list:term") };
-
 Accents.on("sync", function(){
   Accents.trigger("list:term")
 });
 
+var sync = function(){
+  var opts = {continuous: true, complete: onCompleteSync };
+  var urlConnection = "http://" + Accents.domainRemoteDb + "/" + Accents.remoteDb;
+  PouchDB.replicate('accents', urlConnection, opts, function(err, data){ console.log(err); console.log(data); });
+  PouchDB.replicate(urlConnection, 'accents', opts, function(err, data){ console.log(err); console.log(data); });
+};
 
 Accents.on("initialize:after", function(){
   if(Backbone.history){
