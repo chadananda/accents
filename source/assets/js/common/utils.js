@@ -11,7 +11,7 @@ Accents.module("Utils", function(Utils, App, Backbone, Marionette, $, _)  {
         word = word.replace(/Ahmad/, 'Aḥmad'); 
         word = word.replace(/llah/, 'lláh'); 
         word = word.replace(/H[a|á]j[i|í]/, 'Ḥájí'); 
-        word = word.replace(/_Shuhad[a|á]$/, '_Shuhadá’'); 
+        //word = word.replace(/_Shuhad[a|á]$/, '_Shuhadá’'); 
         word = word.replace(/Tihr[a|á]n/, 'Ṭihrán'); 
         word = word.replace(/Yahy[a|á]/, 'Yaḥyá'); 
         word = word.replace(/Sult[a|á]n/, 'Sulṭán'); 
