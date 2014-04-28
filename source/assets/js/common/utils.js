@@ -102,7 +102,7 @@ Accents.module("Utils", function(Utils, App, Backbone, Marionette, $, _)  {
         word = word.replace(/\’/g, '');
         word = word.replace(/\‘/g, '');
         word = word.replace(/\-/g, '');
-        word = word.replace(/_/g, '');
+        word = word.replace(/\_/g, '');
 
         return word;
     };
