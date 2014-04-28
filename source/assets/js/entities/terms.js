@@ -1,8 +1,5 @@
 Accents.module("Entities", function(Entities, App, Backbone, Marionette, $, _){
 
-    //Backbone.sync = BackbonePouch.sync(defaults);
-    //Backbone.Model.prototype.idAttribute = '_id';
-
     Backbone.sync =  BackbonePouch.sync({
       db: PouchDB('accents')
     });
@@ -11,8 +8,6 @@ Accents.module("Entities", function(Entities, App, Backbone, Marionette, $, _){
 
 
     Entities.Term = Backbone.Model.extend({
-        //idAttribute: '_id', // redundant
-
         defaults: function(){
          return  {
           type: "term",
@@ -38,27 +33,33 @@ Accents.module("Entities", function(Entities, App, Backbone, Marionette, $, _){
           if( ! _.isEmpty(errors)){
             return errors;
           }
-        },
-      //  error: function (model, resp, options) {
-       //     console.log("Error trying to save model: ", model, resp);
-      // },
-
-/*
-        //pouch: options,
-        idAttribute: '_id',
-        sync: BackbonePouch.sync({
-          db: PouchDB('termsdb')
-        }),
-*/
-
+        }
     });
 
     Entities.Terms = Backbone.Collection.extend({
         model: Entities.Term,
+        sync: BackbonePouch.sync({
+          db: PouchDB('accents'),
+          fetch: 'query',
+          options: {
+            query: {
+              include_docs: true,
+              fun: {
+                map: function(doc) {
+                  if (doc.type === 'term') {
+                    emit(doc.position, null)
+                  }
+                }
+              }
+            }
+          }
+        }),
         comparator: 'term',
         sort_key: "term",
 
         parse: function(result) {
+          console.log("parser collection");
+          console.log(result);
           return _.pluck(result.rows, 'doc');
         },
 

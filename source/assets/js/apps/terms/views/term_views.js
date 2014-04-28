@@ -3,12 +3,15 @@ Accents.module("TermsApp.Views", function(Views, Accents, Backbone, Marionette, 
   Views.AddTermFormView = Backbone.Marionette.ItemView.extend({
     template: '#add-term-form-template',
     currentAlertView: null,
+    timeFilter: null,
+
     events: {
          'click button': 'addTerm',
          'change #add-word': 'updateTerm',
          'keyup #add-word': 'updateTerm',
          'keyup #book-ref': 'chekTerm'
     },
+
     ui: {
         term: '#add-word',
         ref: '#book-ref',
@@ -78,22 +81,24 @@ Accents.module("TermsApp.Views", function(Views, Accents, Backbone, Marionette, 
         var pos = this.ui.term[0].selectionStart;
         var term = this.ui.term.val();
         var part = Accents.Utils.renderGlyph2UTF(term.slice(0, pos));
+        var self = this;
         this.ui.term.val(part + term.slice(pos));
         this.ui.term[0].selectionStart = part.length;
         this.ui.term[0].selectionEnd = part.length;
-        // temporarily display HTML version below since we cannot display underscores in input
         this.ui.rendered_word.html(Accents.Utils.renderTypedTerm(this.ui.term.val()));
 
         if( this.ui.ref.val() == "" && Accents.TermsApp.refValue){
           this.ui.ref.val( Accents.TermsApp.refValue );
         }
 
-        text_to_filter = this.ui.term.val().replace("_", "");
- 
-        Accents.trigger("filter:terms", Accents.Utils.renderTypedTerm( text_to_filter  ));
+        clearTimeout( this.timeFilter );
+        this.timeFilter = setTimeout(function(){
+          var text_to_filter = self.ui.term.val().replace(/_/g, ""); 
+          Accents.trigger("filter:terms", Accents.Utils.renderTypedTerm( text_to_filter  ));
+        }, 250);
       }
     },
-
+  
     showSuccess: function(){
       var _errors =[];
       _errors.push("The word(s) have been Added");
@@ -113,31 +118,11 @@ Accents.module("TermsApp.Views", function(Views, Accents, Backbone, Marionette, 
         _errors.push("Ref: " + errors.ref);
       }
       this.currentAlertView = new Views.AlertView( {model: new Backbone.Model({errors: _errors, type: "danger"}) } );
-      //this.$(".form-inline").prepend("<div>"+ _errors  +"</ul>");
       this.$(".alert-container").html(this.currentAlertView.render().el);
       if( errors.term ){  this.ui.term.parent().addClass("has-error"); }
       if( errors.term ){  this.ui.ref.parent().addClass("has-error"); }
     }
   });
-
-  // temporary add/remove links
-  /*
-  Views.TempLinksView = Backbone.Marionette.ItemView.extend({
-    template: '#temp-links-template',
-    events: {
-         'click button#deleteall': 'deleteAll',
-         'click button#generatefakes': 'generateFakes',
-    },
-    deleteAll: function() {
-        while (model = this.collection.first()) {
-            model.destroy();
-        }
-    },
-    generateFakes: function () {
-        Accents.Entities.fakeTerms(this.collection);
-    },
-  });
-*/
 
   // table of terms at bottom
   Views.TermView = Backbone.Marionette.ItemView.extend({
@@ -210,7 +195,6 @@ Accents.module("TermsApp.Views", function(Views, Accents, Backbone, Marionette, 
           return true;
         }
       });
-      console.log("Lets filter terms: " + term );
     }
 
   });
@@ -269,5 +253,34 @@ Accents.module("TermsApp.Views", function(Views, Accents, Backbone, Marionette, 
       this.remove();
     }
   });
+
+  Views.WaitingDataView =  Backbone.Marionette.ItemView.extend({
+    template: "#waiting-data-template",
+    className: "well",
+
+    onRender: function(){
+      var opts = {
+        lines: 10, // The number of lines to draw
+        length: 7, // The length of each line
+        width: 3, // The line thickness
+        radius: 8, // The radius of the inner circle
+        corners: 1, // Corner roundness (0..1)
+        rotate: 0, // The rotation offset
+        direction: 1, // 1: clockwise, -1: counterclockwise
+        color: '#000', // #rgb or #rrggbb or array of colors
+        speed: 2, // Rounds per second
+        trail: 60, // Afterglow percentage
+        shadow: false, // Whether to render a shadow
+        hwaccel: false, // Whether to use hardware acceleration
+        className: 'spinner', // The CSS class to assign to the spinner
+        zIndex: 2e9, // The z-index (defaults to 2000000000)
+        top: '10', // Top position relative to parent
+        left: '50%' // Left position relative to parent
+      };
+      var spinner = new Spinner(opts).spin();
+      this.$el.find(".spinner-content").html( spinner.el );
+    }
+  });
+
 
 });

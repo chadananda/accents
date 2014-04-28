@@ -1,16 +1,14 @@
 Accents.module("TermsApp", function(TermsApp, Accents, Backbone, Marionette, $, _){
   TermsApp.Controller = {
     termsList: function(){
+      Accents.main.show(new TermsApp.Views.WaitingDataView());
+
       Accents.terms = new Accents.Entities.Terms();
       var addLayout = new TermsApp.Views.AddTermMainLayout();
-      //Accents.terms.fetch();
-      var term_list_defer = Accents.request("term:entities");
-
 
     // maincontent controller, show add screen
       addLayout.on('show', function(view){
         addLayout.add_term_form.show(new TermsApp.Views.AddTermFormView({ collection: Accents.terms }));
-        //addLayout.add_remove_links.show(new TermsApp.Views.TempLinksView({ collection: Accents.terms }));
 
         var termsListLayout = new TermsApp.Views.TermsListLayout();
         var filteredListView = new TermsApp.Views.FilteredTermsView({ collection: Accents.terms });
@@ -30,22 +28,16 @@ Accents.module("TermsApp", function(TermsApp, Accents, Backbone, Marionette, $, 
         addLayout.add_terms_list.show(termsListLayout);
       });
 
-      term_list_defer.then(function(data){
-	var lastRefValue = "";
-        _.each(data.rows, function(row){
-          if(row.doc && row.doc.type && row.doc.type == 'term'){
-            Accents.terms.add(row.doc);
-            lastRefValue = row.doc.ref;
+      Accents.terms.fetch({
+        success: function(){
+          TermsApp.refValue = Accents.terms.last();
+          if( TermsApp.refValue ){
+            TermsApp.refValue = TermsApp.refValue.get("ref");
           }
-        });
-        TermsApp.refValue = lastRefValue;
-        Accents.terms.sort();
-        Accents.main.show(addLayout);
+          Accents.terms.sort();
+          Accents.main.show(addLayout);
+        }
       });
-
-      // replace with layout
-      // then move to navbar controller
-      //Accents.navbar.show(new NavLinksBoss({  })); // replace this with layout
     }
   };
 });
