@@ -52,28 +52,52 @@ As you type, you will notice a filtered list showing how many times matching wor
 ------------------------
 
 
-### Software Development, Next Steps:
+### Software Development, TODO:
 
-1. Continous 2-way sync data with remote CouchDB (it should be like one or two lines of code)
-    1.  https://diacritics.iriscouch.com/
-    2.  login based on creds giving access to remote db
-    3.  successful login saves locally so repeat login unecessary
-    4.  'login' link become 'log out' link
+1. Speed up main term list 
+    2. Make it a vertical scrolling paginated view
+    2. Possibly ordered by first alphabet letter 
+    3. Still sorted by "base" version
 
-1. Validation rules 
-    1. both fields are required
-    1. only one word on first field (if first field has two words, they are split and added seperately
-    1. the second field has the default valut of the previous entry (so you don't always have to add it)
-    1. hitting Enter in the first field should submit the form
+1. Improve as-you-type filtering
+    1. show complete match at top of list (sometimes the perfect match is short and therefore buried)
+    2. only start matching on >3 letters
+    3. when typing, pause 2 seconds (naggle) on filter match to not seize typing
+    4. keep hash list of fragment bases to spell check individually typed fragments (between dashes and apostrophes)
 
-1. As-you-type search for matching first field
-    1. show count of exact matches, 'base' matches and phonetic matches 
+1. Add "Correction" page
+   1. Integrate diacriticals project
+   2. Provide paste box for pasting in large blocks of HTML/text
+   3. Provide filter options
+   3. Provide view iFrame to see results
+   4. Provide download button to pull down changed document
 
-1. As-you type show list of 'base' matches directly below  
-    2. Move complete list of words to second tab
+1. Add Conflict Report tab to first page or as additional 'app'
+   1. show list of words with conflicted spellings
+   2. show individual items and allow deletion 
 
-1. Formatted Content Editable input box
+1. Debugging
+   1. Debug Javascript communications errors
+   2. Speed up batch data synchronization
+   3. Remember highest page number provided even after logout/login
+   3. Show some visual indication of data synchronizing or offline mode 
+   4. Smooth offline operation
+   4. Login  
+      1. hitting Enter in the first field should submit the form
+      2. should load faster after logging in.
 
 1. Make app resize size to any window
+   2. add vertical scroll bar for list
+   3. horizontal resize
 
 1. Wrap up app in Node-Webkit wrapper for deployment to Mac and Windows (using grunt plugin)
+
+1. Use 'erica' library to store all files in a database 
+   1. URL pulls down loader stub which copies app to local files ?? (possible for node webkit version?)
+   2. Background process updates app from synced DB
+   3. Grunt or GitHub task pushes new changes to deploy DB
+
+
+
+
+
