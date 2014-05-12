@@ -25,8 +25,8 @@ var onCompleteSync = function(){
 Accents.addInitializer(function () {
   Accents.db = new PouchDB('accents');
   Accents.remoteDb = 'accents';
-  //Accents.domainRemoteDb = 'diacritics.iriscouch.com';
-  Accents.domainRemoteDb = 'accents.couchappy.com'; // backup db
+  Accents.domainRemoteDb = 'diacritics.iriscouch.com';
+  //Accents.domainRemoteDb = 'accents.couchappy.com'; // backup db
 
   Accents.db.changes({continuous: true, onChange: function(change){ /*console.log(change); */ } });
 
@@ -50,7 +50,7 @@ var sync = function(){
   var opts = {continuous: true, complete: onCompleteSync };
   var urlConnection = "http://" + Accents.domainRemoteDb + "/" + Accents.remoteDb;
   PouchDB.replicate('accents', urlConnection, opts, function(err, data){ console.log(err); console.log(data); });
-  // PouchDB.replicate(urlConnection, 'accents', opts, function(err, data){ /*console.log(err); console.log(data);*/ });
+  PouchDB.replicate(urlConnection, 'accents', opts, function(err, data){ /*console.log(err); console.log(data);*/ });
 };
 
 Accents.on("initialize:after", function(){
