@@ -25,8 +25,8 @@ var onCompleteSync = function(){
 Accents.addInitializer(function () {
   Accents.db = new PouchDB('accents');
   Accents.remoteDb = 'accents';
-  // Accents.domainRemoteDb = 'diacritics.iriscouch.com';
-  Accents.domainRemoteDb = 'accents.couchappy.com';
+  Accents.domainRemoteDb = 'diacritics.iriscouch.com';
+  // Accents.domainRemoteDb = 'accents.couchappy.com'; // backup db
 
   Accents.db.changes({continuous: true, onChange: function(change){ /*console.log(change); */ } });
 
