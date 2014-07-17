@@ -1,0 +1,37 @@
+requirements:
+
+Columns to import:
+    "Original"(a) -> "original",
+    "Times New Roman ebf engls"(b) ->  "term",
+    "Definition"(e) -> "definition
+
+The existing database looks like this:
+http://accents.couchappy.com/_utils/document.html?accents/001B2279-E072-40CB-8797-B3BE12579A97
+And example spreadsheet is here:
+https://www.dropbox.com/s/ysty8lkmsn64ckr/Transliteration%20-%20LIST%20OF%20ORIENTAL%20TERMS%20-%20incremental%2C%202014-02-26%20%7BMarcel%7D.xlsm 
+
+Filtering:
+  The "term" field should not contain spaces. If a term with spaces is found, it should be split on spaces and each word added separately.
+ The "term" field uses a custom font and needs to be translated into unicode. I'm not sure what all the characters are so we'll add that part at the very end.
+
+
+ DB sample keys:
+
+ id
+ ref
+ term
+ type
+ user
+
+
+ Structure:
+ {
+ 	id:genUUID('xxxxxxxxxx'),
+ 	source: 'marciel',
+ 	term:{
+ 		word1,
+ 		word2
+ 	},
+ 	original:"string",
+ 	definition:"string"
+ }
