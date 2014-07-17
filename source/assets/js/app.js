@@ -17,8 +17,8 @@ Accents.getCurrentRoute = function(){
 };
 
 // wire up application
-var onCompleteSync = function(){ 
-  Accents.trigger("list:term") 
+var onCompleteSync = function(){
+  Accents.trigger("list:term")
   setTimeout(sync,10000);
 };
 
@@ -27,7 +27,7 @@ Accents.addInitializer(function () {
   Accents.remoteDb = 'accents';
   Accents.domainRemoteDb = 'diacritics.iriscouch.com';
 
-  Accents.db.changes({continuous: true, onChange: function(change){ console.log(change); } });
+  Accents.db.changes({continuous: true, onChange: function(change){ /*console.log(change); */} });
 
   sync();
 
@@ -46,10 +46,10 @@ Accents.on("sync", function(){
 });
 
 var sync = function(){
-  var opts = {continuous: true, complete: onCompleteSync };
+  var opts = {continuous: true, complete: onCompleteSync, batch_size: 500};
   var urlConnection = "http://" + Accents.domainRemoteDb + "/" + Accents.remoteDb;
-  PouchDB.replicate('accents', urlConnection, opts, function(err, data){ console.log(err); console.log(data); });
-  PouchDB.replicate(urlConnection, 'accents', opts, function(err, data){ console.log(err); console.log(data); });
+  PouchDB.replicate('accents', urlConnection, opts, function(err, data){ /*console.log(err); console.log(data); */});
+  PouchDB.replicate(urlConnection, 'accents', opts, function(err, data){ /*console.log(err); console.log(data);*/ });
 };
 
 Accents.on("initialize:after", function(){
