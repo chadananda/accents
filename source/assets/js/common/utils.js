@@ -17,7 +17,7 @@ Accents.module("Utils", function(Utils, App, Backbone, Marionette, $, _)  {
         word = word.replace(/Sult[a|á]n/, 'Sulṭán'); 
         word = word.replace(/^ulam[a|á]/, '‘ulamá'); 
         word = word.replace(/^Ulam[a|á]/, '‘Ulamá'); 
-        word = word.replace(/I[s|ṣ]f[a|á]h[a|á]n/, 'Iṣfáhán'); 
+        word = word.replace(/I[s|ṣ]f[a|á]h[a|á]n/, 'Iṣfahán'); 
          
         word = word.replace(/Baha/, 'Bahá'); 
         
