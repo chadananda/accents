@@ -3,8 +3,15 @@ Accents.module("TermsApp", function(TermsApp, App, Backbone, Marionette, $, _){
     termsList: function(){
       if( App.user.isLoggedIn() ){
         TermsApp.Controller.termsList();
+        //add capture of scroll
+        $(window).scroll(TermsApp.Controller.scrollCheck);
       }else{
         App.trigger("login");
+        try{
+          $(window).unbind("scroll");
+        }catch(error){
+          //nothing
+        }
       }
     }
   };

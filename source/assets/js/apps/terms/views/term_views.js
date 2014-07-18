@@ -176,6 +176,8 @@ Accents.module("TermsApp.Views", function(Views, Accents, Backbone, Marionette, 
       }
       this.collection = new Backbone.Collection(array);
       Accents.on("filter:terms", this.filterTerms);  
+      //add capture of scroll
+
     },
 
     onClose: function(){
@@ -183,20 +185,26 @@ Accents.module("TermsApp.Views", function(Views, Accents, Backbone, Marionette, 
     },
 
     filterTerms: function(term){
-      var text = term || ""
-      var patt = new RegExp(text, 'i');
-      var patt2 = new RegExp(Accents.Utils.dotUndersRevert(text), 'i');
-      $("#terms-filtered-table table tbody tr").each(function(){					
-        var text = $(this).find('td.term').text();
-        if( patt2.test( Accents.Utils.dotUndersRevert(text)) || patt.test(text) ){
+      if(term.length>3)
+      {
+        var text = term || ""
+        var patt = new RegExp(text, 'i');
+        var patt2 = new RegExp(Accents.Utils.dotUndersRevert(text), 'i');
+        $("#terms-filtered-table table tbody tr").each(function(){          
+          var text = $(this).find('td.term').text();
+          if( patt2.test( Accents.Utils.dotUndersRevert(text)) || patt.test(text) ){
+            $(this).css("display", "");
+          }else{
+            $(this).css( "display", "none" );
+            return true;
+          }
+        });
+      }else{
+        $("#terms-filtered-table table tbody tr").each(function(){
           $(this).css("display", "");
-        }else{
-          $(this).css( "display", "none" );
-          return true;
-        }
-      });
+        });
+      }
     }
-
   });
 
   // table of terms at bottom

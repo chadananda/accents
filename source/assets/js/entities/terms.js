@@ -35,6 +35,7 @@ Accents.module("Entities", function(Entities, App, Backbone, Marionette, $, _){
           }
         }
     });
+    Entities.currPos = 0;
 
     Entities.Terms = Backbone.Collection.extend({
         model: Entities.Term,
@@ -44,13 +45,9 @@ Accents.module("Entities", function(Entities, App, Backbone, Marionette, $, _){
           options: {
             query: {
               include_docs: true,
-              fun: {
-                map: function(doc) {
-                  if (doc.type === 'term') {
-                    emit(doc.position, null)
-                  }
-                }
-              }
+              // limit:10,
+              // skip:Entities.currPos,
+              fun: "entities_terms"
             }
           }
         }),

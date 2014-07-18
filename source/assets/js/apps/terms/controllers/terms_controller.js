@@ -5,9 +5,17 @@ Accents.module("TermsApp", function(TermsApp, Accents, Backbone, Marionette, $, 
 
       Accents.terms = new Accents.Entities.Terms();
       var addLayout = new TermsApp.Views.AddTermMainLayout();
-
+      Accents.on("loadmore",function(){
+        Accents.Entities.currPos = Accents.Entities.currPos+10;
+        var old = new Accents.Entities.Terms();
+        old.models.forEach(function(data){
+          Accents.terms.models.push(data);
+        });
+        console.log(Accents.terms);
+      })
     // maincontent controller, show add screen
       addLayout.on('show', function(view){
+        console.log("addLayout show triggered");
         addLayout.add_term_form.show(new TermsApp.Views.AddTermFormView({ collection: Accents.terms }));
 
         var termsListLayout = new TermsApp.Views.TermsListLayout();
@@ -38,6 +46,16 @@ Accents.module("TermsApp", function(TermsApp, Accents, Backbone, Marionette, $, 
           Accents.main.show(addLayout);
         }
       });
+    },
+    scrollCheck:function(){
+      var maxHeight = $(document).height();
+      var currentPosition = Number($(window).height())+Number($(window).scrollTop());
+      console.log("checking scroll : curPos - "+currentPosition+" maxHeight - "+maxHeight);
+      if(currentPosition>=(maxHeight-50))
+      {
+        console.log("triggerring loadmore");
+        Accents.trigger("loadmore");
+      }
     }
   };
 });
