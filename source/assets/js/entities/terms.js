@@ -47,7 +47,14 @@ Accents.module("Entities", function(Entities, App, Backbone, Marionette, $, _){
               include_docs: true,
               // limit:10,
               // skip:Entities.currPos,
-              fun: "entities_terms"
+              //fun: "entities_terms"
+              fun:{
+                map: function(doc) {
+                  if (doc.type === 'term') {
+                    emit(doc.position, null)
+                  }
+                }
+              }
             }
           }
         }),
