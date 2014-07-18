@@ -12,7 +12,10 @@ var accents = ["’","’","’","’","’","’","á","b","p","t","_th","j","_
 //	GLOBAL.db_hash
 
 module.exports.startProcess = function(req,res){
-	res.send("starting Export Process ...");
+	if(res!=null)
+	{
+		res.send("starting Export Process ...");
+	}
 	console.log("starting Export Process ...");
 	//scan for files in rootDir
 	// push verified files to ListOfFiles
