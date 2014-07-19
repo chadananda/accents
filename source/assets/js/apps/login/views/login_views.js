@@ -31,8 +31,8 @@ Accents.module("LoginApp.Views", function(Views, Accents, Backbone, Marionette, 
       var btn = $(e.currentTarget);
 
       btn.button('loading');
-      // if(user!='' && password!='')
-      // {
+      if(user!='' && password!='')
+      {
         Accents.remote = new PouchDB(urlConnection, function(error){
         if(error){
             self.showLoginError(error.message);
@@ -47,10 +47,10 @@ Accents.module("LoginApp.Views", function(Views, Accents, Backbone, Marionette, 
             Accents.trigger("sync");
           }
         });
-      // }else{
-      //   self.showLoginError("Username or Password is empty");
-      //   btn.button('reset');
-      // }
+      }else{
+        self.showLoginError("Username or Password is empty");
+        btn.button('reset');
+      }
     },
 
     showLoginError: function(message){
