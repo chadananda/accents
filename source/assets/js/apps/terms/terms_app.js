@@ -4,11 +4,11 @@ Accents.module("TermsApp", function(TermsApp, App, Backbone, Marionette, $, _){
       if( App.user.isLoggedIn() ){
         TermsApp.Controller.termsList();
         //add capture of scroll
-        $(window).scroll(TermsApp.Controller.scrollCheck);
+        $("#terms-table").scroll(TermsApp.Controller.scrollCheck);
       }else{
         App.trigger("login");
         try{
-          $(window).unbind("scroll");
+          $("terms-table").unbind("scroll");
         }catch(error){
           //nothing
         }

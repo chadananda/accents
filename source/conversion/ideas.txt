@@ -35,3 +35,66 @@ Filtering:
  	original:"string",
  	definition:"string"
  }
+
+
+
+
+
+ ================= TO DOs ====================
+
+
+ ( Last to do )
+    Speed up main term list
+        Make it a vertical scrolling paginated view
+        Possibly ordered by first alphabet letter
+        Still sorted by "base" version
+
+( This is tied up to the main term list )
+    Improve as-you-type filtering
+        show complete match at top of list (sometimes the perfect match is short and therefore buried)
+        only start matching on >3 letters - done
+        when typing, pause 2 seconds (naggle) on filter match to not seize typing
+        keep hash list of fragment bases to spell check individually typed fragments (between dashes and apostrophes)
+
+( Need details on the "Correction" page )
+    Add "Correction" page
+        Integrate diacriticals project
+        Provide paste box for pasting in large blocks of HTML/text
+        Provide filter options
+        Provide view iFrame to see results
+        Provide download button to pull down changed document
+
+( Need details on the "conflict" page and the rules for conflicts )
+    Add Conflict Report tab to first page or as additional 'app'
+        show list of words with conflicted spellings
+        show individual items and allow deletion
+
+
+    Debugging
+        Debug Javascript communications errors (so far no console messages on the errors are seen)
+        Speed up batch data synchronization (need to understand this more)
+        Remember highest page number provided even after logout/login (I think this is done already)
+        Show some visual indication of data synchronizing or offline mode 
+        Smooth offline operation (have to test this)
+        Login
+            hitting Enter in the first field should submit the form (done)
+            should load faster after logging in. (using design document)
+
+    Make app resize size to any window ( Implement using bootstrap )
+        add vertical scroll bar for list ( use a div?? current design doesn't have a div)
+        horizontal resize 
+
+    Wrap up app in Node-Webkit wrapper for deployment to Mac and Windows (using grunt plugin)
+
+    Use 'erica' library to store all files in a database
+        URL pulls down loader stub which copies app to local files ?? (possible for node webkit version?)
+        Background process updates app from synced DB
+        Grunt or GitHub task pushes new changes to deploy DB
+
+
+Prioritization
+	based on ease of solution
+		add vertical scroll bar for list (place the list inside a div)
+		horizontal resize (prob 100% height with recalc )
+
+	

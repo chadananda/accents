@@ -12,7 +12,7 @@ Accents.module("LoginApp", function(LoginApp, Accents, Backbone, Marionette, $, 
   Accents.on("login", function(){
     Accents.navigate("login");
     try {
-      $(window).unbind("scroll");
+      $("#terms-table").unbind("scroll");
     }catch(error){
       //nothing
     }
