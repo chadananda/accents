@@ -94,7 +94,8 @@ Filtering:
 
 Prioritization
 	based on ease of solution
-		add vertical scroll bar for list (place the list inside a div)
-		horizontal resize (prob 100% height with recalc )
+		add vertical scroll bar for list (place the list inside a div) -  done
+		horizontal resize (prob 100% height with recalc ) - done
 
-	
+	Investigate how queries are sent to PouchDB to pull data.
+

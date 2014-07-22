@@ -23,7 +23,7 @@ Accents.module("LoginApp", function(LoginApp, Accents, Backbone, Marionette, $, 
     new LoginApp.Router({controller: API});
   });
   try{
-    $(window).unbind("scroll");
+    $("#terms-table").unbind("scroll");
   }catch(error){
     //nothing
   }

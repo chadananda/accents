@@ -2,8 +2,10 @@ Accents.module("TermsApp", function(TermsApp, App, Backbone, Marionette, $, _){
   var API = {
     termsList: function(){
       if( App.user.isLoggedIn() ){
+        $("#terms-table").scroll(TermsApp.Controller.scrollCheck);
         TermsApp.Controller.termsList();
         //add capture of scroll
+        
         $("#terms-table").scroll(TermsApp.Controller.scrollCheck);
       }else{
         App.trigger("login");

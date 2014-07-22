@@ -35,7 +35,14 @@ Accents.module("Entities", function(Entities, App, Backbone, Marionette, $, _){
           }
         }
     });
+    // Entities.AddTermFormView = '';
+    // Entities.TermsListLayout = '';
+    // Entities.FilteredListView = '';
+    // Entities.TermsView = '';
+    Entities.TotalTermsView = 0;
+    Entities.currTermsPos = 0;
     Entities.currPos = 0;
+    Entities.limit = 20;
 
     Entities.Terms = Backbone.Collection.extend({
         model: Entities.Term,
@@ -45,16 +52,16 @@ Accents.module("Entities", function(Entities, App, Backbone, Marionette, $, _){
           options: {
             query: {
               include_docs: true,
-              // limit:10,
-              // skip:Entities.currPos,
-              // fun: "entities_terms"
-              fun:{
-                map: function(doc) {
-                  if (doc.type === 'term') {
-                    emit(doc.position, null)
-                  }
-                }
-              }
+              fun: "entities_terms",
+              // fun:{
+              //   map: function(doc) {
+              //     if (doc.type === 'term') {
+              //       emit(doc.position, null)
+              //     }
+              //   }
+              // },
+              limit: Entities.limit,
+              skip: Entities.currPos
             }
           }
         }),
@@ -63,7 +70,10 @@ Accents.module("Entities", function(Entities, App, Backbone, Marionette, $, _){
 
         parse: function(result) {
           console.log("parser collection");
+          console.log("Entities.limit : "+Entities.limit+" Entities.currPos : "+Entities.currPos);
+          console.log("From entities");
           console.log(result);
+          Entities.TotalTermsView = result.total_rows;
           return _.pluck(result.rows, 'doc');
         },
 

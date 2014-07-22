@@ -212,7 +212,8 @@ Accents.module("TermsApp.Views", function(Views, Accents, Backbone, Marionette, 
     template: '#term-list-total-template',
     serializeData: function() {
         return {
-            "total_count": this.collection.length
+            //"total_count": this.collection.length
+            "total_count": Accents.Entities.TotalTermsView
         };
     },
     collectionEvents: {
