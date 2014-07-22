@@ -11,7 +11,7 @@ Accents.module("TermsApp", function(TermsApp, Accents, Backbone, Marionette, $, 
 
       Accents.terms = new Accents.Entities.Terms(); //execution of request
       console.log(Accents.terms);
-      debugger;
+      //debugger;
       var addLayout = new TermsApp.Views.AddTermMainLayout();
 
       // maincontent controller, show add screen
@@ -117,11 +117,11 @@ Accents.module("TermsApp", function(TermsApp, Accents, Backbone, Marionette, $, 
         });
         var myold = new newInfo();
         console.log(myold);
-        debugger;
+        //debugger;
         myold.fetch({
           success: function(){
             //Merge old with Accents.terms
-            debugger;
+            //debugger;
             myold.models.forEach(function(terms){
               Accents.terms.models.push(terms);
             });
