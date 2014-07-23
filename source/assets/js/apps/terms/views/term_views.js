@@ -21,6 +21,7 @@ Accents.module("TermsApp.Views", function(Views, Accents, Backbone, Marionette, 
     onRender: function(){
       if(Accents.TermsApp.refValue){
         this.ui.ref.val( Accents.TermsApp.refValue );
+        //this.ui.ref.val("hey!");
       }
     },
 
@@ -89,6 +90,7 @@ Accents.module("TermsApp.Views", function(Views, Accents, Backbone, Marionette, 
 
         if( this.ui.ref.val() == "" && Accents.TermsApp.refValue){
           this.ui.ref.val( Accents.TermsApp.refValue );
+          //this.ui.ref.val( "hey2");
         }
 
         clearTimeout( this.timeFilter );

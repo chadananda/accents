@@ -10,6 +10,7 @@ Accents.module("TermsApp", function(TermsApp, Accents, Backbone, Marionette, $, 
       Accents.main.show(new TermsApp.Views.WaitingDataView());
 
       Accents.terms = new Accents.Entities.Terms(); //execution of request
+      Accents.DBpage = new Accents.Entities.DBpage();
       console.log(Accents.terms);
       //debugger;
       var addLayout = new TermsApp.Views.AddTermMainLayout();
@@ -65,12 +66,25 @@ Accents.module("TermsApp", function(TermsApp, Accents, Backbone, Marionette, $, 
       Accents.terms.fetch({
         success: function(){
           //debugger;
-          TermsApp.refValue = Accents.terms.last();
-          if( TermsApp.refValue ){
-            TermsApp.refValue = TermsApp.refValue.get("ref");
-          }
+          // TermsApp.refValue = Accents.terms.last();
+          // if( TermsApp.refValue ){
+          //   TermsApp.refValue = TermsApp.refValue.get("ref");
+          // }
           //Accents.terms.sort();
           Accents.main.show(addLayout);
+          Accents.DBpage = new Accents.Entities.DBpage();
+
+          Accents.DBpage.fetch({
+            success:function() {
+              //debugger;
+              TermsApp.refValue = Accents.DBpage.last();
+              if( TermsApp.refValue ){
+                TermsApp.refValue = TermsApp.refValue.get("ref");
+              }
+              $("#book-ref").val(TermsApp.refValue);
+              //debugger;
+            }
+          });
         }
       });
       //load more information
@@ -143,10 +157,10 @@ Accents.module("TermsApp", function(TermsApp, Accents, Backbone, Marionette, $, 
               });
               //replacement
               //Accents.terms = old;
-              TermsApp.refValue = Accents.terms.last();
-              if( TermsApp.refValue ){
-                TermsApp.refValue = TermsApp.refValue.get("ref");
-              }
+              // TermsApp.refValue = Accents.terms.last();
+              // if( TermsApp.refValue ){
+              //   TermsApp.refValue = TermsApp.refValue.get("ref");
+              // }
               //Accents.terms.sort();
               Accents.main.show(addLayout);
 

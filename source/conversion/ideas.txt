@@ -113,6 +113,8 @@ Prioritization
 
 ========= Things to do today ===================
 
-1) Address problem on fetching more than once
+1) Address problem on fetching more than once -done
 	1.1) create a temporary flag if a loadmore request was sent
 	1.2) 
+2) get the highest DB page
+	2.1) use a temporary view for now

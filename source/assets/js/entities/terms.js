@@ -89,6 +89,46 @@ Accents.module("Entities", function(Entities, App, Backbone, Marionette, $, _){
        }
 
     });
+    
+    Entities.DBpage = Backbone.Collection.extend({
+        model: Entities.Term,
+        sync: BackbonePouch.sync({
+          db: PouchDB('accents'),
+          fetch: 'query',
+          options: {
+            query: {
+              include_docs: true,
+              fun: "entities_terms",
+              // fun:{
+              //   map: function(doc) {
+              //     if (doc.ref) {
+              //       emit(doc.position, null)
+              //     }
+              //   }
+              // },
+            }
+          }
+        }),
+        comparator: 'ref',
+        sort_key: "ref",
+
+        parse: function(result) {
+          console.log("parser collection");
+          console.log("Entities.limit : "+Entities.limit+" Entities.currPos : "+Entities.currPos);
+          console.log("From entities");
+          console.log(result);
+          Entities.lastrowsLength = result.rows.length;
+          Entities.TotalTermsView = result.total_rows;
+          return _.pluck(result.rows, 'doc');
+        },
+
+       comparator: function(a, b){
+         a = Accents.Utils.dotUndersRevert( a.get(this.sort_key) );
+         b = Accents.Utils.dotUndersRevert( b.get(this.sort_key) );
+         return a > b ?  1 : a < b ? -1 : 0;
+       }
+
+    });
 
     Entities.fakeTerms = function(collection){
        console.log('Called Entities.initializeTerms');
