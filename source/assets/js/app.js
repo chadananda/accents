@@ -22,9 +22,9 @@ Accents.getCurrentRoute = function(){
 // wire up application
 var onCompleteSync = function(){
   // console.log("Trigger list:term due to onCompleteSync call");
-  // Accents.trigger("list:term")
-  // console.log("sync called every 10 seconds timer");
-  // setTimeout(sync,10000);
+  Accents.trigger("list:term")
+  console.log("sync called every 10 seconds timer");
+  setTimeout(sync,10000);
 };
 
 Accents.addInitializer(function () {
