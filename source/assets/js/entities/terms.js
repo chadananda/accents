@@ -39,10 +39,14 @@ Accents.module("Entities", function(Entities, App, Backbone, Marionette, $, _){
     // Entities.TermsListLayout = '';
     // Entities.FilteredListView = '';
     // Entities.TermsView = '';
-    Entities.TotalTermsView = 0;
-    Entities.currTermsPos = 0;
-    Entities.currPos = 0;
-    Entities.limit = 20;
+    Entities.TotalTermsView = Number(0);
+    Entities.currTermsPos = Number(0);
+    Entities.currPos = Number(0);
+    Entities.limit = Number(20);
+    Entities.requestMoreFlag = true;
+    Entities.evenResults = true;
+    Entities.lastrowsLength = Number(0);
+    Entities.limitorig = Entities.limit;
 
     Entities.Terms = Backbone.Collection.extend({
         model: Entities.Term,
@@ -52,14 +56,14 @@ Accents.module("Entities", function(Entities, App, Backbone, Marionette, $, _){
           options: {
             query: {
               include_docs: true,
-              //fun: "entities_terms",
-              fun:{
-                map: function(doc) {
-                  if (doc.type === 'term') {
-                    emit(doc.position, null)
-                  }
-                }
-              },
+              fun: "entities_terms",
+              // fun:{
+              //   map: function(doc) {
+              //     if (doc.type === 'term') {
+              //       emit(doc.position, null)
+              //     }
+              //   }
+              // },
               limit: Entities.limit,
               skip: Entities.currPos
             }
@@ -73,6 +77,7 @@ Accents.module("Entities", function(Entities, App, Backbone, Marionette, $, _){
           console.log("Entities.limit : "+Entities.limit+" Entities.currPos : "+Entities.currPos);
           console.log("From entities");
           console.log(result);
+          Entities.lastrowsLength = result.rows.length;
           Entities.TotalTermsView = result.total_rows;
           return _.pluck(result.rows, 'doc');
         },

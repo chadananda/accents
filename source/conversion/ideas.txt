@@ -99,3 +99,20 @@ Prioritization
 
 	Investigate how queries are sent to PouchDB to pull data.
 
+===================== List of Problems =====================
+
+1) the DB page doesn't have the last page 
+2) find should query the DB
+	2.1) formulate a view that can produce a fast response for find
+3) Unless the document view is implemented, loading accents will be slow
+4) delete Word has errors (termsListLayout.add_term_filtered_table.close(); does not exist)
+	4.1) I guess I need to go through this flow more
+5) find out if query to CouchDB can pre-sort by term
+	5.1) temporary view may be the only way to go
+
+
+========= Things to do today ===================
+
+1) Address problem on fetching more than once
+	1.1) create a temporary flag if a loadmore request was sent
+	1.2) 

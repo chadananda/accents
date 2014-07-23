@@ -38,6 +38,7 @@ Accents.module("TermsApp", function(TermsApp, Accents, Backbone, Marionette, $, 
             });
         });
         termsListLayout.add_term_list_table.on("show",function(view){
+            Accents.Entities.requestMoreFlag=true;//meaning ready to accept further loadmore triggers
             var maxHeight = $("#terms-table").height();
             var childHeight = $("#terms-table div:nth-child(1)").height();
             $("#terms-table").scroll(TermsApp.Controller.scrollCheck);
@@ -74,68 +75,84 @@ Accents.module("TermsApp", function(TermsApp, Accents, Backbone, Marionette, $, 
       });
       //load more information
       Accents.on("loadmore",function(){
-        Accents.Entities.currPos = Accents.Entities.currPos + Accents.Entities.limit;
-        var newInfo = Backbone.Collection.extend({
-            model: Accents.Entities.Term,
-            sync: BackbonePouch.sync({
-              db: PouchDB('accents'),
-              fetch: 'query',
-              options: {
-                query: {
-                  include_docs: true,
-                  // fun: "entities_terms",
-                  fun:{
-                    map: function(doc) {
-                      if (doc.type === 'term') {
-                        emit(doc.position, null)
-                      }
-                    }
-                  },
-                  limit: Accents.Entities.limit,
-                  skip: Accents.Entities.currPos
-                }
-              }
-            }),
-            comparator: 'term',
-            sort_key: "term",
-
-            parse: function(result) {
-              console.log("parser collection");
-              console.log("Entities.limit : "+Accents.Entities.limit+" Entities.currPos : "+Accents.Entities.currPos);
-              console.log("From terms controller");
-              console.log(result);
-              Accents.Entities.TotalTermsView = result.total_rows;
-              return _.pluck(result.rows, 'doc');
-            },
-
-           comparator: function(a, b){
-             a = Accents.Utils.dotUndersRevert( a.get(this.sort_key) );
-             b = Accents.Utils.dotUndersRevert( b.get(this.sort_key) );
-             return a > b ?  1 : a < b ? -1 : 0;
-           }
-
-        });
-        var myold = new newInfo();
-        console.log(myold);
-        //debugger;
-        myold.fetch({
-          success: function(){
-            //Merge old with Accents.terms
-            //debugger;
-            myold.models.forEach(function(terms){
-              Accents.terms.models.push(terms);
-            });
-            //replacement
-            //Accents.terms = old;
-            TermsApp.refValue = Accents.terms.last();
-            if( TermsApp.refValue ){
-              TermsApp.refValue = TermsApp.refValue.get("ref");
-            }
-            //Accents.terms.sort();
-            Accents.main.show(addLayout);
-
+        if(Accents.Entities.lastrowsLength>0 && (Number(Accents.Entities.TotalTermsView)>(Number(Accents.Entities.currPos) + Number(Accents.Entities.limit))))
+        {
+          if(Accents.Entities.limit!=Accents.Entities.limitorig)//check
+          {
+            Accents.Entities.limit = Number(Accents.Entities.limitorig);
           }
-        });
+          Accents.Entities.currPos = Number(Accents.Entities.currPos) + Number(Accents.Entities.limit);
+          if(Number(Accents.Entities.TotalTermsView)<(Number(Accents.Entities.currPos) + Number(Accents.Entities.limit)))
+          {
+            var newDiff = Number(Accents.Entities.TotalTermsView) - (Number(Accents.Entities.currPos) + Number(Accents.Entities.limit));
+            Accents.Entities.limit = Number(newDiff);
+          }
+          console.log("fetching records : "+Accents.Entities.currPos+" -> "+(Accents.Entities.currPos+Accents.Entities.limit));
+          var newInfo = Backbone.Collection.extend({
+              model: Accents.Entities.Term,
+              sync: BackbonePouch.sync({
+                db: PouchDB('accents'),
+                fetch: 'query',
+                options: {
+                  query: {
+                    include_docs: true,
+                    fun: "entities_terms",
+                    // fun:{
+                    //   map: function(doc) {
+                    //     if (doc.type === 'term') {
+                    //       emit(doc.position, null)
+                    //     }
+                    //   }
+                    // },
+                    limit: Accents.Entities.limit,
+                    skip: Accents.Entities.currPos
+                  }
+                }
+              }),
+              comparator: 'term',
+              sort_key: "term",
+
+              parse: function(result) {
+                console.log("parser collection");
+                console.log("Entities.limit : "+Accents.Entities.limit+" Entities.currPos : "+Accents.Entities.currPos);
+                console.log("From terms controller");
+                console.log(result);
+                //check if returned items 
+                // check if the total_rows 
+                Accents.Entities.lastrowsLength = result.rows.length;
+                Accents.Entities.TotalTermsView = result.total_rows;
+                return _.pluck(result.rows, 'doc');
+              },
+
+             comparator: function(a, b){
+               a = Accents.Utils.dotUndersRevert( a.get(this.sort_key) );
+               b = Accents.Utils.dotUndersRevert( b.get(this.sort_key) );
+               return a > b ?  1 : a < b ? -1 : 0;
+             }
+
+          });
+          var myold = new newInfo();
+          console.log(myold);
+          //debugger;
+          myold.fetch({
+            success: function(){
+              //Merge old with Accents.terms
+              //debugger;
+              myold.models.forEach(function(terms){
+                Accents.terms.models.push(terms);
+              });
+              //replacement
+              //Accents.terms = old;
+              TermsApp.refValue = Accents.terms.last();
+              if( TermsApp.refValue ){
+                TermsApp.refValue = TermsApp.refValue.get("ref");
+              }
+              //Accents.terms.sort();
+              Accents.main.show(addLayout);
+
+            }
+          });
+        }
       });
     },
     scrollCheck:function(){
@@ -151,7 +168,7 @@ Accents.module("TermsApp", function(TermsApp, Accents, Backbone, Marionette, $, 
       Accents.Entities.currTermsPos["currentPos"] = Number(maxHeight)+Number($("#terms-table").scrollTop());
       Accents.Entities.currTermsPos["oldscrollTop"] = Number($("#terms-table").scrollTop());
       //console.log("checking scroll : curPos - "+Accents.Entities.currTermsPos["currentPos"]+" childHeight - "+childHeight);
-      if(Accents.Entities.currTermsPos["currentPos"]>=(childHeight*0.45))
+      if(Accents.Entities.currTermsPos["currentPos"]>=(childHeight*0.65))
       {
         console.log("triggerring loadmore -> currPosPage "+Accents.Entities.currPos);
         Accents.trigger("loadmore");
