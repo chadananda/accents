@@ -56,7 +56,7 @@ Accents.on("sync", function(){
 
 var sync = function(){
   console.log("sync called");
-  var opts = {live: true, complete: onCompleteSync, batch_size: 3000};
+  var opts = {live: true, complete: onCompleteSync, batch_size: 500};
   var urlConnection = "http://" + Accents.domainRemoteDb + "/" + Accents.remoteDb;
   PouchDB.replicate('accents', urlConnection, opts, function(err, data){ console.log("replicating local to remote");/*console.log(err); console.log(data); */});
   PouchDB.replicate(urlConnection, 'accents', opts, function(err, data){ console.log("replicating remote to local");/*console.log(err); console.log(data);*/ });
