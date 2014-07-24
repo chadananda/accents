@@ -39,6 +39,8 @@ Accents.module("TermsApp", function(TermsApp, Accents, Backbone, Marionette, $, 
             });
         });
         termsListLayout.add_term_list_table.on("show",function(view){
+            // show spinner
+            $('#loadingSpinner').hide();
             Accents.Entities.requestMoreFlag=true;//meaning ready to accept further loadmore triggers
             var maxHeight = $("#terms-table").height();
             var childHeight = $("#terms-table div:nth-child(1)").height();
@@ -95,6 +97,7 @@ Accents.module("TermsApp", function(TermsApp, Accents, Backbone, Marionette, $, 
       Accents.on("loadmore",function(){
         if(Accents.Entities.lastrowsLength>0) //&& (Number(Accents.Entities.TotalTermsView)>(Number(Accents.Entities.currPos) + Number(Accents.Entities.limit)))
         {
+          $('#loadingSpinner').fadeIn();
           if(Accents.Entities.limit!=Accents.Entities.limitorig)//check
           {
             Accents.Entities.limit = Number(Accents.Entities.limitorig);
@@ -171,7 +174,7 @@ Accents.module("TermsApp", function(TermsApp, Accents, Backbone, Marionette, $, 
               //Accents.terms.sort();
               Accents.Entities.lastrowsLength=0;
               Accents.main.show(addLayout);
-
+              $('#loadingSpinner').fadeOut();
             }
           });
         }else{

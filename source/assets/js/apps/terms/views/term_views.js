@@ -254,7 +254,8 @@ Accents.module("TermsApp.Views", function(Views, Accents, Backbone, Marionette, 
     regions: {
       add_term_list_total: "#terms-total",
       add_term_list_table: "#terms-table",
-      add_term_filtered_table: "#terms-filtered-table"
+      add_term_filtered_table: "#terms-filtered-table",
+      add_term_spinner_load:"#loadingSpinner"
     },
   
     initialize: function(){
