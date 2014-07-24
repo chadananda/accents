@@ -47,6 +47,7 @@ Accents.module("Entities", function(Entities, App, Backbone, Marionette, $, _){
     Entities.evenResults = true;
     Entities.lastrowsLength = Number(0);
     Entities.limitorig = Entities.limit;
+    Entities.Preload;
 
     Entities.Terms = Backbone.Collection.extend({
         model: Entities.Term,
@@ -56,16 +57,16 @@ Accents.module("Entities", function(Entities, App, Backbone, Marionette, $, _){
           options: {
             query: {
               include_docs: true,
-              fun: "entities_terms",
+              fun: "entities_terms"
               // fun:{
               //   map: function(doc) {
               //     if (doc.type === 'term') {
               //       emit(doc.position, null)
               //     }
               //   }
-              // },
-              limit: Entities.limit,
-              skip: Entities.currPos
+              //},
+              // limit: Entities.limit,
+              // skip: Entities.currPos
             }
           }
         }),
