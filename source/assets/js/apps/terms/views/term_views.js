@@ -125,7 +125,22 @@ Accents.module("TermsApp.Views", function(Views, Accents, Backbone, Marionette, 
       if( errors.term ){  this.ui.ref.parent().addClass("has-error"); }
     }
   });
-
+  var successRemove = function(model,response){
+    Accents.db.remove(model.toJSON(), function(error, data){ 
+      if(error==null)
+      {
+        console.log(data);
+      }else{
+        if(error.status==409)
+        {
+          console.log("Remove has a 409");
+          console.log(error);
+        }else{
+          console.log(error);
+        }
+      }
+    });
+  }
   // table of terms at bottom
   Views.TermView = Backbone.Marionette.ItemView.extend({
     template: '#term-list-item-template',
@@ -139,12 +154,11 @@ Accents.module("TermsApp.Views", function(Views, Accents, Backbone, Marionette, 
       if( confirm('Are you sure?')){
         this.model.destroy({
           success: function(model, response){
-            Accents.db.remove(model.toJSON(), function(error, data){ console.log(error); console.log(data); });
+            successRemove(model,response);
           }
         });
       }
     }
-
   });
 
   Views.FilteredTermView = Backbone.Marionette.ItemView.extend({

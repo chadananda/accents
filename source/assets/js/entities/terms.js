@@ -42,7 +42,7 @@ Accents.module("Entities", function(Entities, App, Backbone, Marionette, $, _){
     Entities.TotalTermsView = Number(0);
     Entities.currTermsPos = Number(0);
     Entities.currPos = Number(0);
-    Entities.limit = Number(20);
+    Entities.limit = Number(500);
     Entities.requestMoreFlag = true;
     Entities.evenResults = true;
     Entities.lastrowsLength = Number(0);

@@ -43,7 +43,7 @@ Accents.module("TermsApp", function(TermsApp, Accents, Backbone, Marionette, $, 
             var maxHeight = $("#terms-table").height();
             var childHeight = $("#terms-table div:nth-child(1)").height();
             $("#terms-table").scroll(TermsApp.Controller.scrollCheck);
-            console.log("assigning scroll location value");
+            //console.log("assigning scroll location value");
             if(Accents.Entities.currTermsPos["oldmaxHeight"] == undefined)
             {
               Accents.Entities.currTermsPos={};
@@ -57,6 +57,8 @@ Accents.module("TermsApp", function(TermsApp, Accents, Backbone, Marionette, $, 
               $("#terms-table").scrollTop(Accents.Entities.currTermsPos["oldscrollTop"]);
               Accents.Entities.currTermsPos["oldchildHeight"]=childHeight;
             }
+            console.log("triggering loadmore");
+            Accents.trigger("loadmore");
         });
         
         //console.log("afterRender terms-list-table-template");
@@ -72,24 +74,26 @@ Accents.module("TermsApp", function(TermsApp, Accents, Backbone, Marionette, $, 
           // }
           //Accents.terms.sort();
           Accents.main.show(addLayout);
-          Accents.DBpage = new Accents.Entities.DBpage();
 
-          Accents.DBpage.fetch({
-            success:function() {
-              //debugger;
-              TermsApp.refValue = Accents.DBpage.last();
-              if( TermsApp.refValue ){
-                TermsApp.refValue = TermsApp.refValue.get("ref");
-              }
-              $("#book-ref").val(TermsApp.refValue);
-              //debugger;
-            }
-          });
+          // Accents.DBpage = new Accents.Entities.DBpage();
+
+          // Accents.DBpage.fetch({
+          //   success:function() {
+          //     //debugger;
+          //     TermsApp.refValue = Accents.DBpage.last();
+          //     if( TermsApp.refValue ){
+          //       TermsApp.refValue = TermsApp.refValue.get("ref");
+          //     }
+          //     $("#book-ref").val(TermsApp.refValue);
+          //     //debugger;
+          //     //process data and turn off loadmore
+          //   }
+          // });
         }
       });
       //load more information
       Accents.on("loadmore",function(){
-        if(Accents.Entities.lastrowsLength>0 && (Number(Accents.Entities.TotalTermsView)>(Number(Accents.Entities.currPos) + Number(Accents.Entities.limit))))
+        if(Accents.Entities.lastrowsLength>0) //&& (Number(Accents.Entities.TotalTermsView)>(Number(Accents.Entities.currPos) + Number(Accents.Entities.limit)))
         {
           if(Accents.Entities.limit!=Accents.Entities.limitorig)//check
           {
@@ -118,8 +122,8 @@ Accents.module("TermsApp", function(TermsApp, Accents, Backbone, Marionette, $, 
                     //     }
                     //   }
                     // },
-                    limit: Accents.Entities.limit,
-                    skip: Accents.Entities.currPos
+                    // limit: Accents.Entities.limit,
+                    // skip: Accents.Entities.currPos
                   }
                 }
               }),
@@ -152,9 +156,12 @@ Accents.module("TermsApp", function(TermsApp, Accents, Backbone, Marionette, $, 
             success: function(){
               //Merge old with Accents.terms
               //debugger;
-              myold.models.forEach(function(terms){
-                Accents.terms.models.push(terms);
-              });
+              // myold.models.forEach(function(terms){
+              //   if(Terms.)
+              //   Accents.terms.models.push(terms);
+              // });
+              // Accents.terms.models.concat(myold.models);
+              Accents.terms=myold;
               //replacement
               //Accents.terms = old;
               // TermsApp.refValue = Accents.terms.last();
@@ -162,10 +169,21 @@ Accents.module("TermsApp", function(TermsApp, Accents, Backbone, Marionette, $, 
               //   TermsApp.refValue = TermsApp.refValue.get("ref");
               // }
               //Accents.terms.sort();
+              Accents.Entities.lastrowsLength=0;
               Accents.main.show(addLayout);
 
             }
           });
+        }else{
+          var temp = Accents.terms;
+          temp.sort(function(a,b){
+            return a.models.attributes.ref - b.models.attributes.ref;
+          });
+          TermsApp.refValue = temp.last();
+          if( TermsApp.refValue ){
+            TermsApp.refValue = TermsApp.refValue.get("ref");
+          }
+          $("#book-ref").val(TermsApp.refValue);
         }
       });
     },
@@ -182,11 +200,11 @@ Accents.module("TermsApp", function(TermsApp, Accents, Backbone, Marionette, $, 
       Accents.Entities.currTermsPos["currentPos"] = Number(maxHeight)+Number($("#terms-table").scrollTop());
       Accents.Entities.currTermsPos["oldscrollTop"] = Number($("#terms-table").scrollTop());
       //console.log("checking scroll : curPos - "+Accents.Entities.currTermsPos["currentPos"]+" childHeight - "+childHeight);
-      if(Accents.Entities.currTermsPos["currentPos"]>=(childHeight*0.65))
-      {
-        console.log("triggerring loadmore -> currPosPage "+Accents.Entities.currPos);
-        Accents.trigger("loadmore");
-      }
+      // if(Accents.Entities.currTermsPos["currentPos"]>=(childHeight*0.65))
+      // {
+      //   console.log("triggerring loadmore -> currPosPage "+Accents.Entities.currPos);
+      //   Accents.trigger("loadmore");
+      // }
     }
   };
 });
