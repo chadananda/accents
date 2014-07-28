@@ -6,13 +6,13 @@ var rootDir = './import-data';
 GLOBAL.termCounter = [];
 var resendLimit = 9;
 var glyphs = ["ʾ","ʾ","ʾ","ʾ","ʾ","ʾ","á","b","p","t","","j","","ḥ","","d","","r","z","","s","","ṣ","ḍ","ṭ","ẓ","ʿ","","f","q","k","k","g","l","m","n","v","ú","h","y","í","a","i","u"];
-var accents = ["’","’","’","’","’","’","á","b","p","t","_th","j","_ch","ḥ","_kh","d","_dh","r","z","_zh","s","_sh","ṣ","ḍ","ṭ","ẓ","‘","_gh","f","q","k","k","g","l","m","n","v","ú","h","y","í","a","i","u"];
+var accents =["’","’","’","’","’","’","á","b","p","t","_th","j","_ch","ḥ","_kh","d","_dh","r","z","_zh","s","_sh","ṣ","ḍ","ṭ","ẓ","‘","_gh","f","q","k","k","g","l","m","n","v","ú","h","y","í","a","i","u"];
 var conversionHolder ='';
 var mainRowCounter = 0;
 var subRowCounter = 0;
 var worksheetNo = 0;
 var filename = '';
-//	GLOBAL.db 
+//	GLOBAL.db
 //	GLOBAL.db_hash
 
 module.exports.startProcess = function(req,res){
@@ -21,6 +21,8 @@ module.exports.startProcess = function(req,res){
 		res.send("starting Export Process ...");
 	}
 	console.log("starting Export Process ...");
+	//
+	augumentLists(); // do this once to add special underscore replacements
 	//scan for files in rootDir
 	// push verified files to ListOfFiles
 	var ListOfFiles = [];
@@ -91,7 +93,7 @@ function convertGlyph(Bstring)
 	subRowCounter ++;
 	var oldString = Bstring;
 	glyphs.forEach(function(glyph){
-		if(Bstring.indexOf(glyph)!=-1)
+		while (Bstring.indexOf(glyph)!=-1) // does this matter?
 		{
 			var glyphRegex = new RegExp(glyph,"g");
 			var myindex = glyphs.indexOf(glyph);
@@ -158,7 +160,7 @@ function saveRecord(file,Astring,Bstring,Cstring)
 	}
 	mapFunction = mapFunction+"){"+emitPortion+"}}";
 	//console.log(mapFunction);
-	
+
 	queryME(mapFunction,Astring,splitBstring,Cstring);
 }
 
@@ -239,7 +241,7 @@ function saveME(Astring,Bstring,Cstring)
 	mystruct["user"]="chad";
 	var uid = genUUID();
 	saveMEDATA(mystruct,uid,Bstring);
-	
+
 }
 function saveMEDATA(mystruct,uid,Bstring)
 {
@@ -274,7 +276,7 @@ function saveMEDATA(mystruct,uid,Bstring)
 		}
 	});
 }
-function genUUID(pattern) 
+function genUUID(pattern)
 {
 	pattern = pattern || 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx';
 	var uuid = pattern.replace(/[xy]/g, function(c) {
@@ -292,3 +294,34 @@ function sleep(milliseconds) {
     }
   }
 }
+
+function augumentLists() {
+  var underscores = {
+		"": "_th",
+		"": "_ch",
+		"": "_kh",
+		"": "_dh",
+		"": "_zh",
+		"": "_sh",
+		"": "_gh"
+  };
+	for (var find in underscores) {
+		var repl = underscores[find];
+		find = find.toLowerCase(); // just to make sure we are starting at lowercase
+		// all lower version
+		glyphs.push(find);
+		accents.push(repl);
+		// all upper version
+		glyphs.push(find.toUpperCase);
+		accents.push(repl.toUpperCase);
+	  // just uppercase the first letter
+		glyphs.push(key.charAt(0).toUpperCase + key.charAt(1));
+		accents.push('_'+ val.charAt(0).toUpperCase() +'h');
+	}
+}
+
+
+
+
+
+
