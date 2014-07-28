@@ -5,8 +5,18 @@ var PouchDB = require('pouchdb');
 var rootDir = './import-data';
 GLOBAL.termCounter = [];
 var resendLimit = 9;
-var glyphs = ["ʾ","ʾ","ʾ","ʾ","ʾ","ʾ","á","b","p","t","","j","","ḥ","","d","","r","z","","s","","ṣ","ḍ","ṭ","ẓ","ʿ","","f","q","k","k","g","l","m","n","v","ú","h","y","í","a","i","u"];
-var accents =["’","’","’","’","’","’","á","b","p","t","_th","j","_ch","ḥ","_kh","d","_dh","r","z","_zh","s","_sh","ṣ","ḍ","ṭ","ẓ","‘","_gh","f","q","k","k","g","l","m","n","v","ú","h","y","í","a","i","u"];
+//var glyphs = ["ʾ","ʾ","ʾ","ʾ","ʾ","ʾ","á","b","p","t","","j","","ḥ","","d","","r","z","","s","","ṣ","ḍ","ṭ","ẓ","ʿ","","f","q","k","k","g","l","m","n","v","ú","h","y","í","a","i","u"];
+//var accents = ["’","’","’","’","’","’","á","b","p","t","_th","j","_ch","ḥ","_kh","d","_dh","r","z","_zh","s","_sh","ṣ","ḍ","ṭ","ẓ","‘","_gh","f","q","k","k","g","l","m","n","v","ú","h","y","í","a","i","u"];
+//var dual_glyphs          = ["" ,"" ,""  ,"" ,"" ,"" ,"" ];
+//var dual_accents         = ["_th","_ch","_kh","_dh","_zh","_sh","_gh"];
+//var dual_accents_capital = ["_Th","_Ch","_Kh","_Dh","_Zh","_Sh","_Gh"];
+//var single_glyphs = ["ʾ","ʾ","ʾ","ʾ","ʾ","ʾ","á","b","p","t","j","ḥ","d","r","z","s","ṣ","ḍ","ṭ","ẓ","ʿ","f","q","k","k","g","l","m","n","v","ú","h","y","í","a","i","u"];
+//var single_accents = ["’","’","’","’","’","’","á","b","p","t","j","ḥ","d","r","z","s","ṣ","ḍ","ṭ","ẓ","‘","f","q","k","k","g","l","m","n","v","ú","h","y","í","a","i","u"];
+
+var glyphs = ["ʾ","ʾ","ʾ","ʾ","ʾ","ʾ","á","b","p","t","j","ḥ","d","r","z","s","ṣ","ḍ","ṭ","ẓ","ʿ","f","q","k","k","g","l","m","n","v","ú","h","y","í","a","i","u"];
+var accents = ["’","’","’","’","’","’","á","b","p","t","j","ḥ","d","r","z","s","ṣ","ḍ","ṭ","ẓ","‘","f","q","k","k","g","l","m","n","v","ú","h","y","í","a","i","u"];
+augumentGlyphs(); // do this once to add special underscore replacements
+
 var conversionHolder ='';
 var mainRowCounter = 0;
 var subRowCounter = 0;
@@ -22,7 +32,6 @@ module.exports.startProcess = function(req,res){
 	}
 	console.log("starting Export Process ...");
 	//
-	augumentLists(); // do this once to add special underscore replacements
 	//scan for files in rootDir
 	// push verified files to ListOfFiles
 	var ListOfFiles = [];
@@ -92,14 +101,35 @@ function convertGlyph(Bstring)
 {
 	subRowCounter ++;
 	var oldString = Bstring;
+
 	glyphs.forEach(function(glyph){
-		while (Bstring.indexOf(glyph)!=-1) // does this matter?
+		if(Bstring.indexOf(glyph)!=-1)
 		{
 			var glyphRegex = new RegExp(glyph,"g");
 			var myindex = glyphs.indexOf(glyph);
-			Bstring = Bstring.replace(glyphRegex,accents[myindex]);
+			Bstring = Bstring.replace(glyphRegex, accents[myindex]);
 		}
 	});
+
+	/*
+	dual_glyphs.forEach(function(glyph){
+		if(Bstring.indexOf(glyph)!=-1)
+		{
+			var glyphRegex = new RegExp(glyph,"g");
+			var myindex = dual_glyphs.indexOf(glyph);
+			Bstring = Bstring.replace(glyphRegex,dual_accents[myindex]);
+			var glyphCapRegex = new RegExp("^"+dual_accents[myindex],"g");
+			Bstring = Bstring.replace(glyphCapRegex,dual_accents_capital[myindex]);
+		}
+	});
+	single_glyphs.forEach(function(glyph){
+		if(Bstring.indexOf(glyph)!=-1)
+		{
+			var glyphRegex = new RegExp(glyph,"g");
+			var myindex = single_glyphs.indexOf(glyph);
+			Bstring = Bstring.replace(glyphRegex,single_accents[myindex]);
+		}
+	});*/
 	console.log(oldString+" -> "+Bstring);
 	conversionHolder=conversionHolder+oldString+" -> "+Bstring+"\n";
 	if(subRowCounter == mainRowCounter)
@@ -295,7 +325,7 @@ function sleep(milliseconds) {
   }
 }
 
-function augumentLists() {
+function augumentGlyphs() {
   var underscores = {
 		"": "_th",
 		"": "_ch",
