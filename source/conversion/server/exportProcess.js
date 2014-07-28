@@ -7,7 +7,11 @@ GLOBAL.termCounter = [];
 var resendLimit = 9;
 var glyphs = ["ʾ","ʾ","ʾ","ʾ","ʾ","ʾ","á","b","p","t","","j","","ḥ","","d","","r","z","","s","","ṣ","ḍ","ṭ","ẓ","ʿ","","f","q","k","k","g","l","m","n","v","ú","h","y","í","a","i","u"];
 var accents = ["’","’","’","’","’","’","á","b","p","t","_th","j","_ch","ḥ","_kh","d","_dh","r","z","_zh","s","_sh","ṣ","ḍ","ṭ","ẓ","‘","_gh","f","q","k","k","g","l","m","n","v","ú","h","y","í","a","i","u"];
-
+var conversionHolder ='';
+var mainRowCounter = 0;
+var subRowCounter = 0;
+var worksheetNo = 0;
+var filename = '';
 //	GLOBAL.db 
 //	GLOBAL.db_hash
 
@@ -33,6 +37,7 @@ function scanDir(sourceDir, ListOfFiles)
 	returnedList.forEach(function(file){
 		if(fs.existsSync(rootDir+'/'+file))
 		{
+			filename = file;
 			ListOfFiles.push(rootDir+'/'+file);
 		}
 	});
@@ -50,13 +55,19 @@ function processFiles(file)
 	var LastAColumnValue = '';
 	var LastBColumnValue = '';
   	var workbook = xlsx.readFile(file);
+  	//debugger;
   	var sheet_name_list = workbook.SheetNames;
   	GLOBAL.count_limit = 0;
+  	worksheetNo=0;
 	sheet_name_list.forEach(function(y) {
 		var worksheet = workbook.Sheets[y];
 		var columnARegex = /^A.+/gmi;
 		var columnBRegex = /^B.+/gmi;
 		var columnERegex = /^F.+/gmi;
+		mainRowCounter = 0;
+		subRowCounter = 0;
+		worksheetNo ++;
+		conversionHolder='';
 		for (z in worksheet) {
 			if(z[0] === '!') continue;
 			if(columnARegex.test(z) && z[1]>1)
@@ -69,6 +80,7 @@ function processFiles(file)
 			}
 			if(columnERegex.test(z) && z[1]>1)
 			{
+				mainRowCounter ++;
 				saveRecord(file,LastAColumnValue,LastBColumnValue,JSON.stringify(worksheet[z].v));
 			}
 		}
@@ -76,6 +88,7 @@ function processFiles(file)
 }
 function convertGlyph(Bstring)
 {
+	subRowCounter ++;
 	var oldString = Bstring;
 	glyphs.forEach(function(glyph){
 		if(Bstring.indexOf(glyph)!=-1)
@@ -86,6 +99,15 @@ function convertGlyph(Bstring)
 		}
 	});
 	console.log(oldString+" -> "+Bstring);
+	conversionHolder=conversionHolder+oldString+" -> "+Bstring+"\n";
+	if(subRowCounter == mainRowCounter)
+	{
+		//save data into UTF8 format file
+		var options = {
+			encoding:'utf8'
+		};
+		fs.writeFileSync(filename+worksheetNo+".txt", conversionHolder, options);
+	}
 	return Bstring;
 }
 function saveRecord(file,Astring,Bstring,Cstring)
