@@ -5,6 +5,22 @@ var PouchDB = require('pouchdb');
 var rootDir = './import-data';
 GLOBAL.termCounter = [];
 var resendLimit = 9;
+var glyphs = ["ʾ","ʾ","ʾ","ʾ","ʾ","ʾ","á","b","p","t","","j","","ḥ","","d","","r","z","","s","","ṣ","ḍ","ṭ","ẓ","ʿ","","f","q","k","k","g","l","m","n","v","ú","h","y","í","a","i","u"];
+var accents = ["’","’","’","’","’","’","á","b","p","t","_th","j","_ch","ḥ","_kh","d","_dh","r","z","_zh","s","_sh","ṣ","ḍ","ṭ","ẓ","‘","_gh","f","q","k","k","g","l","m","n","v","ú","h","y","í","a","i","u"];
+//var dual_glyphs          = ["" ,"" ,""  ,"" ,"" ,"" ,"" ];
+//var dual_accents         = ["_th","_ch","_kh","_dh","_zh","_sh","_gh"];
+//var dual_accents_capital = ["_Th","_Ch","_Kh","_Dh","_Zh","_Sh","_Gh"];
+//var single_glyphs = ["ʾ","ʾ","ʾ","ʾ","ʾ","ʾ","á","b","p","t","j","ḥ","d","r","z","s","ṣ","ḍ","ṭ","ẓ","ʿ","f","q","k","k","g","l","m","n","v","ú","h","y","í","a","i","u"];
+//var single_accents = ["’","’","’","’","’","’","á","b","p","t","j","ḥ","d","r","z","s","ṣ","ḍ","ṭ","ẓ","‘","f","q","k","k","g","l","m","n","v","ú","h","y","í","a","i","u"];
+
+//var glyphs = ["ʾ","ʾ","ʾ","ʾ","ʾ","ʾ","á","b","p","t","j","ḥ","d","r","z","s","ṣ","ḍ","ṭ","ẓ","ʿ","f","q","k","k","g","l","m","n","v","ú","h","y","í","a","i","u"];
+//var accents = ["’","’","’","’","’","’","á","b","p","t","j","ḥ","d","r","z","s","ṣ","ḍ","ṭ","ẓ","‘","f","q","k","k","g","l","m","n","v","ú","h","y","í","a","i","u"];
+//augumentGlyphs(); // do this once to add special underscore replacements
+//cleanupGlyphsAccents();
+// console.log("glyphs");
+// console.log(glyphs);
+// console.log("accents");
+// console.log(accents);
 var conversionHolder ='';
 var mainRowCounter = 0;
 var subRowCounter = 0;
@@ -90,13 +106,34 @@ function convertGlyph(Bstring)
 	subRowCounter ++;
 	var oldString = Bstring;
 
-	// global replace
-	var replaceList = getReplacementList(); // builds replacement for all underscores - not too slow
-	for (var i = 0; i < replaceList.length; i++) {
-    var re = new RegExp(replaceList[i].find, "g");
-    Bstring = Bstring.replace(re, replaceList[i].repl);
-  }
+	glyphs.forEach(function(glyph){
+		if(Bstring.indexOf(glyph)!=-1)
+		{
+			var glyphRegex = new RegExp(glyph,"g");
+			var myindex = glyphs.indexOf(glyph);
+			Bstring = Bstring.replace(glyphRegex, accents[myindex]);
+		}
+	});
 
+	/*
+	dual_glyphs.forEach(function(glyph){
+		if(Bstring.indexOf(glyph)!=-1)
+		{
+			var glyphRegex = new RegExp(glyph,"g");
+			var myindex = dual_glyphs.indexOf(glyph);
+			Bstring = Bstring.replace(glyphRegex,dual_accents[myindex]);
+			var glyphCapRegex = new RegExp("^"+dual_accents[myindex],"g");
+			Bstring = Bstring.replace(glyphCapRegex,dual_accents_capital[myindex]);
+		}
+	});
+	single_glyphs.forEach(function(glyph){
+		if(Bstring.indexOf(glyph)!=-1)
+		{
+			var glyphRegex = new RegExp(glyph,"g");
+			var myindex = single_glyphs.indexOf(glyph);
+			Bstring = Bstring.replace(glyphRegex,single_accents[myindex]);
+		}
+	});*/
 	console.log(oldString+" -> "+Bstring);
 	conversionHolder=conversionHolder+oldString+" -> "+Bstring+"\n";
 	if(subRowCounter == mainRowCounter)
@@ -281,7 +318,7 @@ function genUUID(pattern)
 		return v.toString(16);
 	});
 	return uuid;
-}
+};
 
 function sleep(milliseconds) {
   var start = new Date().getTime();
@@ -292,11 +329,7 @@ function sleep(milliseconds) {
   }
 }
 
-function getReplacementList() {
-	var result = [
-    {find: "ʾ", repl: "’"},
-    {find: "ʿ", repl: "‘"}
-	];
+function augumentGlyphs() {
   var underscores = {
 		"": "_th",
 		"": "_ch",
@@ -304,26 +337,48 @@ function getReplacementList() {
 		"": "_dh",
 		"": "_zh",
 		"": "_sh",
-		"": "_gh",
+		"": "_gh"
   };
 	for (var find in underscores) {
 		var repl = underscores[find];
 		find = find.toLowerCase(); // just to make sure we are starting at lowercase
-		var item = {};
 		// all lower version
-		item.find = find; item.repl = repl; result.push(item);
+		glyphs.push(find);
+		accents.push(repl);
 		// all upper version
-		item.find = find.toUpperCase; item.repl = repl.toUpperCase; result.push(item);
-    // just uppercase the first letter
-    item.find = find.charAt(0).toUpperCase + find.charAt(1);
-    item.repl = '_'+ repl.charAt(0).toUpperCase() +'h';
-    result.push(item);
+		glyphs.push(find.toUpperCase());
+		accents.push(repl.toUpperCase());
+	  // just uppercase the first letter
+		//glyphs.push(key.charAt(0).toUpperCase + key.charAt(1));
+		//accents.push('_'+ val.charAt(0).toUpperCase() +'h');
+		glyphs.push(find.charAt(0).toUpperCase() + find.charAt(1));
+		accents.push('_'+ repl.charAt(1).toUpperCase() +'h');
 	}
-	return result;
 }
+function cleanupGlyphsAccents(){
+	glyphs.forEach(function(glyph){
+		var myIndex = glyphs.indexOf(glyph);
+		if(accents[myIndex]===glyphs[myIndex])
+		{
+			delete accents[myIndex];
+			delete glyphs[myIndex];
+		}		
+	});
 
-
-
-
-
-
+	//reconstruct new glyphs and accents
+	var newglyph=[];
+	var newaccents=[];
+	for(var x=0;x<glyphs.length;x++)
+	{
+		if(glyphs[x]!=undefined)
+		{
+			newglyph.push(glyphs[x]);
+			newaccents.push(accents[x]);
+		}
+	}
+	glyphs = newglyph;
+	accents = newaccents;
+	// glyphs.concat(newglyph);
+	// accents.concat(newaccents);
+	console.log("fin cleaning glyphs and accents");
+}
