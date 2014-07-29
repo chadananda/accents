@@ -5,8 +5,8 @@ var PouchDB = require('pouchdb');
 var rootDir = './import-data';
 GLOBAL.termCounter = [];
 var resendLimit = 9;
-var glyphs = ["ʾ","ʾ","ʾ","ʾ","ʾ","ʾ","á","b","p","t","","j","","ḥ","","d","","r","z","","s","","ṣ","ḍ","ṭ","ẓ","ʿ","","f","q","k","k","g","l","m","n","v","ú","h","y","í","a","i","u"];
-var accents = ["’","’","’","’","’","’","á","b","p","t","_th","j","_ch","ḥ","_kh","d","_dh","r","z","_zh","s","_sh","ṣ","ḍ","ṭ","ẓ","‘","_gh","f","q","k","k","g","l","m","n","v","ú","h","y","í","a","i","u"];
+//var glyphs = ["ʾ","ʾ","ʾ","ʾ","ʾ","ʾ","á","b","p","t","","j","","ḥ","","d","","r","z","","s","","ṣ","ḍ","ṭ","ẓ","ʿ","","f","q","k","k","g","l","m","n","v","ú","h","y","í","a","i","u"];
+//var accents = ["’","’","’","’","’","’","á","b","p","t","_th","j","_ch","ḥ","_kh","d","_dh","r","z","_zh","s","_sh","ṣ","ḍ","ṭ","ẓ","‘","_gh","f","q","k","k","g","l","m","n","v","ú","h","y","í","a","i","u"];
 //var dual_glyphs          = ["" ,"" ,""  ,"" ,"" ,"" ,"" ];
 //var dual_accents         = ["_th","_ch","_kh","_dh","_zh","_sh","_gh"];
 //var dual_accents_capital = ["_Th","_Ch","_Kh","_Dh","_Zh","_Sh","_Gh"];
@@ -15,6 +15,24 @@ var accents = ["’","’","’","’","’","’","á","b","p","t","_th","j","_
 
 //var glyphs = ["ʾ","ʾ","ʾ","ʾ","ʾ","ʾ","á","b","p","t","j","ḥ","d","r","z","s","ṣ","ḍ","ṭ","ẓ","ʿ","f","q","k","k","g","l","m","n","v","ú","h","y","í","a","i","u"];
 //var accents = ["’","’","’","’","’","’","á","b","p","t","j","ḥ","d","r","z","s","ṣ","ḍ","ṭ","ẓ","‘","f","q","k","k","g","l","m","n","v","ú","h","y","í","a","i","u"];
+var glyphs = ["","","","","","","","","","","","","ʾ","ʿ"];
+var accents =["_Kh","_Gh","_Sh","_Ch","_Th","_th","_ch","_kh","_dh","_zh","_sh","_gh","’","‘"];
+
+// {find: "", repl: "_Kh"},
+//   {find: "", repl: "_Gh"},
+//   {find: "", repl: "_Sh"},
+//   {find: "", repl: "_Ch"},
+//   {find: "", repl: "_Th"},
+//   {find: "", repl: "_th"},
+//   {find: "", repl: "_ch"},
+//   {find: "", repl: "_kh"},
+//   {find: "", repl: "_dh"},
+//   {find: "", repl: "_zh"},
+//   {find: "", repl: "_sh"},
+//   {find: "", repl: "_gh"},
+//   {find: "ʾ"   , repl: "’" },
+//   {find: "ʿ"   , repl: "‘" }
+
 //augumentGlyphs(); // do this once to add special underscore replacements
 //cleanupGlyphsAccents();
 // console.log("glyphs");
