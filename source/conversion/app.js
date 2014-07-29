@@ -1,7 +1,7 @@
 // inital setup
 var PouchDB = require('pouchdb');
 
-var exportProcess = require('./server/exportProcess');
+var exportProcess = require('./server/exportToTemp');
 GLOBAL.PouchDB_opts={
 		cache:false
 	};
@@ -10,6 +10,7 @@ if(process.env.NODE_ENV=='development'){
 	console.log("running Dev");
 	
 	GLOBAL.db_name = 'http://localhost:5984/accents';
+	GLOBAL.db_temp = 'http://localhost:5984/accents_temp';
 	//var db_hashName = 'http://localhost:5984/importexcelhashqueue';
 	GLOBAL.db = new PouchDB(GLOBAL.db_name,GLOBAL.PouchDB_opts);
 	//GLOBAL.db_hash = new PouchDB(db_hashName,PouchDB_opts);
@@ -17,6 +18,7 @@ if(process.env.NODE_ENV=='development'){
 	console.log("running Prod");
 	var remoteLocation = 'http://location:port/'
 	GLOBAL.db_name = 'accents';
+	GLOBAL.db_temp = 'accents_temp';
 	var db_hashName = 'importexcelhashqueue';
 	var remote = remoteLocation+GLOBAL.db_name;
 	var remote_hash = remoteLocation+GLOBAL.db_hashName;
@@ -29,7 +31,7 @@ if(process.env.NODE_ENV=='development'){
 	GLOBAL.db.replicate.from(remote,opts);
 	//GLOBAL.db.replicate.to(remote_hash,opts);
 	//GLOBAL.db.replicate.from(remote_hash,opts);
-	GLOBAL.db = new PouchDB(GLOBAL.db_name,GLOBAL.PouchDB_opts);
+	GLOBAL.db = new PouchDB(remoteLocation+GLOBAL.db_name,GLOBAL.PouchDB_opts);
 	//GLOBAL.db_hash = new PouchDB(db_hashName,PouchDB_opts);
 }
 process.on('SIGTERM', function(){

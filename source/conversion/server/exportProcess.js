@@ -5,47 +5,15 @@ var PouchDB = require('pouchdb');
 var rootDir = './import-data';
 GLOBAL.termCounter = [];
 var resendLimit = 9;
-//var glyphs = ["ʾ","ʾ","ʾ","ʾ","ʾ","ʾ","á","b","p","t","","j","","ḥ","","d","","r","z","","s","","ṣ","ḍ","ṭ","ẓ","ʿ","","f","q","k","k","g","l","m","n","v","ú","h","y","í","a","i","u"];
-//var accents = ["’","’","’","’","’","’","á","b","p","t","_th","j","_ch","ḥ","_kh","d","_dh","r","z","_zh","s","_sh","ṣ","ḍ","ṭ","ẓ","‘","_gh","f","q","k","k","g","l","m","n","v","ú","h","y","í","a","i","u"];
-//var dual_glyphs          = ["" ,"" ,""  ,"" ,"" ,"" ,"" ];
-//var dual_accents         = ["_th","_ch","_kh","_dh","_zh","_sh","_gh"];
-//var dual_accents_capital = ["_Th","_Ch","_Kh","_Dh","_Zh","_Sh","_Gh"];
-//var single_glyphs = ["ʾ","ʾ","ʾ","ʾ","ʾ","ʾ","á","b","p","t","j","ḥ","d","r","z","s","ṣ","ḍ","ṭ","ẓ","ʿ","f","q","k","k","g","l","m","n","v","ú","h","y","í","a","i","u"];
-//var single_accents = ["’","’","’","’","’","’","á","b","p","t","j","ḥ","d","r","z","s","ṣ","ḍ","ṭ","ẓ","‘","f","q","k","k","g","l","m","n","v","ú","h","y","í","a","i","u"];
 
-//var glyphs = ["ʾ","ʾ","ʾ","ʾ","ʾ","ʾ","á","b","p","t","j","ḥ","d","r","z","s","ṣ","ḍ","ṭ","ẓ","ʿ","f","q","k","k","g","l","m","n","v","ú","h","y","í","a","i","u"];
-//var accents = ["’","’","’","’","’","’","á","b","p","t","j","ḥ","d","r","z","s","ṣ","ḍ","ṭ","ẓ","‘","f","q","k","k","g","l","m","n","v","ú","h","y","í","a","i","u"];
 var glyphs = ["","","","","","","","","","","","","ʾ","ʿ",""];
 var accents =["_Kh","_Gh","_Sh","_Ch","_Th","_th","_ch","_kh","_dh","_zh","_sh","_gh","’","‘","_Dh"];
 
-// {find: "", repl: "_Kh"},
-//   {find: "", repl: "_Gh"},
-//   {find: "", repl: "_Sh"},
-//   {find: "", repl: "_Ch"},
-//   {find: "", repl: "_Th"},
-//   {find: "", repl: "_th"},
-//   {find: "", repl: "_ch"},
-//   {find: "", repl: "_kh"},
-//   {find: "", repl: "_dh"},
-//   {find: "", repl: "_zh"},
-//   {find: "", repl: "_sh"},
-//   {find: "", repl: "_gh"},
-//   {find: "ʾ"   , repl: "’" },
-//   {find: "ʿ"   , repl: "‘" }
-
-//augumentGlyphs(); // do this once to add special underscore replacements
-//cleanupGlyphsAccents();
-// console.log("glyphs");
-// console.log(glyphs);
-// console.log("accents");
-// console.log(accents);
 var conversionHolder ='';
 var mainRowCounter = 0;
 var subRowCounter = 0;
 var worksheetNo = 0;
 var filename = '';
-//	GLOBAL.db
-//	GLOBAL.db_hash
 
 module.exports.startProcess = function(req,res){
 	if(res!=null)
@@ -70,7 +38,7 @@ function scanDir(sourceDir, ListOfFiles)
 	returnedList.forEach(function(file){
 		if(fs.existsSync(rootDir+'/'+file))
 		{
-			filename = file;
+			//filename = file;
 			ListOfFiles.push(rootDir+'/'+file);
 		}
 	});
@@ -119,7 +87,7 @@ function processFiles(file)
 		}
 	});
 }
-function convertGlyph(Bstring)
+function convertGlyph(Bstring,file)
 {
 	subRowCounter ++;
 	var oldString = Bstring;
@@ -132,31 +100,13 @@ function convertGlyph(Bstring)
 			Bstring = Bstring.replace(glyphRegex, accents[myindex]);
 		}
 	});
-
-	/*
-	dual_glyphs.forEach(function(glyph){
-		if(Bstring.indexOf(glyph)!=-1)
-		{
-			var glyphRegex = new RegExp(glyph,"g");
-			var myindex = dual_glyphs.indexOf(glyph);
-			Bstring = Bstring.replace(glyphRegex,dual_accents[myindex]);
-			var glyphCapRegex = new RegExp("^"+dual_accents[myindex],"g");
-			Bstring = Bstring.replace(glyphCapRegex,dual_accents_capital[myindex]);
-		}
-	});
-	single_glyphs.forEach(function(glyph){
-		if(Bstring.indexOf(glyph)!=-1)
-		{
-			var glyphRegex = new RegExp(glyph,"g");
-			var myindex = single_glyphs.indexOf(glyph);
-			Bstring = Bstring.replace(glyphRegex,single_accents[myindex]);
-		}
-	});*/
 	console.log(oldString+" -> "+Bstring);
 	conversionHolder=conversionHolder+oldString+" -> "+Bstring+"\n";
 	if(subRowCounter == mainRowCounter)
 	{
 		//save data into UTF8 format file
+		var filenames = file.split('/');
+		filename = filenames[(filenames.length)-1];
 		var options = {
 			encoding:'utf8'
 		};
@@ -178,7 +128,7 @@ function saveRecord(file,Astring,Bstring,Cstring)
 	// 	definition:"string"
 	// }
 	//find existing record with source == 'marciel' and term == Bstring
-	Bstring = convertGlyph(Bstring);
+	Bstring = convertGlyph(Bstring,file);
 	var splitBstring = Bstring.split(" ");
 	var mapFunction = 'function(doc){ if(doc.source == "marciel" ';
 	var emitPortion = "emit(doc.original,doc.term);";
@@ -337,66 +287,3 @@ function genUUID(pattern)
 	});
 	return uuid;
 };
-
-function sleep(milliseconds) {
-  var start = new Date().getTime();
-  for (var i = 0; i < 1e7; i++) {
-    if ((new Date().getTime() - start) > milliseconds){
-      break;
-    }
-  }
-}
-
-function augumentGlyphs() {
-  var underscores = {
-		"": "_th",
-		"": "_ch",
-		"": "_kh",
-		"": "_dh",
-		"": "_zh",
-		"": "_sh",
-		"": "_gh"
-  };
-	for (var find in underscores) {
-		var repl = underscores[find];
-		find = find.toLowerCase(); // just to make sure we are starting at lowercase
-		// all lower version
-		glyphs.push(find);
-		accents.push(repl);
-		// all upper version
-		glyphs.push(find.toUpperCase());
-		accents.push(repl.toUpperCase());
-	  // just uppercase the first letter
-		//glyphs.push(key.charAt(0).toUpperCase + key.charAt(1));
-		//accents.push('_'+ val.charAt(0).toUpperCase() +'h');
-		glyphs.push(find.charAt(0).toUpperCase() + find.charAt(1));
-		accents.push('_'+ repl.charAt(1).toUpperCase() +'h');
-	}
-}
-function cleanupGlyphsAccents(){
-	glyphs.forEach(function(glyph){
-		var myIndex = glyphs.indexOf(glyph);
-		if(accents[myIndex]===glyphs[myIndex])
-		{
-			delete accents[myIndex];
-			delete glyphs[myIndex];
-		}		
-	});
-
-	//reconstruct new glyphs and accents
-	var newglyph=[];
-	var newaccents=[];
-	for(var x=0;x<glyphs.length;x++)
-	{
-		if(glyphs[x]!=undefined)
-		{
-			newglyph.push(glyphs[x]);
-			newaccents.push(accents[x]);
-		}
-	}
-	glyphs = newglyph;
-	accents = newaccents;
-	// glyphs.concat(newglyph);
-	// accents.concat(newaccents);
-	console.log("fin cleaning glyphs and accents");
-}

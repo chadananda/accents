@@ -9,7 +9,7 @@ GLOBAL.router = express.Router();
 // configuration ===============================================================
 
 var port = process.env.PORT || 9876;
-var exportProcess = require('./server/exportProcess');
+var exportProcess = require('./server/webReview');
 GLOBAL.PouchDB_opts={
 		cache:false
 	};
@@ -21,6 +21,7 @@ if(process.env.NODE_ENV=='development'){
 	app.use(bodyParser.urlencoded({extended:true}));		// parse application/x-www-form-urlencoded
 
 	GLOBAL.db_name = 'http://localhost:5984/accents';
+	GLOBAL.db_temp = 'http://localhost:5984/accents_temp';
 	//var db_hashName = 'http://localhost:5984/importexcelhashqueue';
 	GLOBAL.db = new PouchDB(GLOBAL.db_name,GLOBAL.PouchDB_opts);
 	//GLOBAL.db_hash = new PouchDB(db_hashName,PouchDB_opts);
@@ -32,6 +33,7 @@ if(process.env.NODE_ENV=='development'){
 
 	var remoteLocation = 'http://location:port/'
 	GLOBAL.db_name = 'accents';
+	GLOBAL.db_temp = 'accents_temp';
 	var db_hashName = 'importexcelhashqueue';
 	var remote = remoteLocation+GLOBAL.db_name;
 	var remote_hash = remoteLocation+GLOBAL.db_hashName;
