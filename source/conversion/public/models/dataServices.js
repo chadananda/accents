@@ -28,6 +28,11 @@
 				{
 					var deferred = $q.defer();
 					delete doc.termNonConvert;
+					//check if Selected is there
+					if(doc.Selected != undefined)
+					{
+						delete doc.Selected;
+					}
 					accessDB.post(doc, function(err, res) {
 						$rootScope.$apply(function() {
 							if (err) {
