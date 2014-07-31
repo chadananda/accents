@@ -100,6 +100,7 @@
 					//destroy the db
 			        pouchWrapper.destroyTemp();
 			        dataStorage.emptyTempData();
+			        $scope.myData=[];
 				}
 			}
 
