@@ -1,0 +1,30 @@
+<table class="table">
+	<thead>
+		<tr>
+			<th>#</th>
+			<th>Glyph</th>
+			<th>Orig Accent</th>
+			<th>Converted Accent</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-repeat="accentdata in myData track by $index">
+			<td><input name="itemChkBx" type="checkbox" value='{{$index}}'></td>
+			<td>{{items.original}}</td>
+			<td>
+				<table>
+					<tr>
+						<td ng-repeat="newterms in accentdata.term track by $index">{{newterms}}</td>
+					</tr>
+				</table>
+			</td>
+			<td>
+				<table>
+					<tr>
+						<td ng-repeat="oldterms in accentdata.termNonConvert track by $index">{{oldterms}}</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</tbody>
+</table>
