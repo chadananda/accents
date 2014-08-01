@@ -12,6 +12,7 @@ GLOBAL.PouchDB_opts={
 	GLOBAL.db_name = 'http://chad:vanilla123@diacritics.iriscouch.com/accents2';
 	GLOBAL.db_temp_name = 'http://chad:vanilla123@diacritics.iriscouch.com/accents_temp';
 	//var db_hashName = 'http://localhost:5984/importexcelhashqueue';
+	//GLOBAL.db = new PouchDB(GLOBAL.db_name);
 	GLOBAL.db = new PouchDB("accents2");
 	GLOBAL.db_temp = new PouchDB("accents_temp");
 	// GLOBAL.db = new PouchDB(GLOBAL.db_name);
@@ -35,17 +36,17 @@ GLOBAL.PouchDB_opts={
 		create_target: true
 	}
 	
-	console.log("replicating "+GLOBAL.db_name);
-	GLOBAL.db.replicate.from(GLOBAL.db_name,initopts)
+	// console.log("replicating "+GLOBAL.db_name);
+	// GLOBAL.db.replicate.from(GLOBAL.db_name,initopts)
 
-		.on('complete',function(info){
-			console.log(GLOBAL.db_name+" done...");
-			console.log("replicating "+GLOBAL.db_temp_name);
+	// 	.on('complete',function(info){
+	// 		console.log(GLOBAL.db_name+" done...");
+	// 		console.log("replicating "+GLOBAL.db_temp_name);
 
-			GLOBAL.db_temp.replicate.from(GLOBAL.db_temp_name,initopts)
+			// GLOBAL.db_temp.replicate.from(GLOBAL.db_temp_name,initopts)
 
-			.on('complete',function(info){
-				console.log(GLOBAL.db_temp_name+" done...");
+			// .on('complete',function(info){
+			// 	console.log(GLOBAL.db_temp_name+" done...");
 				GLOBAL.db_temp.replicate.to(GLOBAL.db_temp_name,opts);
 				GLOBAL.db_temp.replicate.from(GLOBAL.db_temp_name,opts);
 				GLOBAL.db.replicate.to(GLOBAL.db_name,opts);
@@ -56,24 +57,24 @@ GLOBAL.PouchDB_opts={
 				});
 				console.log("Starting Import Process");
 				exportProcess.startProcess(null,null);
-			})
-			.on('error',function(err){
-				console.log("Error in replication of "+GLOBAL.db_temp_name);
-				console.log(err);
-			});
-			// GLOBAL.db_temp.replicate.to(GLOBAL.db_temp_name,opts);
-			// GLOBAL.db_temp.replicate.from(GLOBAL.db_temp_name,opts);
-			// process.on('SIGTERM', function(){
-			//     console.log('terminating');
-			//     process.exit(1);
+			// })
+			// .on('error',function(err){
+			// 	console.log("Error in replication of "+GLOBAL.db_temp_name);
+			// 	console.log(err);
 			// });
-			// console.log("Starting Import Process");
-			// exportProcess.startProcess(null,null);
-		})
-		.on('error',function(err){
-			console.log("Error in replication of "+GLOBAL.db_name);
-			console.log(err);
-		});
+		// 	GLOBAL.db_temp.replicate.to(GLOBAL.db_temp_name,opts);
+		// 	GLOBAL.db_temp.replicate.from(GLOBAL.db_temp_name,opts);
+		// 	process.on('SIGTERM', function(){
+		// 	    console.log('terminating');
+		// 	    process.exit(1);
+		// 	});
+		// 	console.log("Starting Import Process");
+		// 	exportProcess.startProcess(null,null);
+		// })
+		// .on('error',function(err){
+		// 	console.log("Error in replication of "+GLOBAL.db_name);
+		// 	console.log(err);
+		// });
 	
 // 	//GLOBAL.db.replicate.to(remote_hash,opts);
 // 	//GLOBAL.db.replicate.from(remote_hash,opts);
