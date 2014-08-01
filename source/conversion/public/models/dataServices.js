@@ -1,7 +1,7 @@
 (function(){
 	var accentsDataServices = angular.module('myDataServices',[]);
 
-	var DBlocation = 'http://diacritics.iriscouch.com/'
+	var DBlocation = 'http://chad:vanilla123@diacritics.iriscouch.com/'
 	var DBcollection = 'accents2';
 	var DBcollectionTemp = 'accents_temp';
 	PouchDB_opts={

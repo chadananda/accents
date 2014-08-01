@@ -195,7 +195,7 @@ function queryME(mapFunction,Astring,splitBstring,Cstring,splitConvertedBString)
 				if(err.message == undefined)
 				{
 					//console.log("Undefined reached - resending query for "+Astring);
-					queryME(mapFunction,Astring,splitBstring,Cstring,splitConvertedBString);
+					setImmediate(queryME,mapFunction,Astring,splitBstring,Cstring,splitConvertedBString);
 				}else{
 					console.log("Error with map query");
 					console.log(mapFunction);
@@ -246,13 +246,13 @@ function saveME(Astring,splitBstring,Cstring,splitConvertedBString)
 }
 function saveMEDATA(mystruct,uid,Bstring)
 {
-	if(process.env.NODE_ENV=='development'){
-		var db = new PouchDB(GLOBAL.db_temp,GLOBAL.PouchDB_opts);
-	}else{
-		var db = new PouchDB(remoteLocation+GLOBAL.db_temp,GLOBAL.PouchDB_opts);
-	}
+	//if(process.env.NODE_ENV=='development'){
+		//var db = new PouchDB(GLOBAL.db_temp,GLOBAL.PouchDB_opts);
+	// }else{
+	// 	var db = new PouchDB(remoteLocation+GLOBAL.db_temp,GLOBAL.PouchDB_opts);
+	// }
 	
-	db.put(mystruct,uid,function(err,res){
+	GLOBAL.db_temp.put(mystruct,uid,function(err,res){
 		if(err==null)
 		{
 			console.log("Saved accent");
@@ -273,7 +273,7 @@ function saveMEDATA(mystruct,uid,Bstring)
 				}else{
 					console.log("Undefined reached - resending save for "+Bstring);
 					console.log("Current Resend Count : "+GLOBAL.termCounter[Bstring]);
-					saveMEDATA(mystruct,uid,Bstring);
+					setImmediate(saveMEDATA,mystruct,uid,Bstring);
 				}
 			}else{
 				console.log("Error Saving Data");
