@@ -1,3 +1,4 @@
+var PouchDB = require('pouchdb');
 var fs = require('fs');
 var md5 = require('md5-jkmyers');
 var xlsx = require('xlsx');
@@ -46,6 +47,7 @@ function scanDir(sourceDir, ListOfFiles)
 function checkHash(ListOfFiles)
 {
 	ListOfFiles.forEach(function(file){
+		GLOBAL.termCounter = [];
 		processFiles(file);
 		GLOBAL.termCounter = [];
 	});
@@ -194,7 +196,8 @@ function queryME(mapFunction,Astring,splitBstring,Cstring,splitConvertedBString)
 			}else{
 				if(err.message == undefined)
 				{
-					//console.log("Undefined reached - resending query for "+Astring);
+					console.log("Undefined reached - resending query for "+Astring);
+					//GLOBAL.db = new PouchDB(GLOBAL.db_name);
 					setImmediate(queryME,mapFunction,Astring,splitBstring,Cstring,splitConvertedBString);
 				}else{
 					console.log("Error with map query");
