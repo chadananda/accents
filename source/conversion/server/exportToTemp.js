@@ -167,7 +167,8 @@ function saveRecord(file,Astring,Bstring,Cstring)
 	mapFunction = mapFunction+"){"+emitPortion+"}}";
 	//console.log(mapFunction);
 
-	queryME(mapFunction,Astring,splitBstring,Cstring,splitConvertedBString);
+	//queryME(mapFunction,Astring,splitBstring,Cstring,splitConvertedBString);
+	setImmediate(queryME,mapFunction,Astring,splitBstring,Cstring,splitConvertedBString);
 }
 
 function queryME(mapFunction,Astring,splitBstring,Cstring,splitConvertedBString)
@@ -184,8 +185,9 @@ function queryME(mapFunction,Astring,splitBstring,Cstring,splitConvertedBString)
 				console.log("DB already has the term "+Astring);
 			}else{
 				console.log("Checking tempDB for "+Astring);
+				//console.log(mapFunction);
 				//saveME(Astring,splitBstring,Cstring,splitConvertedBString);
-				queryMEtemp(mapFunction,Astring,splitBstring,Cstring,splitConvertedBString);
+				setImmediate(queryTempDB,mapFunction,Astring,splitBstring,Cstring,splitConvertedBString);
 			}
 		}else{
 			if(err.status==404)
@@ -194,7 +196,7 @@ function queryME(mapFunction,Astring,splitBstring,Cstring,splitConvertedBString)
 				subRowCounter ++;
 				console.log(Astring+" term is not found - Saving Term");
 				//saveME(Astring,splitBstring,Cstring,splitConvertedBString);
-				queryMEtemp(mapFunction,Astring,splitBstring,Cstring,splitConvertedBString);
+				setImmediate(queryTempDB,mapFunction,Astring,splitBstring,Cstring,splitConvertedBString);
 			}else{
 				if(err.message == undefined)
 				{
@@ -210,7 +212,7 @@ function queryME(mapFunction,Astring,splitBstring,Cstring,splitConvertedBString)
 		}
 	});
 }
-function queryMEtemp(mapFunction,Astring,splitBstring,Cstring,splitConvertedBString)
+function queryTempDB(mapFunction,Astring,splitBstring,Cstring,splitConvertedBString)
 {
 	GLOBAL.db_temp.query({"map": mapFunction}, function(err, response){
 		//console.log("responding to db.query");
@@ -238,7 +240,7 @@ function queryMEtemp(mapFunction,Astring,splitBstring,Cstring,splitConvertedBStr
 				{
 					console.log("Undefined reached - resending query for "+Astring);
 					//GLOBAL.db = new PouchDB(GLOBAL.db_name);
-					setImmediate(queryMEtemp,mapFunction,Astring,splitBstring,Cstring,splitConvertedBString);
+					setImmediate(queryTempDB,mapFunction,Astring,splitBstring,Cstring,splitConvertedBString);
 				}else{
 					console.log("Error with map query");
 					console.log(mapFunction);
