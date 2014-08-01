@@ -184,6 +184,46 @@ function queryME(mapFunction,Astring,splitBstring,Cstring,splitConvertedBString)
 				console.log("DB already has the term "+Astring);
 			}else{
 				console.log("Processing "+Astring);
+				//saveME(Astring,splitBstring,Cstring,splitConvertedBString);
+				queryMEtemp(mapFunction,Astring,splitBstring,Cstring,splitConvertedBString);
+			}
+		}else{
+			if(err.status==404)
+			{
+				//no data found then we will save the record
+				subRowCounter ++;
+				console.log(Astring+" term is not found - Saving Term");
+				//saveME(Astring,splitBstring,Cstring,splitConvertedBString);
+				queryMEtemp(mapFunction,Astring,splitBstring,Cstring,splitConvertedBString);
+			}else{
+				if(err.message == undefined)
+				{
+					console.log("Undefined reached - resending query for "+Astring);
+					//GLOBAL.db = new PouchDB(GLOBAL.db_name);
+					setImmediate(queryME,mapFunction,Astring,splitBstring,Cstring,splitConvertedBString);
+				}else{
+					console.log("Error with map query");
+					console.log(mapFunction);
+					console.log(err);
+				}
+			}
+		}
+	});
+}
+function queryMEtemp(mapFunction,Astring,splitBstring,Cstring,splitConvertedBString)
+{
+	GLOBAL.db_temp.query({"map": mapFunction}, function(err, response){
+		//console.log("responding to db.query");
+		//GLOBAL.db.viewCleanup();
+		if(err==null)
+		{
+			subRowCounter ++;
+			if(response.rows.length>0)
+			{
+				//then this means that the data is there and we should do nothing
+				console.log("DB already has the term "+Astring);
+			}else{
+				console.log("Processing "+Astring);
 				saveME(Astring,splitBstring,Cstring,splitConvertedBString);
 			}
 		}else{
@@ -198,7 +238,7 @@ function queryME(mapFunction,Astring,splitBstring,Cstring,splitConvertedBString)
 				{
 					console.log("Undefined reached - resending query for "+Astring);
 					//GLOBAL.db = new PouchDB(GLOBAL.db_name);
-					setImmediate(queryME,mapFunction,Astring,splitBstring,Cstring,splitConvertedBString);
+					setImmediate(queryMEtemp,mapFunction,Astring,splitBstring,Cstring,splitConvertedBString);
 				}else{
 					console.log("Error with map query");
 					console.log(mapFunction);
