@@ -221,7 +221,7 @@ function queryMEtemp(mapFunction,Astring,splitBstring,Cstring,splitConvertedBStr
 			if(response.rows.length>0)
 			{
 				//then this means that the data is there and we should do nothing
-				console.log("DB already has the term "+Astring);
+				console.log("Temp DB already has the term "+Astring);
 			}else{
 				console.log("Processing "+Astring);
 				saveME(Astring,splitBstring,Cstring,splitConvertedBString);
