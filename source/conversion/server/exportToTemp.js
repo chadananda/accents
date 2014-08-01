@@ -183,7 +183,7 @@ function queryME(mapFunction,Astring,splitBstring,Cstring,splitConvertedBString)
 				//then this means that the data is there and we should do nothing
 				console.log("DB already has the term "+Astring);
 			}else{
-				console.log("Processing "+Astring);
+				console.log("Checking tempDB for "+Astring);
 				//saveME(Astring,splitBstring,Cstring,splitConvertedBString);
 				queryMEtemp(mapFunction,Astring,splitBstring,Cstring,splitConvertedBString);
 			}
