@@ -4,21 +4,40 @@
 	var DBlocation = 'http://chad:vanilla123@diacritics.iriscouch.com/'
 	var DBcollection = 'accents2';
 	var DBcollectionTemp = 'accents_temp';
-	PouchDB_opts={
-		cache:false
-	};
-
+	var opts ={
+			live: true,
+			create_target: true,
+			batch_size:500
+		};
+	var initopt = {
+			create_target:true,
+			batch_size:500
+		};
 	accentsDataServices.factory('accessDB', [function() {
 
-		var mydb = new PouchDB(DBlocation+DBcollection,PouchDB_opts);
+		var mydb = new PouchDB(DBlocation+DBcollection);
+		// mydb.replicate.to(DBlocation+DBcollection,opts);
+		// mydb.replicate.from(DBlocation+DBcollection,opts);
+		// mydb.replicate.from(DBlocation+DBcollection,initopt).
+		// 	on('complete', function (info) {
+		// 		// handle complete
+		// 		mydb.replicate.to(DBlocation+DBcollection,opts);
+		// 		mydb.replicate.from(DBlocation+DBcollection,opts);
+		// 	});
 		return mydb;
 
 	}]);
 	accentsDataServices.factory('tempDB',function($http,$q){
-		
-		var mydb = new PouchDB(DBcollectionTemp);
-		PouchDB.replicate(DBcollectionTemp, DBlocation+DBcollectionTemp, {live: true});
-  		PouchDB.replicate(DBlocation+DBcollectionTemp, DBcollectionTemp, {live: true});
+
+		var mydb = new PouchDB(DBlocation+DBcollectionTemp);
+		// mydb.replicate.to(DBlocation+DBcollectionTemp,opts);
+		// mydb.replicate.from(DBlocation+DBcollectionTemp,opts);
+		// mydb.replicate.from(DBlocation+DBcollectionTemp,initopt).
+		// 	on('complete', function (info) {
+		// 		// handle complete
+		// 		mydb.replicate.to(DBlocation+DBcollectionTemp,opts);
+		// 		mydb.replicate.from(DBlocation+DBcollectionTemp,opts);
+		// 	});
 		return mydb;
 	});
 	accentsDataServices.factory('pouchWrapper', ['$q', '$rootScope', 'accessDB', 'tempDB',
@@ -96,6 +115,7 @@
 							deferred.reject(err);
 						}
 					});
+					return deferred.promise;
 				}
 	  		};
 		}

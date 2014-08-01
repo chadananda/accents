@@ -1,9 +1,9 @@
 (function(){
 	
-	var accentReviewApp = angular.module('mainAppController',["ui.bootstrap","myDataServices"]);
+	var accentReviewApp = angular.module('mainAppController',["ui.bootstrap","myDataServices","partialsController"]);
 
-	accentReviewApp.controller('mainPageController',["$scope","dataStorage","pouchWrapper",
-		function($scope,dataStorage,pouchWrapper){
+	accentReviewApp.controller('mainPageController',["$scope","dataStorage","pouchWrapper","$modal","$log",
+		function($scope,dataStorage,pouchWrapper,$modal,$log){
 			$scope.myData = dataStorage.getTempData();
 			$scope.checkedMemoryItems = [];
 			console.log($scope.myData);
@@ -16,14 +16,32 @@
 					return;
 				}
 				$scope.myData = dataStorage.getTempData();
-			})
+			});
+
+			$scope.open = function (size) {
+
+				$scope.modalInstance = $modal.open({
+					templateUrl: 'views/loadingModal.html',
+					size: size,
+					backdrop:'static',
+					scope: $scope
+				});
+			};
+			$scope.close = function(){
+				$scope.modalInstance.dismiss('cancel');
+			}
+			$scope.loadingmsg = "Loading temp data";
+			$scope.open("sm");
 			pouchWrapper.pullAllDocs().then(function(res){
 				console.log(this.reviewdata);
 				console.log(res);
 				dataStorage.pushTempData(res.rows);
+				$scope.close();
 			},function(err){
 				console.log(err);
+				$scope.close();
 			});
+
 			$scope.checkedItem = function(index,event){
 			
 				if((event.target).checked)
@@ -75,6 +93,7 @@
 			$scope.addToAccents = function(){
 				if($scope.myData.length>0){
 					if (confirm("Are you sure?") == true) {
+						$scope.open("sm");
 						var counter=0;
 						for(var x=0;x<$scope.myData.length;x++)
 				        {
@@ -94,16 +113,24 @@
 			};
 			$scope.checkAddStatus = function(mycounter){
 				console.log("Finished Saving ("+mycounter+"/"+$scope.myData.length+")");
+				$scope.loadingmsg = "Finished Saving record ("+mycounter+"/"+$scope.myData.length+")";
 				if(mycounter==$scope.myData.length || mycounter>$scope.myData.length)
 				{
 					alert("Data Transfer Done");
+					$scope.close();
 					//destroy the db
-			        pouchWrapper.destroyTemp();
+			        pouchWrapper.destroyTemp().then(function(res){
+			        	console.log("destroy complete");
+			        	console.log(res);
+			        },function(err){
+			        	console.log("destroy Error");
+			        	console.log(err);
+			        });
 			        dataStorage.emptyTempData();
 			        $scope.myData=[];
+			        $scope.loadingmsg = "No more data to load since temp DB is already dropped";
 				}
 			}
-
 	}]);
 
 })();
