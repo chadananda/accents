@@ -8,15 +8,46 @@ GLOBAL.PouchDB_opts={
 
 // if(process.env.NODE_ENV=='development'){
 // 	console.log("running Dev");
-	
-	GLOBAL.db_name = 'http://chad:vanilla123@diacritics.iriscouch.com/accents2';
-	GLOBAL.db_temp_name = 'http://chad:vanilla123@diacritics.iriscouch.com/accents_temp';
+	var db1 = "accents2";
+	var db2 = "accents_temp";
+	GLOBAL.db_name = 'http://chad:vanilla123@diacritics.iriscouch.com/'+db1;
+	GLOBAL.db_temp_name = 'http://chad:vanilla123@diacritics.iriscouch.com/'+db2;
 	// GLOBAL.db_name = 'http://localhost:5984/accents2';
 	// GLOBAL.db_temp_name = 'http://localhost:5984/accents_temp';
 	//var db_hashName = 'http://localhost:5984/importexcelhashqueue';
 	//GLOBAL.db = new PouchDB(GLOBAL.db_name);
-	GLOBAL.db = new PouchDB("accents2");
-	GLOBAL.db_temp = new PouchDB("accents_temp");
+	
+
+	PouchDB.destroy(db1,function(err,info){
+		PouchDB.destroy(db1,function(err,info){
+			GLOBAL.db = new PouchDB(db1);
+			GLOBAL.db_temp = new PouchDB(db2);
+			var opts ={
+				live: true,
+				create_target: true,
+				batch_size:500
+			};
+			console.log("replicating "+GLOBAL.db_name);
+			GLOBAL.db.replicate.from(GLOBAL.db_name,{create_target:true,batch_size:1000})
+			.on('complete',function(info){
+				GLOBAL.db_temp.replicate.to(GLOBAL.db_temp_name,opts);
+				GLOBAL.db_temp.replicate.from(GLOBAL.db_temp_name,opts);
+				GLOBAL.db.replicate.to(GLOBAL.db_name,opts);
+				GLOBAL.db.replicate.from(GLOBAL.db_name,opts);
+				process.on('SIGTERM', function(){
+				    console.log('terminating');
+				    process.exit(1);
+				});
+				console.log("Starting Import Process");
+				exportProcess.startProcess(null,null);	
+			})
+			.on('error',function(info){
+				console.log(info);
+			});
+			
+		});
+	});
+	
 	// GLOBAL.db = new PouchDB(GLOBAL.db_name);
 	// GLOBAL.db_temp = new PouchDB(GLOBAL.db_temp_name);
 
@@ -29,23 +60,7 @@ GLOBAL.PouchDB_opts={
 // 	var db_hashName = 'importexcelhashqueue';
 // 	var remote = remoteLocation+GLOBAL.db_name;
 // 	var remote_hash = remoteLocation+GLOBAL.db_hashName;
-var opts ={
-	live: true,
-	create_target: true,
-	batch_size:500
-};
 
-
-GLOBAL.db_temp.replicate.to(GLOBAL.db_temp_name,opts);
-GLOBAL.db_temp.replicate.from(GLOBAL.db_temp_name,opts);
-GLOBAL.db.replicate.to(GLOBAL.db_name,opts);
-GLOBAL.db.replicate.from(GLOBAL.db_name,opts);
-process.on('SIGTERM', function(){
-    console.log('terminating');
-    process.exit(1);
-});
-console.log("Starting Import Process");
-exportProcess.startProcess(null,null);
 
 // process.on('SIGTERM', function(){
 //     console.log('terminating');

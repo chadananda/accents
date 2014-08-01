@@ -46,11 +46,11 @@
 				addToAccents: function(doc) 
 				{
 					var deferred = $q.defer();
-					delete doc.termNonConvert;
+					delete doc["termNonConvert"];
 					//check if Selected is there
-					if(doc.Selected != undefined)
+					if(doc["Selected"] != undefined)
 					{
-						delete doc.Selected;
+						delete doc["Selected"];
 					}
 					accessDB.post(doc, function(err, res) {
 						$rootScope.$apply(function() {
