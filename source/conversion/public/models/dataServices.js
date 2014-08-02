@@ -16,7 +16,7 @@
 	accentsDataServices.factory('accessDB', [function() {
 
 		// var mydb = new PouchDB(DBlocation+DBcollection);
-		PouchDB.destroy(DBcollection);
+		//PouchDB.destroy(DBcollection);
 		var mydb = new PouchDB(DBcollection);
 		mydb.replicate.from(DBlocation+DBcollection,opts);
 		mydb.replicate.to(DBlocation+DBcollection,opts);
@@ -31,7 +31,7 @@
 	}]);
 	accentsDataServices.factory('tempDB',function($http,$q){
 
-		PouchDB.destroy(DBcollectionTemp);
+		//PouchDB.destroy(DBcollectionTemp);
 		var mydb = new PouchDB(DBcollectionTemp);
 		mydb.replicate.from(DBlocation+DBcollectionTemp,opts);
 		mydb.replicate.to(DBlocation+DBcollectionTemp,opts);
