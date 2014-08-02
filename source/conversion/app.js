@@ -9,11 +9,11 @@ GLOBAL.PouchDB_opts={
 // if(process.env.NODE_ENV=='development'){
 // 	console.log("running Dev");
 	var db1 = "accents";
-	var db2 = "accents_temp2";
-	GLOBAL.db_name = 'http://chad:vanilla123@diacritics.iriscouch.com/'+db1;
-	GLOBAL.db_temp_name = 'http://chad:vanilla123@diacritics.iriscouch.com/'+db2;
-	// GLOBAL.db_name = 'http://localhost:5984/'+db1;
-	// GLOBAL.db_temp_name = 'http://localhost:5984/'+db2;
+	var db2 = "accents_temp";
+	// GLOBAL.db_name = 'http://chad:vanilla123@diacritics.iriscouch.com/'+db1;
+	// GLOBAL.db_temp_name = 'http://chad:vanilla123@diacritics.iriscouch.com/'+db2;
+	GLOBAL.db_name = 'http://localhost:5984/'+db1;
+	GLOBAL.db_temp_name = 'http://localhost:5984/'+db2;
 	//var db_hashName = 'http://localhost:5984/importexcelhashqueue';
 	//GLOBAL.db = new PouchDB(GLOBAL.db_name);
 	
