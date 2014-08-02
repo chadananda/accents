@@ -8,7 +8,7 @@
 		</tr>
 	</thead>
 	<tbody>
-		<tr ng-repeat="accentdata in myData track by $index">
+		<tr ng-repeat="accentdata in myData | orderBy:'term[0]' track by $index">
 			<td><input name="itemChkBx" type="checkbox" value='{{$index}}' ng-click="checkedItem($index,$event);" ng-model="accentdata.Selected"></td>
 			<td>{{items.original}}</td>
 			<td>

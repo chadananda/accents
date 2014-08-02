@@ -134,8 +134,10 @@ function saveRecord(file,Astring,Bstring,Cstring)
 	var ConvertedBString = convertGlyph(Astring,Bstring,Cstring,file);
 	var splitBstring = Bstring.split(" ");
 	var splitConvertedBString = ConvertedBString.split(" ");
-	var mapFunction = 'function(doc){ if(doc.source == "marciel" ';
+	var mapFunction = 'function(doc){ ';
+	mapFunction = mapFunction +'if(doc.term instanceof Array){ if(doc.source == "marciel" ';
 	var emitPortion = "emit(doc.original,doc.term);";
+	var emitPortion2 = '';
 	for(var x=0;x<splitConvertedBString.length;x++)
 	{
 		var temp = '';
@@ -162,11 +164,16 @@ function saveRecord(file,Astring,Bstring,Cstring)
 				}
 			}
 		}
+		if(x==0)
+		{
+			emitPortion2 = 'if(doc.source == "mariciel" && doc.term == '+temp+'){ emit(doc.original,doc.term); }';
+		}
 		mapFunction = mapFunction+"&& doc.term["+x+"] == "+temp+" ";
 	}
 	mapFunction = mapFunction+"){"+emitPortion+"}}";
-	//console.log(mapFunction);
-
+	mapFunction = mapFunction+'else{ '+emitPortion2+'}}';
+	// console.log(mapFunction);
+	// debugger;
 	//queryME(mapFunction,Astring,splitBstring,Cstring,splitConvertedBString);
 	setImmediate(queryME,mapFunction,Astring,splitBstring,Cstring,splitConvertedBString);
 }
