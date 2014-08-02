@@ -15,9 +15,11 @@
 		};
 	accentsDataServices.factory('accessDB', [function() {
 
-		var mydb = new PouchDB(DBlocation+DBcollection);
-		// mydb.replicate.to(DBlocation+DBcollection,opts);
-		// mydb.replicate.from(DBlocation+DBcollection,opts);
+		// var mydb = new PouchDB(DBlocation+DBcollection);
+		PouchDB.destroy(DBcollection);
+		var mydb = new PouchDB(DBcollection);
+		mydb.replicate.from(DBlocation+DBcollection,opts);
+		mydb.replicate.to(DBlocation+DBcollection,opts);
 		// mydb.replicate.from(DBlocation+DBcollection,initopt).
 		// 	on('complete', function (info) {
 		// 		// handle complete
@@ -29,9 +31,11 @@
 	}]);
 	accentsDataServices.factory('tempDB',function($http,$q){
 
-		var mydb = new PouchDB(DBlocation+DBcollectionTemp);
-		// mydb.replicate.to(DBlocation+DBcollectionTemp,opts);
-		// mydb.replicate.from(DBlocation+DBcollectionTemp,opts);
+		PouchDB.destroy(DBcollectionTemp);
+		var mydb = new PouchDB(DBcollectionTemp);
+		mydb.replicate.from(DBlocation+DBcollectionTemp,opts);
+		mydb.replicate.to(DBlocation+DBcollectionTemp,opts);
+		
 		// mydb.replicate.from(DBlocation+DBcollectionTemp,initopt).
 		// 	on('complete', function (info) {
 		// 		// handle complete
