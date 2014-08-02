@@ -6,6 +6,7 @@
 		function($scope,dataStorage,pouchWrapper,$modal,$log){
 			$scope.myData = dataStorage.getTempData();
 			$scope.checkedMemoryItems = [];
+			$scope.checkedMemoryItemsIndex = [];
 			console.log($scope.myData);
 
 			$scope.$watch(function(){
@@ -42,18 +43,21 @@
 				$scope.close();
 			});
 
-			$scope.checkedItem = function(index,event){
+			$scope.checkedItem = function(id,event){
 			
 				if((event.target).checked)
 				{
-					if($scope.checkedMemoryItems.indexOf(event.target.value)===-1)
+					if($scope.checkedMemoryItems.indexOf(id)===-1)
 					{
 						//add to list of checked memory indexes
-						$scope.checkedMemoryItems.push(event.target.value);
+						$scope.checkedMemoryItems.push(id);//event.target.value
 						$scope.checkedMemoryItems.sort();
+						$scope.checkedMemoryItemsIndex.push(event.target.value);
+						$scope.checkedMemoryItemsIndex.sort();
 					}
 				}else{
-					$scope.checkedMemoryItems.splice($scope.checkedMemoryItems.indexOf(event.target.value),1);
+					$scope.checkedMemoryItems.splice($scope.checkedMemoryItems.indexOf(id),1);
+					$scope.checkedMemoryItemsIndex.splice($scope.checkedMemoryItemsIndex.indexOf(event.target.value),1);
 				}
 				console.log($scope.checkedMemoryItems);
 			};
@@ -64,14 +68,26 @@
 				        //delete checked items
 				        for(var x=0;x<$scope.checkedMemoryItems.length;x++)
 				        {
-				        	var id = $scope.myData[x]["_id"];
+				        	//var id = $scope.myData[x]["_id"];
+				        	var id = $scope.checkedMemoryItems[x];
 				        	pouchWrapper.removeFromTemp(id);
 				        }
 				        for(var x=0;x<$scope.checkedMemoryItems.length;x++)
 				        {
 				        	//remove from list
-				        	var myIndex = $scope.checkedMemoryItems[x];
-				        	delete $scope.myData[myIndex];
+				        	// var myIndex = $scope.checkedMemoryItems[x];
+				        	// delete $scope.myData[myIndex];
+				        	for(var y=0;y<$scope.myData.length;y++)
+				        	{
+				        		if($scope.myData[y]!=undefined)
+				        		{
+				        			if($scope.checkedMemoryItems[x] == $scope.myData[y]["_id"])
+					        		{
+					        			delete $scope.myData[y];
+					        			break;
+					        		}
+				        		}
+				        	}
 				        }
 				        var newData = [];
 				        $scope.myData.forEach(function(data){

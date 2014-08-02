@@ -73,13 +73,19 @@
 					tempDB.get(id, function(err, doc) {
 						$rootScope.$apply(function() {
 						  if (err) {
+						  	console.log("Error reading document from delete");
+						  	console.log(err);
 						    deferred.reject(err);
 						  } else {
 						    tempDB.remove(doc, function(err, res) {
 						      $rootScope.$apply(function() {
 						        if (err) {
+						          console.log("Error deleting document");
+						          console.log(err);
 						          deferred.reject(err)
 						        } else {
+						          console.log("Successful deleting");
+						          console.log(res);
 						          deferred.resolve(res)
 						        }
 						      });
@@ -154,7 +160,10 @@
 				});
 			},
 			setTempData: function(data){
-				tempDatas = data;
+				tempDatas = [];
+				data.forEach(function(item){
+					tempDatas.push(item);
+				});
 			},
 			getTempData: function(){
 				return tempDatas;
