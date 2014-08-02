@@ -193,8 +193,8 @@ function queryME(mapFunction,Astring,splitBstring,Cstring,splitConvertedBString)
 			}else{
 				console.log("Checking tempDB for "+Astring);
 				//console.log(mapFunction);
-				//saveME(Astring,splitBstring,Cstring,splitConvertedBString);
-				setImmediate(queryTempDB,mapFunction,Astring,splitBstring,Cstring,splitConvertedBString);
+				saveME(Astring,splitBstring,Cstring,splitConvertedBString);
+				// setImmediate(queryTempDB,mapFunction,Astring,splitBstring,Cstring,splitConvertedBString);
 			}
 		}else{
 			if(err.status==404)
@@ -202,8 +202,8 @@ function queryME(mapFunction,Astring,splitBstring,Cstring,splitConvertedBString)
 				//no data found then we will save the record
 				subRowCounter ++;
 				console.log(Astring+" term is not found - Saving Term");
-				//saveME(Astring,splitBstring,Cstring,splitConvertedBString);
-				setImmediate(queryTempDB,mapFunction,Astring,splitBstring,Cstring,splitConvertedBString);
+				saveME(Astring,splitBstring,Cstring,splitConvertedBString);
+				//setImmediate(queryTempDB,mapFunction,Astring,splitBstring,Cstring,splitConvertedBString);
 			}else{
 				if(err.message == undefined)
 				{
@@ -270,30 +270,50 @@ function saveME(Astring,splitBstring,Cstring,splitConvertedBString)
 	// 	original:"string",
 	// 	definition:"string"
 	// }
-	var mystruct = {
-		term:[],
-		termNonConvert:[]
-	};
-	mystruct["id"]=genUUID('xxxxxxxxxx');
-	mystruct["source"]="marciel";
-	splitBstring.forEach(function(word){
-		var temp = word;
+	// var mystruct = {};
+	// mystruct["id"]=genUUID('xxxxxxxxxx');
+	// mystruct["source"]="marciel";
+	// splitBstring.forEach(function(word){
+	// 	var temp = word;
+	// 	temp = temp.replace('"', '');
+	// 	temp = temp.replace('"', '');
+	// 	mystruct.term.push(temp);
+	// });
+	// splitConvertedBString.forEach(function(word){
+	// 	var temp = word;
+	// 	temp = temp.replace('"', '');
+	// 	temp = temp.replace('"', '');
+	// 	mystruct.termNonConvert.push(temp);
+	// });
+	// mystruct["original"]=eval("("+Astring+")");
+	// mystruct["definition"]=eval("("+Cstring+")");
+	// mystruct["type"]="term";
+	// mystruct["user"]="chad";
+	// var uid = genUUID();
+
+	for(var x = 0; x < splitConvertedBString.length; x++)
+	{
+		var mystruct = {};
+		mystruct["id"]=genUUID('xxxxxxxxxx');
+		mystruct["source"]="marciel";
+		mystruct["original"]=eval("("+Astring+")");
+		mystruct["definition"]=eval("("+Cstring+")");
+		mystruct["type"]="term";
+		mystruct["user"]="chad";
+		var temp = splitBstring[x];
+		var temp2 = splitConvertedBString[x];
+		//cleanup
 		temp = temp.replace('"', '');
 		temp = temp.replace('"', '');
-		mystruct.term.push(temp);
-	});
-	splitConvertedBString.forEach(function(word){
-		var temp = word;
-		temp = temp.replace('"', '');
-		temp = temp.replace('"', '');
-		mystruct.termNonConvert.push(temp);
-	});
-	mystruct["original"]=eval("("+Astring+")");
-	mystruct["definition"]=eval("("+Cstring+")");
-	mystruct["type"]="term";
-	mystruct["user"]="chad";
-	var uid = genUUID();
-	saveMEDATA(mystruct,uid,splitBstring);
+		mystruct["termNonConvert"]=temp;
+		//cleanup 2
+		temp2 = temp2.replace('"', '');
+		temp2 = temp2.replace('"', '');
+		mystruct["term"]=temp2;
+		var uid = genUUID();
+		saveMEDATA(mystruct,uid,splitBstring);	
+	}
+	// saveMEDATA(mystruct,uid,splitBstring);
 
 }
 function saveMEDATA(mystruct,uid,Bstring)
