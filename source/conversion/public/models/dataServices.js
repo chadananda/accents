@@ -2,7 +2,7 @@
 	var accentsDataServices = angular.module('myDataServices',[]);
 
 	var DBlocation = 'http://chad:vanilla123@diacritics.iriscouch.com/'
-	var DBcollection = 'accents2';
+	var DBcollection = 'accents';
 	var DBcollectionTemp = 'accents_temp';
 	var opts ={
 			live: true,
