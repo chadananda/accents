@@ -1,7 +1,8 @@
 (function(){
 	var accentsDataServices = angular.module('myDataServices',[]);
 
-	var DBlocation = 'http://chad:vanilla123@diacritics.iriscouch.com/'
+	var DBlocation = 'http://chad:vanilla123@diacritics.iriscouch.com/';
+	//var DBlocation = 'http://localhost:5984/';
 	var DBcollection = 'accents';
 	var DBcollectionTemp = 'accents_temp';
 	var opts ={
@@ -16,26 +17,50 @@
 	accentsDataServices.factory('accessDB', [function() {
 
 		// var mydb = new PouchDB(DBlocation+DBcollection);
-		//PouchDB.destroy(DBcollection);
-		var mydb = new PouchDB(DBcollection);
-		mydb.replicate.from(DBlocation+DBcollection,opts);
-		mydb.replicate.to(DBlocation+DBcollection,opts);
-		// mydb.replicate.from(DBlocation+DBcollection,initopt).
-		// 	on('complete', function (info) {
-		// 		// handle complete
-		// 		mydb.replicate.to(DBlocation+DBcollection,opts);
+		// try{
+		// 	PouchDB.destroy(DBcollection, function(err, info) { 
+		// 		var mydb = new PouchDB(DBcollection);
 		// 		mydb.replicate.from(DBlocation+DBcollection,opts);
+		// 		mydb.replicate.to(DBlocation+DBcollection,opts);
 		// 	});
+		// }catch(error){
+		// 	console.log("Error deleting "+DBcollection);
+		// 	console.log(error);
+		// 	var mydb = new PouchDB(DBcollection);
+		// 	mydb.replicate.from(DBlocation+DBcollection,opts);
+		// 	mydb.replicate.to(DBlocation+DBcollection,opts);
+		// }		
+		var mydb = new PouchDB(DBcollection);
+		//mydb.replicate.from(DBlocation+DBcollection,opts);
+		//mydb.replicate.to(DBlocation+DBcollection,opts);
+		mydb.replicate.from(DBlocation+DBcollection,initopt).
+			on('complete', function (info) {
+				// handle complete
+				mydb.replicate.to(DBlocation+DBcollection,opts);
+				mydb.replicate.from(DBlocation+DBcollection,opts);
+			});
 		return mydb;
 
 	}]);
 	accentsDataServices.factory('tempDB',function($http,$q){
 
-		//PouchDB.destroy(DBcollectionTemp);
-		var mydb = new PouchDB(DBcollectionTemp);
-		mydb.replicate.from(DBlocation+DBcollectionTemp,opts);
-		mydb.replicate.to(DBlocation+DBcollectionTemp,opts);
-		
+		// try{
+		// 	PouchDB.destroy(DBcollectionTemp,function(err, info) { 
+		// 		var mydb = new PouchDB(DBcollectionTemp);
+		// 		mydb.replicate.from(DBlocation+DBcollectionTemp,opts);
+		// 		mydb.replicate.to(DBlocation+DBcollectionTemp,opts);
+		// 	});
+		// }catch(error){
+		// 	console.log("Error deleting "+DBcollectionTemp);
+		// 	console.log(error);
+		// 	var mydb = new PouchDB(DBcollectionTemp);
+		// 	mydb.replicate.from(DBlocation+DBcollectionTemp,opts);
+		// 	mydb.replicate.to(DBlocation+DBcollectionTemp,opts);
+		// }
+		var mydb = new PouchDB(DBlocation+DBcollectionTemp);
+		// var mydb = new PouchDB(DBcollectionTemp);
+		// 		mydb.replicate.from(DBlocation+DBcollectionTemp,opts);
+		// 		mydb.replicate.to(DBlocation+DBcollectionTemp,opts);
 		// mydb.replicate.from(DBlocation+DBcollectionTemp,initopt).
 		// 	on('complete', function (info) {
 		// 		// handle complete
