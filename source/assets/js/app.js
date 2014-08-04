@@ -39,27 +39,19 @@ Accents.addInitializer(function () {
   
 
   //trying to force fetch the data
-  Accents.Entities.Preload = new Accents.Entities.DBpage();
-  Accents.Entities.Preload.fetch({
-    success:function(){
-      //debugger;
-      console.log("triggerring fetch:preload");
-      console.log(Accents.Entities.Preload);
-      Accents.trigger("fetch:preload",Accents.Entities.Preload);
-    }
-  });
+  preload();
   sync(Accents.db);
-  var options = {
-    include_docs : true
-  };
-  Accents.db.allDocs(options,function(err,res){
-    if(err==null)
-    {
-      console.log(res);
-      debugger;
-      Accents.Entities.Preload=res;
-    }
-  });
+  // var options = {
+  //   include_docs : true
+  // };
+  // Accents.db.allDocs(options,function(err,res){
+  //   if(err==null)
+  //   {
+  //     console.log(res);
+  //     debugger;
+  //     Accents.Entities.Preload=res;
+  //   }
+  // });
   //end trying to force fetch
   var user = {};
   if(typeof(Storage)!=="undefined"){
@@ -86,6 +78,17 @@ var sync = function(target){
   target.replicate.from(urlConnection, opts);
 };
 
+var preload = function(){
+  Accents.Entities.Preload = new Accents.Entities.DBpage();
+  Accents.Entities.Preload.fetch({
+    success:function(){
+      //debugger;
+      console.log("triggerring fetch:preload");
+      console.log(Accents.Entities.Preload);
+      Accents.trigger("fetch:preload",Accents.Entities.Preload);
+    }
+  });
+};
 Accents.on("initialize:after", function(){
   console.log("initialize:after called");
   if(Backbone.history){
