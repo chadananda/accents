@@ -36,16 +36,28 @@ Accents.addInitializer(function () {
  
   Accents.db.changes({live: true, onChange: function(change){ /*console.log(change); */} });  
 
-  sync();
+  
 
   //trying to force fetch the data
-  Accents.Entities.Preload = new Accents.Entities.Terms();
+  Accents.Entities.Preload = new Accents.Entities.DBpage();
   Accents.Entities.Preload.fetch({
     success:function(){
-      debugger;
+      //debugger;
       Accents.trigger("fetch:preload",Accents.Entities.Preload);
     }
   });
+  sync();
+  // var options = {
+  //   include_docs : true
+  // };
+  // Accents.db.allDocs(options,function(err,res){
+  //   if(err==null)
+  //   {
+  //     console.log(res);
+  //     debugger;
+  //     Accents.Entities.Preload=res;
+  //   }
+  // });
   //end trying to force fetch
   var user = {};
   if(typeof(Storage)!=="undefined"){

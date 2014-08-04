@@ -95,11 +95,11 @@ Accents.module("Entities", function(Entities, App, Backbone, Marionette, $, _){
         model: Entities.Term,
         sync: BackbonePouch.sync({
           db: PouchDB('accents'),
-          fetch: 'query',
+          fetch: 'allDocs',
           options: {
-            query: {
-              include_docs: true,
-              fun: "entities_terms",
+            allDocs: {
+              include_docs: true
+              // fun: "entities_terms",
               // fun:{
               //   map: function(doc) {
               //     if (doc.ref) {
@@ -121,6 +121,7 @@ Accents.module("Entities", function(Entities, App, Backbone, Marionette, $, _){
           Entities.lastrowsLength = result.rows.length;
           Entities.TotalTermsView = result.total_rows;
           return _.pluck(result.rows, 'doc');
+          //return _.pluck(result.rows);
         },
 
        comparator: function(a, b){
