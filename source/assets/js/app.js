@@ -80,14 +80,14 @@ var sync = function(target){
 
 var preload = function(){
   Accents.Entities.Preload = new Accents.Entities.DBpage();
-  Accents.Entities.Preload.fetch({
-    success:function(){
-      //debugger;
-      console.log("triggerring fetch:preload");
-      console.log(Accents.Entities.Preload);
-      Accents.trigger("fetch:preload",Accents.Entities.Preload);
-    }
-  });
+  // Accents.Entities.Preload.fetch({
+  //   success:function(){
+  //     //debugger;
+  //     console.log("triggerring fetch:preload");
+  //     console.log(Accents.Entities.Preload);
+  //     Accents.trigger("fetch:preload",Accents.Entities.Preload);
+  //   }
+  // });
 };
 Accents.on("initialize:after", function(){
   console.log("initialize:after called");

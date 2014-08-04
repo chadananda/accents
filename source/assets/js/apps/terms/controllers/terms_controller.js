@@ -87,7 +87,15 @@ Accents.module("TermsApp", function(TermsApp, Accents, Backbone, Marionette, $, 
           Accents.terms.sort();
           Accents.main.show(addLayout);
         });
-      }      
+      }
+      Accents.Entities.Preload.fetch({
+        success:function(){
+          //debugger;
+          console.log("triggerring fetch:preload");
+          console.log(Accents.Entities.Preload);
+          Accents.trigger("fetch:preload",Accents.Entities.Preload);
+        }
+      });
     }
   };
 });
