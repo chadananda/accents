@@ -71,6 +71,26 @@ Accents.module("TermsApp", function(TermsApp, Accents, Backbone, Marionette, $, 
         });
         addLayout.add_terms_list.show(termsListLayout);
       });
+      // if(Accents.Entities.Preload.length>0)
+      // {
+      //   Accents.terms = Accents.Entities.Preload;
+      //   TermsApp.refValue = Accents.terms.last();
+      //   if( TermsApp.refValue ){
+      //     TermsApp.refValue = TermsApp.refValue.get("ref");
+      //   }
+      //   Accents.terms.sort();
+      //   Accents.main.show(addLayout);
+      // }else{
+      //   Accents.on("prefetch:data",function(data){
+      //     Accents.terms = data;
+      //     TermsApp.refValue = Accents.terms.last();
+      //     if( TermsApp.refValue ){
+      //       TermsApp.refValue = TermsApp.refValue.get("ref");
+      //     }
+      //     //Accents.terms.sort();
+      //     Accents.main.show(addLayout);
+      //   });
+      // }
     }
   };
 });

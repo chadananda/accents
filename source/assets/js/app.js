@@ -38,11 +38,52 @@ Accents.addInitializer(function () {
   Accents.db.changes({live: true, onChange: function(change){ /*console.log(change); */} });  
 
   sync(Accents.db);
-
+  Accents.Entities.Preload = {
+    length:0,
+    models:[],
+    last:function(){
+      try{
+        return this.models[this.length-1].attributes;
+      }catch(error){
+        return "";
+      }
+    }
+  };
   Accents.Entities.Preload = new Accents.Entities.Terms();
-  Accents.db.allDocs({},function(){
-
-  });
+  // Accents.db.allDocs({include_docs:true},function(err, res){
+  //   if(err==null)
+  //   {
+  //     var counter=0;
+  //     for(var x = 0;x < res.rows.length;x++)
+  //     {
+  //       for(var y = 1;y < res.rows.length;y++)
+  //       {
+  //         if(res.rows[x].doc.term>res.rows[y].doc.term)
+  //         {
+  //           var temp = res.rows[y];
+  //           res.rows[y] = res.rows[x];
+  //           res.rows[x] = temp;
+  //         }
+  //       }
+  //     }
+  //     res.rows.forEach(function(data){
+  //       data.doc['get'] = function(key){
+  //         return this[key];
+  //       };
+  //       var struct = {
+  //         _changing:false,
+  //         _pending:false,
+  //         attributes : data.doc
+  //       }
+  //       Accents.Entities.Preload.models.push(struct);
+  //       counter++;
+  //       Accents.Entities.Preload.length = counter;
+  //     });
+  //     Accents.trigger("prefetch:data",Accents.Entities.Preload);
+  //   }else{
+  //     console.log("Error occurred");
+  //   }
+  // });
   var user = {};
   if(typeof(Storage)!=="undefined"){
     var userSession = sessionStorage.getItem( "session-user" );
