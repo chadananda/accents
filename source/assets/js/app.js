@@ -38,7 +38,14 @@ Accents.addInitializer(function () {
 
   sync();
 
+  //trying to force fetch the data
   Accents.Entities.Preload = new Accents.Entities.Terms();
+  Accents.Entities.Preload.fetch({
+    success:function(){
+      Accents.trigger("fetch:preload",Accents.Entities.Preload);
+    }
+  });
+  //end trying to force fetch
   var user = {};
   if(typeof(Storage)!=="undefined"){
     var userSession = sessionStorage.getItem( "session-user" );

@@ -13,32 +13,44 @@ Accents.module("TermsApp", function(TermsApp, Accents, Backbone, Marionette, $, 
         if(Accents.Entities.Preload.models.length > 0)
         {
           Accents.terms = Accents.Entities.Preload;
-          debugger;
-          Accents.terms.trigger("fetch");
+          // debugger;
+          // Accents.terms.trigger("fetch");
+          TermsApp.refValue = Accents.terms.last();
+          if( TermsApp.refValue ){
+            TermsApp.refValue = TermsApp.refValue.get("ref");
+          }
+          Accents.terms.sort();
+          Accents.main.show(addLayout);
         }else{
-          Accents.Entities.Preload.fetch({
-            success:function(){
-              Accents.terms = Accents.Entities.Preload;
-              TermsApp.refValue = Accents.terms.last();
-              if( TermsApp.refValue ){
-                TermsApp.refValue = TermsApp.refValue.get("ref");
-              }
-              Accents.terms.sort();
-              Accents.main.show(addLayout);
-            }
-          });
-        }
-      }catch(error){
-        Accents.Entities.Preload.fetch({
-          success:function(){
-            Accents.terms = Accents.Entities.Preload;
+          Accents.on("fetch:preload",function(data){
+            Accents.terms = data;
             TermsApp.refValue = Accents.terms.last();
             if( TermsApp.refValue ){
               TermsApp.refValue = TermsApp.refValue.get("ref");
             }
             Accents.terms.sort();
             Accents.main.show(addLayout);
+          });
+      }catch(error){
+        // Accents.Entities.Preload.fetch({
+        //   success:function(){
+        //     Accents.terms = Accents.Entities.Preload;
+        //     TermsApp.refValue = Accents.terms.last();
+        //     if( TermsApp.refValue ){
+        //       TermsApp.refValue = TermsApp.refValue.get("ref");
+        //     }
+        //     Accents.terms.sort();
+        //     Accents.main.show(addLayout);
+        //   }
+        // });
+        Accents.on("fetch:preload",function(data){
+          Accents.terms = data;
+          TermsApp.refValue = Accents.terms.last();
+          if( TermsApp.refValue ){
+            TermsApp.refValue = TermsApp.refValue.get("ref");
           }
+          Accents.terms.sort();
+          Accents.main.show(addLayout);
         });
       }      
       
