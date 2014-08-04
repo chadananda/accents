@@ -43,21 +43,23 @@ Accents.addInitializer(function () {
   Accents.Entities.Preload.fetch({
     success:function(){
       //debugger;
+      console.log("triggerring fetch:preload");
+      console.log(Accents.Entities.Preload);
       Accents.trigger("fetch:preload",Accents.Entities.Preload);
     }
   });
-  sync();
-  // var options = {
-  //   include_docs : true
-  // };
-  // Accents.db.allDocs(options,function(err,res){
-  //   if(err==null)
-  //   {
-  //     console.log(res);
-  //     debugger;
-  //     Accents.Entities.Preload=res;
-  //   }
-  // });
+  sync(Accents.db);
+  var options = {
+    include_docs : true
+  };
+  Accents.db.allDocs(options,function(err,res){
+    if(err==null)
+    {
+      console.log(res);
+      debugger;
+      Accents.Entities.Preload=res;
+    }
+  });
   //end trying to force fetch
   var user = {};
   if(typeof(Storage)!=="undefined"){
@@ -74,12 +76,14 @@ Accents.on("sync", function(){
   Accents.trigger("list:term")
 });
 
-var sync = function(){
+var sync = function(target){
   console.log("sync called");
-  var opts = {live: true, complete: onCompleteSync, batch_size: 500};
+  var opts = {live: true, complete: onCompleteSync, batch_size: 5000};
   var urlConnection = "http://" + Accents.domainRemoteDb + "/" + Accents.remoteDb;
-  PouchDB.replicate('accents', urlConnection, opts, function(err, data){ console.log("replicating local to remote");/*console.log(err); console.log(data); */});
-  PouchDB.replicate(urlConnection, 'accents', opts, function(err, data){ console.log("replicating remote to local");/*console.log(err); console.log(data);*/ });
+  // PouchDB.replicate('accents', urlConnection, opts, function(err, data){ console.log("replicating local to remote");/*console.log(err); console.log(data); */});
+  // PouchDB.replicate(urlConnection, 'accents', opts, function(err, data){ console.log("replicating remote to local");/*console.log(err); console.log(data);*/ });
+  target.replicate.to(urlConnection, opts);
+  target.replicate.from(urlConnection, opts);
 };
 
 Accents.on("initialize:after", function(){
