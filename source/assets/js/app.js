@@ -42,6 +42,7 @@ Accents.addInitializer(function () {
   Accents.Entities.Preload = new Accents.Entities.Terms();
   Accents.Entities.Preload.fetch({
     success:function(){
+      debugger;
       Accents.trigger("fetch:preload",Accents.Entities.Preload);
     }
   });
