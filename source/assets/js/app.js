@@ -31,7 +31,7 @@ Accents.addInitializer(function () {
   Accents.db = new PouchDB('accents');
   Accents.remoteDb = 'accents';
   //Accents.domainRemoteDb = 'localhost:5984';
-  Accents.domainRemoteDb = 'chad:vanilla123@diacritics.iriscouch.com';
+  Accents.domainRemoteDb = 'diacritics.iriscouch.com';
   //Accents.domainRemoteDb = 'accents.couchappy.com'; // backup db
   var urlConnection = "http://" + Accents.domainRemoteDb + "/" + Accents.remoteDb;
 
@@ -40,6 +40,9 @@ Accents.addInitializer(function () {
   sync(Accents.db);
 
   Accents.Entities.Preload = new Accents.Entities.Terms();
+  Accents.db.allDocs({},function(){
+
+  });
   var user = {};
   if(typeof(Storage)!=="undefined"){
     var userSession = sessionStorage.getItem( "session-user" );
@@ -53,7 +56,7 @@ Accents.addInitializer(function () {
 
 Accents.on("sync", function(){
   console.log("triggering list:term");
-  Accents.trigger("list:term")
+  Accents.trigger("list:term");
 });
 
 var sync = function(target){
