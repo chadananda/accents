@@ -79,7 +79,7 @@ var sync = function(target){
 };
 
 var preload = function(){
-  Accents.Entities.Preload = new Accents.Entities.DBpage();
+  Accents.Entities.Preload = new Accents.Entities.Terms();
   // Accents.Entities.Preload.fetch({
   //   success:function(){
   //     //debugger;
