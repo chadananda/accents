@@ -31,7 +31,7 @@ Accents.addInitializer(function () {
   Accents.db = new PouchDB('accents');
   Accents.remoteDb = 'accents';
   //Accents.domainRemoteDb = 'localhost:5984';
-  Accents.domainRemoteDb = 'diacritics.iriscouch.com';
+  Accents.domainRemoteDb = 'chad:vanilla123@diacritics.iriscouch.com';
   //Accents.domainRemoteDb = 'accents.couchappy.com'; // backup db
   var urlConnection = "http://" + Accents.domainRemoteDb + "/" + Accents.remoteDb;
 
