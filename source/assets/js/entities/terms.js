@@ -13,7 +13,8 @@ Accents.module("Entities", function(Entities, App, Backbone, Marionette, $, _){
           type: "term",
           term: "",
           ref: "",
-          user: ""
+          user: "",
+          id:""
           };
         },
 
@@ -95,11 +96,12 @@ Accents.module("Entities", function(Entities, App, Backbone, Marionette, $, _){
         model: Entities.Term,
         sync: BackbonePouch.sync({
           db: PouchDB('accents'),
-          fetch: 'query',
+          fetch: 'allDocs',
           options: {
-            query: {
+            allDocs: {
               include_docs: true,
-              fun: "entities_terms",
+              limit: 900000
+              // fun: "entities_terms",
               // fun:{
               //   map: function(doc) {
               //     if (doc.ref) {
@@ -110,8 +112,8 @@ Accents.module("Entities", function(Entities, App, Backbone, Marionette, $, _){
             }
           }
         }),
-        comparator: 'ref',
-        sort_key: "ref",
+        comparator: 'term',
+        sort_key: "term",
 
         parse: function(result) {
           console.log("parser collection");

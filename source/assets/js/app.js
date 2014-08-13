@@ -36,20 +36,20 @@ Accents.addInitializer(function () {
   var urlConnection = "http://" + Accents.domainRemoteDb + "/" + Accents.remoteDb;
 
   Accents.db.changes({live: true, onChange: function(change){ /*console.log(change); */} });  
-
+  // Accents.Entities.Preload = new Accents.Entities.Terms();
   sync(Accents.db);
-  Accents.Entities.Preload = {
-    length:0,
-    models:[],
-    last:function(){
-      try{
-        return this.models[this.length-1].attributes;
-      }catch(error){
-        return "";
-      }
-    }
-  };
-  Accents.Entities.Preload = new Accents.Entities.Terms();
+  // Accents.Entities.Preload = {
+  //   length:0,
+  //   models:[],
+  //   last:function(){
+  //     try{
+  //       return this.models[this.length-1].attributes;
+  //     }catch(error){
+  //       return "";
+  //     }
+  //   }
+  // };
+  Accents.Entities.Preload = new Accents.Entities.DBpage();
   // Accents.db.allDocs({include_docs:true},function(err, res){
   //   if(err==null)
   //   {
@@ -102,7 +102,7 @@ Accents.on("sync", function(){
 
 var sync = function(target){
   console.log("sync called");
-  var opts = {live: true, complete: onCompleteSync, batch_size: 500};
+  var opts = {live: true, complete: onCompleteSync, batch_size: 100, batches_limit:100};
   var urlConnection = "http://" + Accents.domainRemoteDb + "/" + Accents.remoteDb;
   // PouchDB.replicate('accents', urlConnection, opts, function(err, data){ console.log("replicating local to remote");/*console.log(err); console.log(data); */});
   // PouchDB.replicate(urlConnection, 'accents', opts, function(err, data){ console.log("replicating remote to local");/*console.log(err); console.log(data);*/ });
