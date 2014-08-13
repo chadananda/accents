@@ -49,6 +49,7 @@ Accents.module("Entities", function(Entities, App, Backbone, Marionette, $, _){
     Entities.lastrowsLength = Number(0);
     Entities.limitorig = Entities.limit;
     Entities.Preload;
+    //debugger;
 
     Entities.Terms = Backbone.Collection.extend({
         model: Entities.Term,
@@ -95,7 +96,7 @@ Accents.module("Entities", function(Entities, App, Backbone, Marionette, $, _){
     Entities.DBpage = Backbone.Collection.extend({
         model: Entities.Term,
         sync: BackbonePouch.sync({
-          db: PouchDB('accents'),
+          db: PouchDB("http://diacritics.iriscouch.com/accents"),
           fetch: 'allDocs',
           options: {
             allDocs: {
