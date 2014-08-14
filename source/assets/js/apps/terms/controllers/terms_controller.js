@@ -8,16 +8,53 @@ Accents.module("TermsApp", function(TermsApp, Accents, Backbone, Marionette, $, 
   TermsApp.Controller = {
     termsList: function(){
       Accents.main.show(new TermsApp.Views.WaitingDataView());
-
       try{
-        if(Accents.Entities.Preload.models.length > 0)
+        if(Accents.Entities.Preload.models.length > 0 && Accents.Entities.CacheLoad.models.length == undefined)
         {
           Accents.terms = Accents.Entities.Preload;
-          debugger;
+          //debugger;
           Accents.terms.trigger("fetch");
         }else{
           Accents.Entities.Preload.fetch({
             success:function(){
+              try{
+                if(Accents.Entities.CacheLoad.models.length == undefined)
+                {
+                  Accents.terms = Accents.Entities.Preload;
+                  TermsApp.refValue = Accents.terms.last();
+                  if( TermsApp.refValue ){
+                    TermsApp.refValue = TermsApp.refValue.get("ref");
+                  }
+                  Accents.terms.sort();
+                  Accents.main.show(addLayout);
+                }
+              }catch(error){
+                Accents.terms = Accents.Entities.Preload;
+                TermsApp.refValue = Accents.terms.last();
+                if( TermsApp.refValue ){
+                  TermsApp.refValue = TermsApp.refValue.get("ref");
+                }
+                Accents.terms.sort();
+                Accents.main.show(addLayout);
+              }
+            }
+          });
+        }
+      }catch(error){
+        Accents.Entities.Preload.fetch({
+          success:function(){
+            try{
+              if(Accents.Entities.CacheLoad.models.length == undefined)
+              {
+                Accents.terms = Accents.Entities.Preload;
+                TermsApp.refValue = Accents.terms.last();
+                if( TermsApp.refValue ){
+                  TermsApp.refValue = TermsApp.refValue.get("ref");
+                }
+                Accents.terms.sort();
+                Accents.main.show(addLayout);
+              }
+            }catch(error){
               Accents.terms = Accents.Entities.Preload;
               TermsApp.refValue = Accents.terms.last();
               if( TermsApp.refValue ){
@@ -26,18 +63,6 @@ Accents.module("TermsApp", function(TermsApp, Accents, Backbone, Marionette, $, 
               Accents.terms.sort();
               Accents.main.show(addLayout);
             }
-          });
-        }
-      }catch(error){
-        Accents.Entities.Preload.fetch({
-          success:function(){
-            Accents.terms = Accents.Entities.Preload;
-            TermsApp.refValue = Accents.terms.last();
-            if( TermsApp.refValue ){
-              TermsApp.refValue = TermsApp.refValue.get("ref");
-            }
-            Accents.terms.sort();
-            Accents.main.show(addLayout);
           }
         });
       }      
@@ -102,6 +127,7 @@ Accents.module("TermsApp", function(TermsApp, Accents, Backbone, Marionette, $, 
       //   Accents.main.show(addLayout);
       // }else{
         Accents.on("prefetch:data",function(data){
+          //debugger;
           Accents.terms = data;
           TermsApp.refValue = Accents.terms.last();
           if( TermsApp.refValue ){
@@ -119,7 +145,7 @@ Accents.module("TermsApp", function(TermsApp, Accents, Backbone, Marionette, $, 
           }
           Accents.Entities.currTermsPos["currentPos"] = Number(maxHeight)+Number($("#terms-table").scrollTop());
           Accents.Entities.currTermsPos["oldscrollTop"] = Number($("#terms-table").scrollTop());
-          debugger;
+          //debugger;
           Accents.main.show(addLayout);
         });
       // }

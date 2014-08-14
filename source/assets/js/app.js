@@ -30,6 +30,7 @@ var onCompleteSync = function(){
 Accents.addInitializer(function () {
   Accents.db = new PouchDB('accents');
   Accents.dbHandOff = Number(0);
+  Accents.undefinedCounter = Number(0);
   Accents.remoteDb = 'accents';
   //Accents.domainRemoteDb = 'localhost:5984';
   Accents.domainRemoteDb = 'diacritics.iriscouch.com';
@@ -153,21 +154,21 @@ var sync = function(target){
     console.log("DB is upto date");
     console.log(info);
     console.log("last_seq -> "+info.last_seq);
+    console.log("Accents.Entities.TotalTermsView -> "+Accents.Entities.TotalTermsView);
+    if(info.last_seq == undefined)
+    {
+      Accents.undefinedCounter++;
+      console.log("undefinedCounter -> "+Accents.undefinedCounter);
+    }
+    if(Accents.undefinedCounter == 2)
+    {
+      callCache(info);
+    }
     if(Accents.Entities.TotalTermsView!=0)
     {
       if(info.last_seq == Accents.Entities.TotalTermsView || info.last_seq > Accents.Entities.TotalTermsView)
       {
-        //check if localStorage transfer has been done
-        if(Accents.dbHandOff != 0)
-        {
-          Accents.Entities.Preload = new Accents.Entities.DBpage();
-          Accents.Entities.Preload.fetch({
-            success:function(){
-              console.log("Cache Load done");
-              Accents.trigger("prefetch:data");
-            }
-          });
-        }
+        callCache(info);
       }
     }
   })
@@ -175,9 +176,28 @@ var sync = function(target){
     console.log("Complete is fired; Error Syncing");
     console.log(info);
     onCompleteSync();
+  })
+  .on('error',function(err){
+    console.log("error in sync");
+    console.log(err);
   });//Accents.Entities.Preload = new Accents.Entities.DBpage();
-  target.compact();
+  //target.compact();
 };
+
+var callCache = function(info){
+  //check if localStorage transfer has been done
+  if(Accents.dbHandOff == 0)
+  {
+    Accents.dbHandOff =1;
+    Accents.Entities.CacheLoad = new Accents.Entities.Terms();
+    Accents.Entities.CacheLoad.fetch({
+      success:function(){
+        console.log("Cache Load done");
+        Accents.trigger("prefetch:data",Accents.Entities.CacheLoad);
+      }
+    });
+  }  
+}
 
 Accents.on("initialize:after", function(){
   console.log("initialize:after called");

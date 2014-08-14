@@ -49,6 +49,7 @@ Accents.module("Entities", function(Entities, App, Backbone, Marionette, $, _){
     Entities.lastrowsLength = Number(0);
     Entities.limitorig = Entities.limit;
     Entities.Preload;
+    Entities.CacheLoad;
     //debugger;
 
     Entities.Terms = Backbone.Collection.extend({
@@ -78,7 +79,7 @@ Accents.module("Entities", function(Entities, App, Backbone, Marionette, $, _){
         parse: function(result) {
           console.log("parser collection");
           console.log("Entities.limit : "+Entities.limit+" Entities.currPos : "+Entities.currPos);
-          console.log("From entities");
+          console.log("From Term entities");
           console.log(result);
           Entities.lastrowsLength = result.rows.length;
           Entities.TotalTermsView = result.total_rows;
@@ -119,7 +120,7 @@ Accents.module("Entities", function(Entities, App, Backbone, Marionette, $, _){
         parse: function(result) {
           console.log("parser collection");
           console.log("Entities.limit : "+Entities.limit+" Entities.currPos : "+Entities.currPos);
-          console.log("From entities");
+          console.log("From DBpage entities");
           console.log(result);
           Entities.lastrowsLength = result.rows.length;
           Entities.TotalTermsView = result.total_rows;
