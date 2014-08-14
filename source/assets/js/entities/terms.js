@@ -14,7 +14,8 @@ Accents.module("Entities", function(Entities, App, Backbone, Marionette, $, _){
           term: "",
           ref: "",
           user: "",
-          id:""
+          id:"",
+          original:""
           };
         },
 

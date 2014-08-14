@@ -187,8 +187,10 @@ var sync = function(target){
 
 var callCache = function(info){
   //check if localStorage transfer has been done
+  console.log("called callCache");
   if(Accents.dbHandOff == 0)
   {
+    console.log("called Terms Cache");
     Accents.dbHandOff =1;
     Accents.Entities.CacheLoad = new Accents.Entities.Terms();
     Accents.Entities.CacheLoad.fetch({
