@@ -69,6 +69,26 @@ Accents.module("TermsApp", function(TermsApp, Accents, Backbone, Marionette, $, 
 	      filteredListView = tmp;
             });
         });
+        termsListLayout.add_term_list_table.on("show",function(view){
+            var maxHeight = $("#terms-table").height();
+            var childHeight = $("#terms-table div:nth-child(1)").height();
+            $("#terms-table").scroll(TermsApp.Controller.scrollCheck);
+            //console.log("assigning scroll location value");
+            if(Accents.Entities.currTermsPos["oldmaxHeight"] == undefined)
+            {
+              Accents.Entities.currTermsPos={};
+              Accents.Entities.currTermsPos["oldmaxHeight"] = maxHeight;
+              Accents.Entities.currTermsPos["oldchildHeight"] = childHeight;
+              Accents.Entities.currTermsPos["oldscrollTop"] = Number($("#terms-table").scrollTop());
+              Accents.Entities.currTermsPos["currentPos"] = Number(maxHeight)+Number($("#terms-table").scrollTop());
+            }
+            if(Accents.Entities.currTermsPos["oldchildHeight"]!=childHeight)
+            {
+              $("#terms-table").scrollTop(Accents.Entities.currTermsPos["oldscrollTop"]);
+              Accents.Entities.currTermsPos["oldchildHeight"]=childHeight;
+            }
+            console.log("resetted scroll position");
+        });
         addLayout.add_terms_list.show(termsListLayout);
       });
       // if(Accents.Entities.Preload.length>0)
@@ -81,15 +101,27 @@ Accents.module("TermsApp", function(TermsApp, Accents, Backbone, Marionette, $, 
       //   Accents.terms.sort();
       //   Accents.main.show(addLayout);
       // }else{
-      //   Accents.on("prefetch:data",function(data){
-      //     Accents.terms = data;
-      //     TermsApp.refValue = Accents.terms.last();
-      //     if( TermsApp.refValue ){
-      //       TermsApp.refValue = TermsApp.refValue.get("ref");
-      //     }
-      //     //Accents.terms.sort();
-      //     Accents.main.show(addLayout);
-      //   });
+        Accents.on("prefetch:data",function(data){
+          Accents.terms = data;
+          TermsApp.refValue = Accents.terms.last();
+          if( TermsApp.refValue ){
+            TermsApp.refValue = TermsApp.refValue.get("ref");
+          }
+          //Accents.terms.sort();
+          var maxHeight = $("#terms-table").height();
+          var childHeight = $("#terms-table div:nth-child(1)").height();
+          //debugger;
+          //initialize  Accents.Entities.currTermsPos
+          if(Accents.Entities.currTermsPos["oldchildHeight"]!=childHeight)
+          {
+            $("#terms-table").scrollTop(Accents.Entities.currTermsPos["oldscrollTop"]);
+            Accents.Entities.currTermsPos["oldchildHeight"]=childHeight;
+          }
+          Accents.Entities.currTermsPos["currentPos"] = Number(maxHeight)+Number($("#terms-table").scrollTop());
+          Accents.Entities.currTermsPos["oldscrollTop"] = Number($("#terms-table").scrollTop());
+          debugger;
+          Accents.main.show(addLayout);
+        });
       // }
     }
   };

@@ -97,12 +97,12 @@ Accents.module("Entities", function(Entities, App, Backbone, Marionette, $, _){
         model: Entities.Term,
         sync: BackbonePouch.sync({
           db: PouchDB("http://diacritics.iriscouch.com/accents"),
-          fetch: 'allDocs',
+          fetch: 'query',
           options: {
-            allDocs: {
+            query: {
               include_docs: true,
-              limit: 900000
-              // fun: "entities_terms",
+              //limit: 900000
+              fun: "entities_terms"
               // fun:{
               //   map: function(doc) {
               //     if (doc.ref) {

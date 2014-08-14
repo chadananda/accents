@@ -29,7 +29,7 @@ var onCompleteSync = function(){
 
 Accents.addInitializer(function () {
   Accents.db = new PouchDB('accents');
-
+  Accents.dbHandOff = Number(0);
   Accents.remoteDb = 'accents';
   //Accents.domainRemoteDb = 'localhost:5984';
   Accents.domainRemoteDb = 'diacritics.iriscouch.com';
@@ -51,6 +51,11 @@ Accents.addInitializer(function () {
   //   }
   // };
   Accents.Entities.Preload = new Accents.Entities.DBpage();
+  Accents.Entities.Preload.fetch({
+    success:function(){
+      console.log("Live Load done");
+    }
+  });
   sync(Accents.db);
   // AccentsOnlinedb.allDocs({include_docs:true},function(err, res){
   //   if(err==null)
@@ -139,7 +144,7 @@ Accents.on("sync", function(){
 var sync = function(target){
   console.log("sync called");
   //var opts = {live: true, complete: onCompleteSync, batch_size: 100, batches_limit:100};
-  var opts = {live: true, batch_size: 100000, batches_limit:10};
+  var opts = {live: true, batch_size: 500, batches_limit:10};
   var urlConnection = "http://" + Accents.domainRemoteDb + "/" + Accents.remoteDb;
   // PouchDB.replicate('accents', urlConnection, opts, function(err, data){ console.log("replicating local to remote");/*console.log(err); console.log(data); */});
   // PouchDB.replicate(urlConnection, 'accents', opts, function(err, data){ console.log("replicating remote to local");/*console.log(err); console.log(data);*/ });
@@ -147,6 +152,24 @@ var sync = function(target){
   .on('uptodate', function (info) {
     console.log("DB is upto date");
     console.log(info);
+    console.log("last_seq -> "+info.last_seq);
+    if(Accents.Entities.TotalTermsView!=0)
+    {
+      if(info.last_seq == Accents.Entities.TotalTermsView || info.last_seq > Accents.Entities.TotalTermsView)
+      {
+        //check if localStorage transfer has been done
+        if(Accents.dbHandOff != 0)
+        {
+          Accents.Entities.Preload = new Accents.Entities.DBpage();
+          Accents.Entities.Preload.fetch({
+            success:function(){
+              console.log("Cache Load done");
+              Accents.trigger("prefetch:data");
+            }
+          });
+        }
+      }
+    }
   })
   .on('complete',function(info){
     console.log("Complete is fired; Error Syncing");
