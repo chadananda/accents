@@ -133,7 +133,7 @@ Accents.module("TermsApp", function(TermsApp, Accents, Backbone, Marionette, $, 
           if( TermsApp.refValue ){
             TermsApp.refValue = TermsApp.refValue.get("ref");
           }
-          //Accents.terms.sort();
+          Accents.terms.sort();
           var maxHeight = $("#terms-table").height();
           var childHeight = $("#terms-table div:nth-child(1)").height();
           //debugger;
