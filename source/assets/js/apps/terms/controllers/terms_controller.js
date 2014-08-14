@@ -128,25 +128,31 @@ Accents.module("TermsApp", function(TermsApp, Accents, Backbone, Marionette, $, 
       // }else{
         Accents.on("prefetch:data",function(data){
           //debugger;
-          Accents.terms = data;
-          TermsApp.refValue = Accents.terms.last();
-          if( TermsApp.refValue ){
-            TermsApp.refValue = TermsApp.refValue.get("ref");
-          }
-          Accents.terms.sort();
-          var maxHeight = $("#terms-table").height();
-          var childHeight = $("#terms-table div:nth-child(1)").height();
-          //debugger;
-          //initialize  Accents.Entities.currTermsPos
-          if(Accents.Entities.currTermsPos["oldchildHeight"]!=childHeight)
+          if(Accents.Entities.Preload.models.length < Accents.Entities.CacheLoad.models.length ||
+             Accents.Entities.Preload.models.length == Accents.Entities.CacheLoad.models.length)
           {
-            $("#terms-table").scrollTop(Accents.Entities.currTermsPos["oldscrollTop"]);
-            Accents.Entities.currTermsPos["oldchildHeight"]=childHeight;
+            Accents.terms = data;
+            TermsApp.refValue = Accents.terms.last();
+            if( TermsApp.refValue ){
+              TermsApp.refValue = TermsApp.refValue.get("ref");
+            }
+            Accents.terms.sort();
+            var maxHeight = $("#terms-table").height();
+            var childHeight = $("#terms-table div:nth-child(1)").height();
+            //debugger;
+            //initialize  Accents.Entities.currTermsPos
+            if(Accents.Entities.currTermsPos["oldchildHeight"]!=childHeight)
+            {
+              $("#terms-table").scrollTop(Accents.Entities.currTermsPos["oldscrollTop"]);
+              Accents.Entities.currTermsPos["oldchildHeight"]=childHeight;
+            }
+            Accents.Entities.currTermsPos["currentPos"] = Number(maxHeight)+Number($("#terms-table").scrollTop());
+            Accents.Entities.currTermsPos["oldscrollTop"] = Number($("#terms-table").scrollTop());
+            //debugger;
+            Accents.main.show(addLayout);
+          }else{
+            Accents.dbHandOff=0;
           }
-          Accents.Entities.currTermsPos["currentPos"] = Number(maxHeight)+Number($("#terms-table").scrollTop());
-          Accents.Entities.currTermsPos["oldscrollTop"] = Number($("#terms-table").scrollTop());
-          //debugger;
-          Accents.main.show(addLayout);
         });
       // }
     }

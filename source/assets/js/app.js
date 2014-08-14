@@ -180,6 +180,7 @@ var sync = function(target){
   .on('error',function(err){
     console.log("error in sync");
     console.log(err);
+    sync(target);
   });//Accents.Entities.Preload = new Accents.Entities.DBpage();
   //target.compact();
 };
