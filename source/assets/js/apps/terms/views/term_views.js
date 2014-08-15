@@ -53,7 +53,8 @@ Accents.module("TermsApp.Views", function(Views, Accents, Backbone, Marionette, 
                     term: termV,
                     ref: self.ui.ref.val(),
                     user : Accents.user.get('user'),
-                    type: 'term'
+                    type: 'term',
+                    original: ''
                 });
                 self.collection.add(savedModel);
                 savedModel.save({}, {
@@ -72,7 +73,7 @@ Accents.module("TermsApp.Views", function(Views, Accents, Backbone, Marionette, 
           this.ui.term.focus();
         }else{ 
           this.showErrors(errors);
-	}
+        }
     },
 
     updateTerm: function (e) {
