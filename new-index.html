@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="root">
+    <head>
+        <meta charset="utf-8">
+        <title>Interminable - A Transliteration Suggestion Builder</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="description" content="Transliterated Spelling Suggestions">
+        <meta name="viewport" content="width=device-width">
+        <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+        <link rel="shortcut icon" href="favicon.ico" />
+        <link rel="apple-touch-icon" href="apple-touch-icon.png"/>
+        <link rel="apple-touch-icon" sizes="72x72" href="assets/img/ios/apple-touch-icon-72x72-precomposed.png" />
+        <link rel="apple-touch-icon" sizes="114x114" href="assets/img/ios/apple-touch-icon-114x114-precomposed.png" />
+        <link rel="apple-touch-icon" sizes="144x144" href="assets/img/ios/apple-touch-icon-144x144-precomposed.png" />
+        <link rel="stylesheet" href="assets/css/app.css">
+        
+        <!--Bootstrap css start-->
+        
+        <link  href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet" >
+        <link  href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css" rel="stylesheet" >
+        <link  href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+        
+        <!--Bootstrap css end-->
+        
+        <!-- App script start-->
+        <script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+        <script src="angular_sources/js/angular.min.js"></script>
+         <!-- End App script-->
+         
+        <!--Angular Modules-->
+        <script src="angular_sources/modules/login_module.js"></script>
+        <!-- End Angular Modules-->
+       
+    </head>
+    <body>
+                <div class="container application">
+                   <header>
+                        <div>
+                            <div id="primary_links">
+                                <ul class="nav nav-pills pull-right">
+                                    <li class="active"><a href="#add"><i class="fa fa-plus"></i> &nbsp;Add Words</a></li>
+                                    <li><a href="#correct"><i class="fa fa-check"></i> &nbsp;AutoCorrect</a></li>
+                                    <li><a id="login-link" href="#login"><i class="fa fa-sign-in"></i>&nbsp; Login</a></li>
+                                </ul>
+                            </div>
+                        <img src="assets/img/sizes/full-logo-beta-square-sm-64.png" class="pull-left logo">
+                        <h3 class="text-muted maintitle"> Interminable<br>Accents</h3>
+                        <p class="text-muted subtitle"> A proof of concept suggestion builder for Baha'i terms </p>
+                    </div>
+                </header>
+                
+                
+                
+            <div id="maincontent" ng-controller="index">
+                <div>
+                    <div id="addword-input-form">
+                        <div class="form-inline">
+                            <div class="alert-container" ng-if="isValidate"><div><div class="alert alert-danger"><a class="close" href="#">x</a>
+		                      <ul><li> Name or password is incorrect. </li>  </ul></div>
+                                </div>
+                             </div>
+                            <div class="form-group">
+                                <div class="alert alert-error" style="display:none"></div>
+                                <table class="add-word-form">
+                                    <tbody><tr><td colspan="3"><label for="add-word" class=""> Sign In </label></td></tr>
+                                    <tr><td colspan="3">
+                                            <div class="row">
+                                                <div class="term col-md-5 col-sm-5 col-xs-12 md_sm_no_pad_right xs_m_bottom15"><input type="text" id="user" class="form-control" placeholder="User" ng-model="isUser"></div>
+                                                <div class="term col-md-5 col-sm-5 col-xs-12 md_sm_no_pad_right xs_m_bottom15"><input type="password" id="password" class="form-control" placeholder="Password" ng-model="isPassword"></div>
+                                                <div class="button col-md-2 col-sm-2 col-xs-12"><button type="submit" data-loading-text="Wait..." class="btn btn-lg btn-primary active" id="login-btn" ng-click="getUser()">Sign In</button></div>
+                                            </div>
+                                        </td>                                                            
+                                </tr></tbody></table>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+        </div>
+        
+        <!---end middle part-->
+            <footer></footer>
+        </div>
+        
+        <a href="https://github.com/chadananda/accents"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/e7bbb0521b397edbd5fe43e7f760759336b5e05f/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677265656e5f3030373230302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png"></a>
+    
+    </body>
+    <script>
+    $(document).ready(function(){
+    $(".close").click(function(){
+        $(this).hide();
+    });
+});
+    </script>
+    </html>
