@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="myApp">
+    <head>
+        <meta charset="utf-8">
+        <title>Interminable - A Transliteration Suggestion Builder</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="description" content="Transliterated Spelling Suggestions">
+        <meta name="viewport" content="width=device-width">
+        <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+        <link rel="shortcut icon" href="favicon.ico" />
+        <link rel="apple-touch-icon" href="apple-touch-icon.png"/>
+        <link rel="apple-touch-icon" sizes="72x72" href="assets/img/ios/apple-touch-icon-72x72-precomposed.png" />
+        <link rel="apple-touch-icon" sizes="114x114" href="assets/img/ios/apple-touch-icon-114x114-precomposed.png" />
+        <link rel="apple-touch-icon" sizes="144x144" href="assets/img/ios/apple-touch-icon-144x144-precomposed.png" />
+        
+        <link rel="stylesheet" href="assets/css/app.css">
+        <link  href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet" >
+        <link  href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css" rel="stylesheet" >
+        <script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+        <link  href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+        
+         <!-- App script start-->
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+        <script src="angular_sources/js/angular.min.js"></script>
+        
+        <!-- End App script -->
+         <!--Angular Modules-->
+            <script src="angular_sources/modules/pouchdb.js"></script>
+            <script src="angular_sources/modules/app.js"></script>
+            <script src="angular_sources/modules/controllers.js"></script>
+        <!-- End Anular module-->
+    </head>
+    <body ng-controller="MyCtrl">
+                <div class="container application">
+                   <header>
+                        <div>
+                            <div id="primary_links">
+                                <ul class="nav nav-pills pull-right">
+                                    <li class="active"><a href="#add" ng-click="addTodo()"><i class="fa fa-plus"></i> &nbsp;Add Words</a></li>
+                                    <li><a href="#correct"><i class="fa fa-check"></i> &nbsp;AutoCorrect</a></li>
+                                    <li><a id="login-link" href="new-index.html><i class="fa fa-sign-in"></i>&nbsp; Logout</a></li>
+                                </ul>
+                            </div>
+                        <img src="assets/img/sizes/full-logo-beta-square-sm-64.png" class="pull-left logo">
+                        <h3 class="text-muted maintitle"> Interminable<br>Accents</h3>
+                        <p class="text-muted subtitle"> A proof of concept suggestion builder for Baha'i terms </p>
+                    </div>
+                </header>
+                
+                
+                
+            <div id="maincontent">
+                <!---spiner -->
+                <div ng-show="waitContent" class="well" style="float: left;width: 100%;margin-bottom: 20px;"><div class="spinner-content" style="text-align: center;float: left;width: 100%;margin: -18px 0px;"><i class="fa fa-spinner fa-spin" style="font-size: 40px;"></i></div></div>
+                 <!---end spiner-->  
+                  <!--add word form-->
+                  <div ng-show="mainContentiner">
+                  <div id="add-term-form" style="float: left;width: 100%;">
+                    <div id="addword-input-form">
+                        <div class="form-inline">
+                            <div class="alert-container"></div>
+                            <table class="add-word-form">
+                                <tbody>
+                                    <tr><td colspan="3"><label for="add-word" class=""> Add New Word </label></td></tr>
+                            <tr><td colspan="3">
+                                <div class="row">                                    
+                                    <div class="term col-md-5 col-sm-5 col-xs-12 md_sm_no_pad_right xs_m_bottom15">
+                                        <div class="form-group" style="width: 100%;">
+                                            <input type="text" id="add-word" ng-model="todoTerm" name="add-word" class="form-control" placeholder="New Transliterated Term">
+                                            <div class="clearfix"></div>
+                                            <span id="rendered-word" style="float:left;"></span>
+                                        </div>
+                                    </div>
+                                
+                                    <div class="ref col-md-4 col-sm-4 col-xs-12 md_sm_no_pad_right xs_m_bottom15">
+                                         <div class="form-group ">
+                                                <input type="text" id="book-ref" ng-model="myRef" name="book-acr" class="form-control" placeholder="Book Ref">
+                                                <div class="clearfix"></div>
+                                                <span class="ref-example">e.g. Iqan pg 72</span>
+                                        </div>
+                                    </div>
+                                    <div class="button col-md-3 col-sm-3 col-xs-12"><button ng-click="addTodo()" type="button" class="btn btn-lg btn-info active" id="addform-btn"><i class="fa fa-plus"></i> &nbsp;Add Word</button></div>
+                                    </div>                                                
+                            </td>                        
+                        </tr>
+                        
+                    </tbody>
+                    
+                    </table>
+                        </div>
+                    </div>
+                
+                </div> 
+                <!--end add word form-->
+                <!--show load table-->
+                    <div id="add-terms-list" style="display:;"><div>
+                        <ul class="nav nav-tabs" id="myTab">
+                          <li ng-class="[all]" ng-click="al()"><a href="#list-all" data-toggle="tab" >All</a></li>
+                          <li ng-class="[fil]" ng-click="fl()"><a href="#search" data-toggle="tab" disabled="disabled" >Filtered</a></li>
+                        </ul>
+                        <div class="tab-content" ng-show="isFirstElementVisible">
+                            <div class="tab-pane active" id="list-all">
+                             <div id="terms-total"><h3>Terms Collected:<span>{{todos.length}}</span></h3></div>
+                            </div>
+                             <div id="terms-table" class="table-responsive" style="height:50vh;overflow:auto;">
+                                    <table class="table table-striped">
+                                    
+        <thead><tr> <th>id</th><th>Orig</th> <th>Suggestion</th>   <th>Reference</th> <th>Contributor</th> <th></th> </tr></thead>
+        <tbody>
+    <tr ng-repeat="todo in todos" >
+    <td class="id">{{todo.id}}</td>
+    <td class="term">??</td>
+    <td class="term">{{todo.term}}</td>
+    <td class="ref">{{todo.ref}}</td>
+    <td class="user">chad</td>
+    <td class="action"><button  ng-click="removeDone(todo)" type="button" class="btn btn-danger btn-xs remove"><span class="glyphicon glyphicon-remove"></span></button></td>
+        </tr>
+    </tbody>
+    </table>
+</div></div><!-- This might be the place where the terms are placed -->
+      </div>
+
+      <div class="tab-pane" id="search">
+        <div id="terms-filtered-table" style="height:50vh;overflow:auto;display:;" ng-show="isSecondElementVisible"><div>
+    <table class="table table-striped">
+        <thead><tr> <th>Term</th> <th>Count</th> </tr></thead>
+        <tbody>
+        <tr ng-repeat="todo in jObj | filter:todoText" >
+        <td class="ref">{{todo.term}}</td>
+         <td class="ref">{{todo.count}}</td>
+        </tr>
+       </tbody>
+    </table>
+                             </div>
+                        </div>
+                    </div>
+                
+                <!---end show table-->
+                
+                
+            </div>
+        </div>
+        <!---end middle part-->
+         <footer id="footer">
+	<span id="todo-count"></span>
+        <div id="sync-wrapper">
+          <div id="sync-success">Currently syncing</div>
+          <div id="sync-error">There was a problem syncing</div>
+        </div>
+      </footer>
+        </div>
+        
+         <a href="https://github.com/chadananda/accents"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png"></a>
+    
+    </body>
+    </html> 

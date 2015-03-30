@@ -1,7 +1,0 @@
-{
-  "description": "This project attempts to address that fundamental problem by building an authoritative dictionary of correctly spelled terms and names.",
-  "devDependencies": {
-    "grunt": "^0.4.4",
-    "grunt-node-webkit-builder": "~0.1.14"
-  }
-}
