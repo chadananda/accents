@@ -2,7 +2,7 @@
 
 ## http://chadananda.github.io/accents
 
-<a href="https://www.youtube.com/watch?v=AuoAnqVRUCI"><img src="http://content.screencast.com/users/chadananda/folders/Jing/media/898cce0f-4105-42ae-97cc-af4fdba8bd92/00000490.png" align="center" width="500" ></a>
+<a href="https://www.youtube.com/watch?v=AuoAnqVRUCI" target="_blank"><img src="http://content.screencast.com/users/chadananda/folders/Jing/media/a6d6c80d-7c88-4a7b-b5bd-bbe86f7074b9/00000491.png" align="center" width="600" ></a>
 
 
 ### The big idea:
