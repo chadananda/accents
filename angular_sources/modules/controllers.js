@@ -154,4 +154,14 @@ function remove(what) {
         return self.indexOf(value) === index;
     }).join('').substr(2,8);
 }
+function sync() {
+  var syncDom = document.getElementById('sync-wrapper');
+  syncDom.setAttribute('data-sync-state', 'syncing');
+  var opts = {live: true};
+  $scope.pouchdb.replicate.to(remoteCouch, opts, syncError);
+  $scope.pouchdb.replicate.from(remoteCouch, opts, syncError);
+  }
+  function syncError() {
+    syncDom.setAttribute('data-sync-state', 'error');
+  }
 }]);
