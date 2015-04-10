@@ -5,7 +5,6 @@ ctrl.controller('MyCtrl', ['$scope', function($scope) {
 
   $scope.todos = [];
   $scope.jObj = [];
-  var remoteCouch = 'http://chad:vanilla123@diacritics.iriscouch.com/accents';
   $scope.all = 'active';  
   $scope.isSecondElementVisible=false;
    $scope.isFirstElementVisible=true;
@@ -48,7 +47,6 @@ ctrl.controller('MyCtrl', ['$scope', function($scope) {
                     console.log(err);
                 }
                 else {
-                    sync();
                     $scope.loadTodos(response.rows)
                     
                 }
@@ -74,9 +72,6 @@ ctrl.controller('MyCtrl', ['$scope', function($scope) {
             });
         };
     }
-
-
-
     $scope.addTodo = function() {
         var newTodo = {
             _id: Math.uuid(),
@@ -159,7 +154,6 @@ function remove(what) {
         return self.indexOf(value) === index;
     }).join('').substr(2,8);
 }
-
 function sync() {
   var syncDom = document.getElementById('sync-wrapper');
   syncDom.setAttribute('data-sync-state', 'syncing');
@@ -170,5 +164,4 @@ function sync() {
   function syncError() {
     syncDom.setAttribute('data-sync-state', 'error');
   }
-  
 }]);
