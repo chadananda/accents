@@ -52,8 +52,32 @@
 <!-- add links main content page -->
 <script type="text/template" id="add-term-main-layout-template">
     <div id="add-term-form"></div>
+     <div id="similar-terms">
+         <div class="form-group" style="  width: 100%;margin: 0;margin-bottom: 1em;background-color: #eee;border-radius: 6px;box-shadow: 0px 0px 2px #aaa;border: 1px solid silver;padding: 10px 15px;">
+         <label style="font-size: 18pt;">Similar Terms</label><br/>
+        <div> <span style="  font-size: 14pt;color:#454545;">3 Exact Matches,none verified</span><br/>
+           <ul style="list-style:none;font-weight: 600;">
+            <li><span style="font-size:17px;"><i class="fa fa-pencil-square-o"></i> &nbsp;&nbsp;&nbsp; Aqdas,DB Pg 6 </span></li>
+            <li><span style="font-size:17px;"><i class="fa fa-pencil-square-o"></i> &nbsp;&nbsp;&nbsp; Aqdas,Eqan Pg 43 </span></li>
+              <li><span style="font-size:17px;"><i class="fa fa-pencil-square-o"></i> &nbsp;&nbsp;&nbsp; Aqdas,ESW Pg 19 </span></li>
+          </ul>
+           </div> 
+          <div>
+          <span style="  font-size: 14pt;color:#454545;">47 Partial Matches</span><br/>
+           <div style="padding-left: 6%;font-size:17px;font-weight: 600;"><span><i class="fa fa-sort-desc" style="vertical-align: sub;"></i> &nbsp;&nbsp;&nbsp;Kitab-i-Aqadas-7</span></div>
+           <div style="padding-left: 6%;font-size:17px;font-weight: 600;"><span><i class="fa fa-sort-asc" style="vertical-align: sub;"></i> &nbsp;&nbsp;&nbsp;Suriy-i-Aqadas-3</span></div>
+           <div style="padding-left: 10%;"><span>Suriy-i-Aqadas,DB Pg-6,(arabic),verified<i class="fa fa-play-circle-o" style="font-size: 20px;padding-left:15px;"></i><i class="fa fa-pencil-square-o" style="font-size: 20px;padding-left:10px;"></i><i class="fa fa-minus-circle" style="font-size: 20px;padding-left:50px;color: rgb(239, 64, 64);"></i></span>
+          <br/> <span>Suriy-i-Aqadas,DB Pg-8,(arabic),verified<i class="fa fa-play-circle-o" style="font-size: 20px;padding-left:15px;"></i><i class="fa fa-pencil-square-o" style="font-size: 20px;padding-left:10px;"></i><i class="fa fa-minus-circle" style="font-size: 20px;padding-left:50px;color: rgb(239, 64, 64);"></i></span>
+          </div>
+          </div>
+          
+          </div>     
+          
+     </div>
     <div id="add-remove-links"></div>
     <div id="add-terms-list"></div>
+   
+    
 </script>
 
 
@@ -71,30 +95,71 @@
             <tr>
             <td colspan="3">
             <div class="row">                                    
-			<div class="term col-md-5 col-sm-5 col-xs-12 md_sm_no_pad_right xs_m_bottom15">
+			<div class="term col-md-4 col-sm-4 col-xs-12 md_sm_no_pad_right xs_m_bottom15">
             	<div class="form-group" style="width: 100%;">
 					<input type="text" id="add-word" name="add-word" class="form-control" placeholder="New Transliterated Term" >
                     <div class="clearfix"></div>
                     <span id="rendered-word" style="float:left;"></span>
             	</div>
 			</div>
+            
+             <div class="term col-md-4 col-sm-4 col-xs-12 md_sm_no_pad_right xs_m_bottom15">
+            	<div class="form-group" style="width: 100%;">
+					<input type="text" id="" name="" class="form-control" placeholder="Arabic/Farsi Code" >
+                    <div class="clearfix"></div>
+                    <span id="" style="float:left;"></span>
+            	</div>
+			</div>
+            
             <div class="ref col-md-4 col-sm-4 col-xs-12 md_sm_no_pad_right xs_m_bottom15">
-            	<div class="form-group ">
+            	<div class="form-group " style="padding-right: 13px;">
                     <input type="text" id="book-ref" name="book-acr" class="form-control" placeholder="Book Ref">
                     <div class="clearfix"></div>
                     <span class="ref-example">e.g. Iqan pg 72</span>
 				</div>
 			</div>
-            <div class="button col-md-3 col-sm-3 col-xs-12"><button type="submit" class="btn btn-lg btn-info active" id="addform-btn"><i class="fa fa-plus"></i> &nbsp;Add Word</button></div>
+          
+           </div>
             
+    
             </div>                                                
             </td>                        
 		</tr>
+        <tr>
+            <td colspan="4">
+            <div class="row">     
+            
+             <div>
+               <div class="ref col-md-8 col-sm-8 col-xs-12 md_sm_no_pad_right xs_m_bottom15">
+            	<div class="form-group " style="  width: 20%">
+                    <input type="checkbox" id="" name="" class="form-control" style="height:25px;width:22%;">&nbsp;<span style="width: 25%;font-size: 19px;vertical-align: middle;">Verified</span>
+                      </div>
+                
+                <div class="form-group " style="  width:27%">
+                    <input type="checkbox" id="" name="" class="form-control" style="height:25px;width:15%;">&nbsp;<span style="width: 25%;font-size: 19px;vertical-align: middle;">Ambiguous</span>
+                   </div>
+                   <div class="form-group " style="width:27%"><img src="d2.png" width="35px" height="35px"/>
+                   <img src="d1.png" width="20px" height="32px" style="margin-left: 10px;"/></div>
+			</div>
+            
+             <div class="button col-md-4 col-sm-4 col-xs-12" style="  padding-left: 0px;"><button type="submit" class="btn btn-lg btn-info active" id="addform-btn" style="float:right;height: 40px;font-size: 11pt!important;"><i class="fa fa-plus"></i> &nbsp;Save/Add</button>
+             <button type="submit" class="btn btn-lg btn-info active" id="addform-btn" style="float:left;height: 40px;font-size: 11pt!important;"><i class="fa fa-trash-o"></i> &nbsp;Delete</button></div>
+             
+            
+            </div></td></tr>
+        
         <!--- <tr><td id="rendered-word"></td><td class="ref-example">e.g. Iqan pg 72</td><td></td></tr> -->
             </table>
         </div>
     </div>
 </script>
+
+
+</div>
+
+
+
+
 
 <!-- alert template -->
 <script type="text/template" id="alert-template">
@@ -104,6 +169,8 @@
 			<% _.each(errors, function(error){%> <li> <%= error %> </li>  <%});%>
 		<ul>
 	</div>
+    
+    
 </script>
 
 <!-- replaces #add-remove-links
