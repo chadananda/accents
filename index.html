@@ -52,32 +52,8 @@
 <!-- add links main content page -->
 <script type="text/template" id="add-term-main-layout-template">
     <div id="add-term-form"></div>
-     <div id="similar-terms">
-         <div class="form-group" style="  width: 100%;margin: 0;margin-bottom: 1em;background-color: #eee;border-radius: 6px;box-shadow: 0px 0px 2px #aaa;border: 1px solid silver;padding: 10px 15px;">
-         <label style="font-size: 18pt;">Similar Terms</label><br/>
-        <div> <span style="  font-size: 14pt;color:#454545;">3 Exact Matches,none verified</span><br/>
-           <ul style="list-style:none;font-weight: 600;">
-            <li><span style="font-size:17px;"><i class="fa fa-pencil-square-o"></i> &nbsp;&nbsp;&nbsp; Aqdas,DB Pg 6 </span></li>
-            <li><span style="font-size:17px;"><i class="fa fa-pencil-square-o"></i> &nbsp;&nbsp;&nbsp; Aqdas,Eqan Pg 43 </span></li>
-              <li><span style="font-size:17px;"><i class="fa fa-pencil-square-o"></i> &nbsp;&nbsp;&nbsp; Aqdas,ESW Pg 19 </span></li>
-          </ul>
-           </div> 
-          <div>
-          <span style="  font-size: 14pt;color:#454545;">47 Partial Matches</span><br/>
-           <div style="padding-left: 6%;font-size:17px;font-weight: 600;"><span><i class="fa fa-sort-desc" style="vertical-align: sub;"></i> &nbsp;&nbsp;&nbsp;Kitab-i-Aqadas-7</span></div>
-           <div style="padding-left: 6%;font-size:17px;font-weight: 600;"><span><i class="fa fa-sort-asc" style="vertical-align: sub;"></i> &nbsp;&nbsp;&nbsp;Suriy-i-Aqadas-3</span></div>
-           <div style="padding-left: 10%;"><span>Suriy-i-Aqadas,DB Pg-6,(arabic),verified<i class="fa fa-play-circle-o" style="font-size: 20px;padding-left:15px;"></i><i class="fa fa-pencil-square-o" style="font-size: 20px;padding-left:10px;"></i><i class="fa fa-minus-circle" style="font-size: 20px;padding-left:50px;color: rgb(239, 64, 64);"></i></span>
-          <br/> <span>Suriy-i-Aqadas,DB Pg-8,(arabic),verified<i class="fa fa-play-circle-o" style="font-size: 20px;padding-left:15px;"></i><i class="fa fa-pencil-square-o" style="font-size: 20px;padding-left:10px;"></i><i class="fa fa-minus-circle" style="font-size: 20px;padding-left:50px;color: rgb(239, 64, 64);"></i></span>
-          </div>
-          </div>
-          
-          </div>     
-          
-     </div>
     <div id="add-remove-links"></div>
     <div id="add-terms-list"></div>
-   
-    
 </script>
 
 
@@ -154,13 +130,6 @@
     </div>
 </script>
 
-
-</div>
-
-
-
-
-
 <!-- alert template -->
 <script type="text/template" id="alert-template">
 	<div class="alert alert-<%= type %>">
@@ -169,8 +138,6 @@
 			<% _.each(errors, function(error){%> <li> <%= error %> </li>  <%});%>
 		<ul>
 	</div>
-    
-    
 </script>
 
 <!-- replaces #add-remove-links
