@@ -56,10 +56,9 @@ As you type, you will notice a filtered list showing how many times matching wor
 
 ### Software Development, TODO:
 
-1. Speed up main term list 
-    2. Make it a vertical scrolling paginated view
-    2. Possibly ordered by first alphabet letter 
-    3. Still sorted by "base" version
+1. convert basic interface to Angular and extend fields
+
+<img src="http://content.screencast.com/users/chadananda/folders/Jing/media/6bb56730-582f-41c6-99f5-d7a381adf4f1/00000535.png" width="400" />
 
 1. Improve as-you-type filtering
     1. show complete match at top of list (sometimes the perfect match is short and therefore buried)
