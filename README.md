@@ -56,48 +56,18 @@ As you type, you will notice a filtered list showing how many times matching wor
 
 ### Software Development, TODO:
 
-1. convert basic interface to Angular and extend fields
+1. Convert basic interface to Angular including PouchDB storage and sync to Couch
 
-<img src="http://content.screencast.com/users/chadananda/folders/Jing/media/6bb56730-582f-41c6-99f5-d7a381adf4f1/00000535.png" width="400" />
+3. Extend Fields on Edit View
 
-1. Improve as-you-type filtering
-    1. show complete match at top of list (sometimes the perfect match is short and therefore buried)
-    2. only start matching on >3 letters
-    3. when typing, pause 2 seconds (naggle) on filter match to not seize typing
-    4. keep hash list of fragment bases to spell check individually typed fragments (between dashes and apostrophes)
+<img src="http://content.screencast.com/users/chadananda/folders/Jing/media/6bb56730-582f-41c6-99f5-d7a381adf4f1/00000535.png" />
 
-1. Add "Correction" page
-   1. Integrate diacriticals project
-   2. Provide paste box for pasting in large blocks of HTML/text
-   3. Provide filter options
-   3. Provide view iFrame to see results
-   4. Provide download button to pull down changed document
+1. Add Bulk verification View
+<img src="http://content.screencast.com/users/chadananda/folders/Jing/media/b5ac9f2d-a0ec-4de2-82fe-0ae40833b0c6/00000536.png" />
 
-1. Add Conflict Report tab to first page or as additional 'app'
-   1. show list of words with conflicted spellings
-   2. show individual items and allow deletion 
-
-1. Debugging
-   1. Debug Javascript communications errors
-   2. Speed up batch data synchronization
-   3. Remember highest page number provided even after logout/login
-   3. Show some visual indication of data synchronizing or offline mode 
-   4. Smooth offline operation
-   4. Login  
-      1. hitting Enter in the first field should submit the form
-      2. should load faster after logging in.
-
-1. Make app resize size to any window
-   2. add vertical scroll bar for list
-   3. horizontal resize
-
-1. Wrap up app in Node-Webkit wrapper for deployment to Mac and Windows (using grunt plugin)
-
-1. Use 'erica' library to store all files in a database 
-   1. URL pulls down loader stub which copies app to local files ?? (possible for node webkit version?)
-   2. Background process updates app from synced DB
-   3. Grunt or GitHub task pushes new changes to deploy DB
-
+1. Add Audio Recording View
+<img src="http://content.screencast.com/users/chadananda/folders/Jing/media/7febee5c-977c-4194-aac7-af5345fafa2c/00000537.png" />
+ 
 
 
 
