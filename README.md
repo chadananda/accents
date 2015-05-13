@@ -45,6 +45,11 @@ As you type, you will notice a filtered list showing how many times matching wor
 
 * Enter one word at a time. If the term has multiple words (that is, divided by a space) then just enter one at a time.
 
+* If you can read some Persian/Arabic script, search for the word in Google and try to verify the spelling. Copy in the Arabic.
+
+* If you are a native Persian speaker, consider contributing pronunciation recordings.  
+
+
 
 
 ------------------------
