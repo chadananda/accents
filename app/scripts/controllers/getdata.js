@@ -16,13 +16,16 @@ angular.module('accentsApp')
       'Karma'
     ];
 	
-	 $scope.getAllData = function() {
+	// $scope.getAllData = function() {
       getRecords.getAllData()
         .success(function(data) {
+			
 		if(data.rows)
 		{
 		console.log(data.rows);
+		
 	$scope.docs=data.rows;
+	$scope.count=data.total_rows;
 		}
 		
 		
@@ -33,5 +36,13 @@ angular.module('accentsApp')
         .error(function(error) {
         console.log(error);
         });
+        
+        $scope.deletedoc = function(id) {
+			
+        alert(id)
+        
+        
+        
+        
     };
   });
