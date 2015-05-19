@@ -18,20 +18,17 @@ body{background:url('../images/bodybg.png') repeat; }
 .txtuppcase{text-transform:uppercase!important;}
 .posrleative{position:relative ;}
 .form-inline .form-control{width:100%;}
-button,input{border-radius:0px !important; border:none!important;}
+ button,input{border-radius:0px !important; border:none!important;}
 .topbutton button{margin-top:15px; -webkit-transition: all 0.5s ease-in-out;-moz-transition: all 0.5s ease-in-out;  -o-transition: all 0.5s ease-in-out;transition: all 0.5s ease-in-out;}
 
 .logo img{max-width:86px;}
 .logo h3{color:#999999;}
 .logo p{font-size:12px; color:#999999;}
-#main-container{ border:1px solid #f0f0f0; max-width:992px; background:#ffffff;}
-
+ #main-container{ border:1px solid #f0f0f0; max-width:992px; background:#ffffff;}
 .inputexm{position:absolute;  left:20px; bottom:-16px; font-size:10px; color:#999999; font-style:italic;} 
 .addtext{background:#333333; color:#fefefe;}
 .addtext h3{border-bottom:1px solid #3d3d3d; padding-bottom:10px; margin-top:5px; margin-bottom:20px;}
-
 .remove{padding:3px;}
-
 .tablecontainer th{   text-transform: uppercase;  background: #2D5D76;border: none !important;color: #fff;text-align: center }
 .tablecontainer td{text-align:center; border-bottom:1px solid #f0f0f0; }
 .tablecontainer tr{-webkit-transition: all 0.2s ease-in-out;-moz-transition: all 0.2s ease-in-out;  -o-transition: all 0.2s ease-in-out;transition: all 0.2s ease-in-out;}
@@ -49,9 +46,30 @@ button,input{border-radius:0px !important; border:none!important;}
 /*-------------------------login-----------------------------------*/
 #loginPage{max-width:600px; width:100%; margin:0 auto; background:#333; padding:20px; color:#fff; box-shadow:0px 6px 8px -6px #000;  border: 3px solid #767676;}
 .loginIcon{position:absolute; right:15px; top:10px; color:#ccc;}
- .login-btn{min-width:200px;  text-transform: uppercase;font-size: 15px;}
+.login-btn{min-width:200px;  text-transform: uppercase;font-size: 15px;}
 /*-------------------------login-----------------------------------*/
+.playmic a{display:block; color:#ffffff; border:1px solid #ffffff; padding:8px;padding: 3px 5px; opacity:0.8;}
+.playmic img{max-width:15px;}
+.playmic a:hover{opacity:1;}
+.autosearch-container{border:1px solid #3d3d3d;  background: #3C3B3B; }
+.autosearch-container ul{list-style:none; padding-left:10px;}
+.autosearch-container ul li a{ color:#f0f0f0; font-size:12px;}
+.accentpanel .panel {background:transparent; color:#fff; border-radius:0px;  border: 0px;}
+.accentpanel .panel-heading{background:transparent; color:#fff;padding: 5px 15px;}
+.accentpanel .panel-title > a{font-size:13px;}
+.playIcon{color:#69CCFF;}
+.deleteIcon{color:#FF0000;}
+.accentpanel .panel-body ul li{border-bottom:1px solid #414141; margin-bottom:0px;}
+.accentpanel .panel-body ul li:hover{background:#414141;}
+.accentpanel .panel-body span {opacity:0.75; font-size:18px;}
+.accentpanel .panel-body span:hover{opacity:1;}
+.accentpanel .panel-body div{width:85px;}
+.disabled{  cursor: no-drop; opacity:0.3 !important}
+.openPanelrotate{transform: rotate(90deg); -moz-transform: rotate(90deg); -ms-transform: rotate(90deg); -webkit-transform: rotate(90deg); -o-transform: rotate(90deg);}
 
+.autochoose{left:0; background: #fafafa; color:#333333; box-shadow: 0px 1px 2px #666; left: 0;position: absolute;top: 100%;z-index: 99; display:none;}
+.autochoose .checkbox{ width:100%; padding:5px 15px;    display: inline-block;}
+.autochoose input[type="checkbox"]{margin-left:0px !important; margin-right:5px;}
 
 @media all and (max-width : 1150px)
 {

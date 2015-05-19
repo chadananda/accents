@@ -8,7 +8,7 @@
  * Controller of the accentsApp
  */
 angular.module('accentsApp')
-  .controller('getdataCtrl', function ($scope,$http,getRecords) {
+  .controller('getdataCtrl', function ($scope,$http,getRecords,$window) {
   $scope.docs={};
     $scope.awesomeThings = [
       'HTML5 Boilerplate',
@@ -16,7 +16,7 @@ angular.module('accentsApp')
       'Karma'
     ];
 
-	
+	 //////////////////////////Fetch  data/////////////////////////////////////
 	// $scope.getAllData = function() {
       getRecords.getAllData()
         .success(function(data) {
@@ -27,43 +27,73 @@ angular.module('accentsApp')
 		
 	$scope.docs=data.rows;
 	$scope.count=data.total_rows;
-		}
-		
-		
-		
-				
+		}	
           
         })
         .error(function(error) {
       //  console.log(error);
         });
         
-        $scope.deletedoc = function(id) {
-			
-        alert(id)
+         //////////////////////////Delete data/////////////////////////////////////
         
-        
-        
+        $scope.deletedoc = function(id,rev) {
+		if($window.confirm('Are you SURE you want to delete?')){	
+       	$http.delete('http://diacritics.iriscouch.com/accents_swarandeep/'+id+'?rev='+rev).
+		success(function(data, status, headers, config) {
+	//  console.log(Status);
+   console.log(status);
+  }).
+  error(function(data, status, headers, config) {
+	  //console.log(Status);
+   alert(status);
+  });   
+      }  
         
     };
     
     
+      //////////////////////////single record data/////////////////////////////////////
+        
+        $scope.editdoc = function(id,rev) {
+			
+       	$http.get('http://diacritics.iriscouch.com/accents_swarandeep/'+id+'?rev='+rev+'&include_docs=true').
+		success(function(data, status, headers, config) {
+	//  console.log(Status);
+	$scope.editdata=data;
+   console.log(data);
+  }).
+  error(function(data, status, headers, config) {
+	  //console.log(Status);
+   alert(status);
+  });   
+     
+        
+    };
+    
+    //////////////////////////Add data/////////////////////////////////////
     
     $scope.adddata=function(){
-    alert('hi');
-   /* $http.post({
-        url: 'http://diacritics.iriscouch.com/accents_swarandeep/',
-        
-        data: JSON.stringify({"_rev": "4-0795f5da8974dc19e1178a0fd11d890b","id":"4cf643637","source": "marciel",   "original": "شرح الفوائد", "definition": "by Shaykh Aḥmad-i-Aḥsá’í", "type": "term", "user": "chad",   "term": "_Sharḥu’l-Far"}),
-        headers: {'Content-Type': 'application/json'}
-      }).success(function (data, status, headers, config) {
-           alert(data);
-        }).error(function (data, status, headers, config) {
-            $scope.status = status + ' ' + headers;
-        });*/
+    var term=$scope.search.doc.term;
+    var  original=$scope.original;
+    var refrence=$scope.reference;
+    var definition=$scope.definition;
+    //console.log(newterm);
+   // var newtrans=$scope.newtrans;
+    var data= JSON.stringify({"source": "Swarandeep",   "original":original , "definition":definition, "type": "term", "user": "Swarandeep","term": term,"ref":refrence});
+    
+    $http.post('http://diacritics.iriscouch.com/accents_swarandeep/', data).
+  success(function(data, status, headers, config) {
+	  console.log(status);
+    //alert('Success');
+  }).
+  error(function(data, status, headers, config) {
+	  console.log(status);
+   //alert('eroro');
+  });
+
 };  
     
-    
+     //////////////////////////Search data/////////////////////////////////////
     
     $scope.getnames=function(searchval){
 		$http.get('http://diacritics.iriscouch.com/accents_swarandeep/_design/lists/_view/full_term?startkey="'+searchval+'"&endkey="'+searchval+'\\ufff0"&include_docs=true')
