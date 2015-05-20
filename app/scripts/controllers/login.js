@@ -15,6 +15,7 @@ angular.module('accentsApp')
       'Karma'
     ];
      $scope.login = function() {
+		
 		 var username=$scope.username;
 		 var password=$scope.password;
 var domainRemoteDb='diacritics.iriscouch.com';
@@ -23,19 +24,19 @@ var urlConnection = "http://" + username + ":" + password + "@" + domainRemoteDb
 
 
 var db = new PouchDB(urlConnection, function(error){
+
         if(error){
 			$location.path("/");
-			
             
           }else{
 			 
-			
 			 
            $scope.todoText ={username: username, loggedIn: true, startDate: new Date()};
            
              localStorage.setItem('session-user', JSON.stringify($scope.todoText))
              var session=localStorage.getItem('session-user');
-              $location.path("/getdata");
+            //  $location.path("/getdata");
+            window.location.href="/#/getdata";
           
             }
            

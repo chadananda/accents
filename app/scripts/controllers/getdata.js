@@ -52,6 +52,25 @@ angular.module('accentsApp')
     };
     
     
+     //////////////////////////Delete data in the form/////////////////////////////////////
+        
+        $scope.deletedata = function() {
+			var id=document.getElementById("keyid").value;
+			var rev=document.getElementById("keyrev").value; 
+		if($window.confirm('Are you SURE you want to delete?')){	
+       	$http.delete('http://diacritics.iriscouch.com/accents_swarandeep/'+id+'?rev='+rev).
+		success(function(data, status, headers, config) {
+	//  console.log(Status);
+   console.log(status);
+  }).
+  error(function(data, status, headers, config) {
+	  //console.log(Status);
+   alert(status);
+  });   
+      }  
+        
+    };
+    
       //////////////////////////single record data/////////////////////////////////////
         
         $scope.editdoc = function(id,rev) {
@@ -60,6 +79,13 @@ angular.module('accentsApp')
 		success(function(data, status, headers, config) {
 	//  console.log(Status);
 	$scope.editdata=data;
+	document.getElementById("term").value=data.term;
+	document.getElementById("keyid").value=data._id;
+	document.getElementById("keyrev").value=data._rev;
+	$('#addword').css({ "display":"none" });
+	$('#Button2').css({ "display":"block" });
+	$('#updateword').css({ "display":"block" });
+
    console.log(data);
   }).
   error(function(data, status, headers, config) {
@@ -74,12 +100,12 @@ angular.module('accentsApp')
     
     $scope.adddata=function(){
     var term=$scope.search.doc.term;
-    var  original=$scope.original;
-    var refrence=$scope.reference;
-    var definition=$scope.definition;
+    var  original=$scope.editdata.original;
+    var refrence=$scope.editdata.reference;
+    var definition=$scope.editdata.definition;
     //console.log(newterm);
    // var newtrans=$scope.newtrans;
-    var data= JSON.stringify({"source": "Swarandeep",   "original":original , "definition":definition, "type": "term", "user": "Swarandeep","term": term,"ref":refrence});
+var data= JSON.stringify({"source": "Swarandeep",   "original":original , "definition":definition, "type": "term", "user": "Swarandeep","term": term,"ref":refrence});
     
     $http.post('http://diacritics.iriscouch.com/accents_swarandeep/', data).
   success(function(data, status, headers, config) {
@@ -92,6 +118,31 @@ angular.module('accentsApp')
   });
 
 };  
+  
+   //////////////////////////Update data/////////////////////////////////////
+
+    $scope.updatedata=function(){
+	var id=document.getElementById("keyid").value;
+	var rev=document.getElementById("keyrev").value;
+	var term=$scope.search.doc.term;
+    var  original=$scope.editdata.original;
+    var refrence=$scope.editdata.reference;
+    var definition=$scope.editdata.definition;
+    //console.log(newterm);
+   // var newtrans=$scope.newtrans;
+    var data= JSON.stringify({"source": "Swarandeep",   "original":original , "definition":definition, "type": "term", "user": "Swarandeep","term": term,"ref":refrence});
+   
+    $http.put('http://diacritics.iriscouch.com/accents_swarandeep/'+id+'?rev='+rev, data).
+  success(function(data, status, headers, config) {
+	  console.log(status);
+    //alert('Success');
+  }).
+  error(function(data, status, headers, config) {
+	  console.log(status);
+   //alert('eroro');
+  });
+
+};    
     
      //////////////////////////Search data/////////////////////////////////////
     
