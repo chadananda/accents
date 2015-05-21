@@ -18,15 +18,17 @@ angular.module('accentsApp')
 
 	 //////////////////////////Fetch  data/////////////////////////////////////
 	// $scope.getAllData = function() {
+	
       getRecords.getAllData()
         .success(function(data) {
-			
+			$("#spinner").show();
 		if(data.rows)
 		{
 		//console.log(data.rows.doc);
 		
 	$scope.docs=data.rows;
 	$scope.count=data.total_rows;
+	$("#spinner").hide()
 		}	
           
         })
@@ -41,11 +43,30 @@ angular.module('accentsApp')
        	$http.delete('http://diacritics.iriscouch.com/accents_swarandeep/'+id+'?rev='+rev).
 		success(function(data, status, headers, config) {
 	//  console.log(Status);
+	$("#spinner").show();
    console.log(status);
+   $scope.message='Record Deleted Successfully';
+       $http.get('http://diacritics.iriscouch.com/accents_swarandeep/_all_docs?include_docs=true')
+        .success(function(data) {
+			
+		if(data.rows)
+		{
+		console.log(data.rows.doc);
+		
+	$scope.docs=data.rows;
+	$scope.count=data.total_rows;
+	$("#spinner").hide();
+		}	
+          
+        })
+        .error(function(error) {
+       console.log(error);
+        });
   }).
   error(function(data, status, headers, config) {
 	  //console.log(Status);
-   alert(status);
+	  $scope.message='Error Deleting Record';
+   //alert(status);
   });   
       }  
         
@@ -110,10 +131,27 @@ var data= JSON.stringify({"source": "Swarandeep",   "original":original , "defin
     $http.post('http://diacritics.iriscouch.com/accents_swarandeep/', data).
   success(function(data, status, headers, config) {
 	  console.log(status);
-    //alert('Success');
+	  $scope.message='Record Added Successfully';
+   $http.get('http://diacritics.iriscouch.com/accents_swarandeep/_all_docs?include_docs=true')
+        .success(function(data) {
+			
+		if(data.rows)
+		{
+		console.log(data.rows.doc);
+		
+	$scope.docs=data.rows;
+	$scope.count=data.total_rows;
+		}	
+          
+        })
+        .error(function(error) {
+       console.log(error);
+        });
+  
   }).
   error(function(data, status, headers, config) {
 	  console.log(status);
+$scope.message='Error adding record';
    //alert('eroro');
   });
 
@@ -131,11 +169,25 @@ var data= JSON.stringify({"source": "Swarandeep",   "original":original , "defin
     //console.log(newterm);
    // var newtrans=$scope.newtrans;
     var data= JSON.stringify({"source": "Swarandeep",   "original":original , "definition":definition, "type": "term", "user": "Swarandeep","term": term,"ref":refrence});
-   
+     $scope.message='Record Updated Successfully';
     $http.put('http://diacritics.iriscouch.com/accents_swarandeep/'+id+'?rev='+rev, data).
   success(function(data, status, headers, config) {
-	  console.log(status);
-    //alert('Success');
+	 $http.get('http://diacritics.iriscouch.com/accents_swarandeep/_all_docs?include_docs=true')
+        .success(function(data) {
+			
+		if(data.rows)
+		{
+		console.log(data.rows.doc);
+		
+	$scope.docs=data.rows;
+	$scope.count=data.total_rows;
+		}	
+          
+        })
+        .error(function(error) {
+       console.log(error);
+        });
+  
   }).
   error(function(data, status, headers, config) {
 	  console.log(status);

@@ -26,9 +26,12 @@ var urlConnection = "http://" + username + ":" + password + "@" + domainRemoteDb
 var db = new PouchDB(urlConnection, function(error){
 
         if(error){
+			//console.log(error.message);
 			$location.path("/");
-            
-          }else{
+			           $scope.errormessage =error.message;
+			
+			
+			                }else{
 			 
 			 
            $scope.todoText ={username: username, loggedIn: true, startDate: new Date()};

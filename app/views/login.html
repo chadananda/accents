@@ -1,5 +1,5 @@
 ﻿      
-                      <div class="col-lg-12  clearfix pb30" >
+                      <div class="col-lg-12  clearfix pb30" ng-controller="loginCtrl" >
                       <div class="clearfix" id="loginPage">
                       <div class="col-lg-12 clearfix mb30 ">
                        
@@ -16,6 +16,7 @@
                        </div>
                       
                       </div>
+                      <div style="color:red; text-align:center;">{{errormessage}}</div>
                        <div class="col-lg-12 clearfix ">
                       <form ng-submit="login()">
                           <div class="form-group posrleative">

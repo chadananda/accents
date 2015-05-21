@@ -26,12 +26,39 @@
                           </div>
                        </div>
                 </div>
-                 <div class="col-sm-6 logo p0 valignmiddle text-right topbutton mt10">
+                 <div class="col-sm-6 logo p0 valignmiddle text-right topbutton mt10" style="display:none;">
                     <button type="button" class="btn btn-info txtuppcase "><span class="glyphicon glyphicon-plus mr5"></span>add words</button>
                     <button type="button" class="btn btn-default txtuppcase "><span class="glyphicon glyphicon-ok mr5"></span>Auto Correct</button>
                     <button type="button" class="btn btn-danger txtuppcase " title="Logout" onclick="logout()"><span class="glyphicon glyphicon-off"></span></button>
                  </div>
-                
+                <div class="col-sm-3 col-sm-offset-3 logo p0 valignmiddle text-right topbutton mt10" >
+					<div class="header">
+					  <div class="navbar navbar-default" role="navigation">
+						<!--div class="container"-->
+						  <div class="navbar-header">
+
+							<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#js-navbar-collapse">
+							  <span class="sr-only">Toggle navigation</span>
+							  <span class="icon-bar"></span>
+							  <span class="icon-bar"></span>
+							  <span class="icon-bar"></span>
+							</button>
+
+							<!--a class="navbar-brand" href="#/">accents</a-->
+						  </div>
+
+						  <div class="collapse navbar-collapse" id="js-navbar-collapse" style="padding:0;">
+
+							<ul class="nav navbar-nav">
+							  <li class="active"><a href="#/">Add Term</a></li>
+							  <li><a ng-href="#/about">Verify Terms</a></li>
+							  <li><a class="btn-danger txtuppcase logout" style="color:#ffffff;" title="Logout" onclick="logout()"><span class="glyphicon glyphicon-off"></span></a></li>
+							</ul>
+						  </div>
+						</div>
+					  <!--/div-->
+					</div>
+                </div>
             </div>                    
              
             <div class="col-lg-12 clearfix mb10 p0 pt10 pb30 addtext mt30">    
@@ -212,7 +239,7 @@
                      <h5 class="blankalert"> Ref & Term can't be blank</h5>
                  </div>
             </div>
-       
+       <div>{{message}}</div>
         <div class="col-lg-12 clearfix  mb10 p0  mt30">
                 <div role="tabpanel">
                       <ul class="nav nav-tabs" role="tablist">
@@ -236,6 +263,7 @@
                                        </tr>
                                    </thead>
                       <tbody>
+						   
                  <tr ng-repeat="doc in docs | filter:search">
 						  
 						 
@@ -250,7 +278,7 @@
                         
                        
                     </tr>
-
+ <img id="spinner" ng-src="images/loading-x.gif" style="display:none;width:50px;height:50px;text-align:center;">
                 </table>
                         </div>
                           <!--------------------TABLE-END------------------------->
