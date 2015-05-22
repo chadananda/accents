@@ -8,7 +8,7 @@
  * Controller of the accentsApp
  */
 angular.module('accentsApp')
-  .controller('loginCtrl', function ($scope,$location) {
+  .controller('loginCtrl', function ($scope,$location,$timeout) {
     $scope.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',
@@ -22,13 +22,15 @@ var domainRemoteDb='diacritics.iriscouch.com';
 var remoteDb='accents';
 var urlConnection = "http://" + username + ":" + password + "@" + domainRemoteDb + "/" + remoteDb;
 
-
+console.log(urlConnection);
 var db = new PouchDB(urlConnection, function(error){
 
+console.log(error);
         if(error){
 			//console.log(error.message);
 			$location.path("/");
-			           $scope.errormessage =error.message;
+			 $timeout(function(){$scope.errormessage =error.message},100);
+			          // $scope.errormessage ="Invalid Username and Password";
 			
 			
 			                }else{
