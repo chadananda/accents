@@ -69,19 +69,28 @@
              
             <div class="col-lg-12 clearfix mb10 p0 pt10 pb30 addtext mt30">    
                 <h3 class="pl15 pr15" id="toptext">Term Add</h3> 
-                <h2 class="col-lg-12 clearfix text-center" style="color:white;font-weight:bold;margin:10px;">{{search.doc.term}}</h2>
+                <h2 class="col-lg-12 clearfix text-center" style="color:white;font-weight:bold;margin:10px;margin-top:-60px;">{{search.doc.term}}</h2>
                 <div class="col-lg-12 clearfix"> 
                 <form class="form-inline clearfix">
-				 <div class="col-md-12 col-md-offset-1">
-                  <div class="form-group col-sm-5 ">
+				 <div class="col-md-12 ">
+                  <div class="form-group col-sm-6 ">
 					 
                     <input type="text" class="form-control chkval"  value="" name="term" ng-model="search.doc.term"  ng-model-options="{debounce: 700}" id="term" placeholder="New Transliterated Term" onfocus="changeterm()" />
                     <input type="hidden" id="keyid"  />
                     <input type="hidden" id="keyrev"  />  
-                    <label for="term">New Transliterated Term</label>                            
+                     <span class="inputexm">Term</span>
+                    
                   </div>
-                  <div class="form-group posrleative col-sm-5 ">
-                    <input type="text" name="original" class="form-control chkval openautochoose" ng-model="editdata.original" placeholder="Arabic" />
+                  <div class="form-group posrleative col-sm-6 ">
+					  <input type="text" name="reference"  class="form-control chkval" ng-model="editdata.ref" placeholder="KA p 25"/>
+                     <span class="inputexm">Reference e.g. Iqan pg 72</span>
+                     
+                   
+                  </div>
+                  </div>
+                   <div class="col-md-12">
+                  <div class="form-group posrleative col-sm-6 ">
+                     <input type="text" name="original" class="form-control chkval openautochoose" ng-model="editdata.original" placeholder="Arabic" />
 
                        <div class=" col-lg-12">
                                 <div class=" autochoose">
@@ -103,18 +112,12 @@
                                 </div>
                                 
                    </div>
-                    <label for="original">Arabic</label>
+                     <span class="inputexm">Arabic</span>
+                     
                   </div>
-                  </div>
-                   <div class="col-md-12 col-md-offset-1">
-                  <div class="form-group posrleative col-sm-5 ">
-                    <input type="text" name="reference"  class="form-control chkval" ng-model="editdata.ref" placeholder="KA p 25"/>
-                     <span class="inputexm">e.g. Iqan pg 72</span>
-                      <label for="reference">Reference</label>
-                  </div>
-				  <div class="form-group col-sm-5 ">
+				  <div class="form-group col-sm-6 ">
                     <input type="text" class="form-control chkval" name="definition" placeholder="Definition" ng-model="editdata.definition" />
-                    <label for="definition">Definition</label>
+                    <span class="inputexm">Notes</span>
                   </div>
 				</div>
 			   </form>
@@ -135,13 +138,13 @@
                               <a href="javascript:void();">  <img src="images/mic.png" alt="mic" /></a>
                           </div>
                       </div>
-                  <div class="col-sm-6 clearfix">
+                  <div class="col-sm-6 clearfix"><div class="col-sm-12 clearfix">
                          <button type="submit" class="btn btn-warning pull-right mt20 " id="addword" ng-click="adddata();"><span class="glyphicon glyphicon-plus mr5"></span>Add Words</button>
                          <button type="submit" class="btn btn-warning pull-right mt20 " id="updateword" ng-click="updatedata();"  style="display:none;">
 							 <span class="glyphicon glyphicon-edit mr5"></span>Update Words</button>
                          <button type="submit" class="btn btn-danger pull-right mt20 mr20" id="Button2" style="display:none;" ng-click="deletedata();" >
 							 <span class="glyphicon glyphicon-trash mr5"></span>Delete</button>
-                  </div> 
+                  </div>  </div> 
                 </div>
                 
                 <div class="col-lg-12 clearfix mt30"> 

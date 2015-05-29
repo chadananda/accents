@@ -67,22 +67,16 @@
                 </div>
             </div>
             <div class="col-lg-12 clearfix mb10 p0 pt10 pb30 addtext mt30">
-				<h3 id="toptext" class="pl15 pr15">Search Term</h3>
-				 <h2 class="col-lg-12 clearfix text-center" style="color:white;font-weight:bold;margin:10px;">{{search.doc.term}}</h2>
-				<h2 class="col-lg-12 clearfix text-center ng-binding" style="color:white;font-weight:bold;margin:10px;"></h2>
-				<div class="col-lg-12 clearfix"> 
-					<form class="form-inline clearfix ng-pristine ng-valid">
-					 <div class="col-md-12 ">
-					  <div class="form-group col-sm-7 ">						 
-						<input type="text" onfocus="changeterm()" placeholder="Search Transliterated Term" id="term" ng-model-options="{debounce: 700}" ng-model="search.doc.term" name="term" value="" class="form-control chkval ng-pristine ng-untouched ng-valid">
-						<input type="hidden" id="keyid">
-						<input type="hidden" id="keyrev">                          
-					  </div>
+				<h3 id="toptext" class="nb"><!--class="pl15 pr15"-->
+						<label class="col-sm-1" for="inputEmail3">Filter: </label>
+						<div class="col-sm-11">
+							<input type="text" size="150" onfocus="changeterm()" placeholder="Search Transliterated Term" id="term" ng-model-options="{debounce: 700}" ng-model="search.doc.term" name="term" value="" class="form-control chkval ng-pristine ng-untouched ng-valid">
+						</div>
 
-					  </div>
-
-				</form>
-                </div>
+				</h3>
+				<input type="hidden" id="keyid">
+						<input type="hidden" id="keyrev">   
+				
             </div>                    
              <!--
             <div class="col-lg-12 clearfix mb10 p0 pt10 pb30 addtext mt30">    
@@ -266,7 +260,7 @@
                  </div>
             </div>
        <div>{{message}}</div>-->
-        <div class="col-lg-12 clearfix  mb10 p0  mt30">
+        <div class="col-lg-12 clearfix  mb10 p0 mt10"><!--mt30-->
                 <div role="tabpanel">
                      <!-- <ul class="nav nav-tabs" role="tablist">
                         <li role="presentation" class="active"><a data-target="#home" aria-controls="home" role="tab" data-toggle="tab">All</a></li>
@@ -282,10 +276,10 @@
                                   <thead>
                                      <tr>
                                          <!--th>id</th-->
-                                         <th>Orig</th>
-                                         <th>Suggestion</th>   
-                                         <th>Reference</th> 
-                                         <th>Contributor</th> 
+                                         <th>Term</th>
+                                         <th>Reference</th>   
+                                         <th>Original</th> 
+                                         <th>Notes</th> 
                                          <th></th> 
                                        </tr>
                                    </thead>
@@ -294,10 +288,10 @@
                  <tr ng-repeat="doc in docs | filter:search | offset: currentPage*itemsPerPage | limitTo: itemsPerPage">
 						 
                         <!--td class="id" ng-model="did">{{doc.doc.id}}</td-->
-                        <td class="term">{{doc.doc.original}}</td>
-                        <td class="term" ng-model="terms">{{doc.doc.term}}</td>
-                        <td class="ref">{{doc.doc.ref}}</td>
-                        <td class="user">{{doc.doc.user}}</td>
+                        <td class="term">{{doc.doc.term}}</td>
+                        <td class="term" ng-model="terms">{{doc.doc.ref}}</td>
+                        <td class="ref">{{doc.doc.original}}</td>
+                        <td class="user">{{doc.doc.definition}}</td>
                         <td class="action"><button type="button" class="btn btn-danger btn-xs remove" ng-click="deletedoc(doc.doc._id,doc.doc._rev);"><span class="glyphicon glyphicon-remove"></span></button>
                         <button type="button" class="btn btn-primary btn-xs editbtn" ng-click="editdoc(doc.doc._id,doc.doc._rev);" ><span class="glyphicon glyphicon-edit"></span></button>
                         </td>
