@@ -31,6 +31,10 @@ angular
         templateUrl: 'views/data.html',
         controller: 'getdataCtrl'
       })
+      .when('/allterms', {
+        templateUrl: 'views/allrecords.html',
+        controller: 'AlltermsCtrl'
+      })
       
       
        

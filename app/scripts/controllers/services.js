@@ -3,7 +3,7 @@ angular.module('accentsApp')
   .factory('getRecords', function($http) {
     return {
       getAllData: function(userId) {
-        return $http.get('http://diacritics.iriscouch.com/accents_swarandeep/_all_docs?include_docs=true');
+        return $http.get('http://127.0.0.1:5986/testdb/_all_docs?include_docs=true');
       },
     };
   })
@@ -13,8 +13,3 @@ angular.module('accentsApp')
   Pouch.enableAllDbs = true;
   return new Pouch('accents');
 });
-
-
-
-
-

@@ -2,14 +2,14 @@
 
 /**
  * @ngdoc function
- * @name accentsApp.controller:getdataCtrl
+ * @name accentsApp.controller:alltermsCtrl
  * @description
- * # getdataCtrl
+ * # alltermsCtrl
  * Controller of the accentsApp
  */
 angular.module('accentsApp')
-  .controller('getdataCtrl', function ($scope,$http,getRecords,$window,$filter) {
-	  
+  .controller('AlltermsCtrl', function ($scope,$http,getRecords,$window,$filter) {
+	   console.log('posts controllers loaded');
   $scope.docs={};
     $scope.awesomeThings = [
       'HTML5 Boilerplate',

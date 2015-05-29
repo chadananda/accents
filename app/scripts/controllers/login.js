@@ -18,8 +18,9 @@ angular.module('accentsApp')
 		
 		 var username=$scope.username;
 		 var password=$scope.password;
-var domainRemoteDb='diacritics.iriscouch.com';
-var remoteDb='accents';
+		 console.log(username , password);
+var domainRemoteDb='127.0.0.1:5986';
+var remoteDb='testdb';
 var urlConnection = "http://" + username + ":" + password + "@" + domainRemoteDb + "/" + remoteDb;
 
 console.log(urlConnection);

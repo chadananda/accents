@@ -8,7 +8,12 @@
 	if(localStorage.getItem("session-user") === null)
 	{
 		window.location.href="/";
-	}                                                                  
+	}    
+	function changeterm()
+	{
+		//console.log("functioncalled");
+		//$('#checkedStrict').trigger('click');
+	}                                                              
 </script>
    <a href="javascript:void();"> <img src="images/forkme.png" alt="forkme" class="img-responsive forkme" /></a>
         <div class="container  clearfix"  id="main-container" ng-controller="getdataCtrl">
@@ -31,7 +36,7 @@
                     <button type="button" class="btn btn-default txtuppcase "><span class="glyphicon glyphicon-ok mr5"></span>Auto Correct</button>
                     <button type="button" class="btn btn-danger txtuppcase " title="Logout" onclick="logout()"><span class="glyphicon glyphicon-off"></span></button>
                  </div>
-                <div class="col-sm-3 col-sm-offset-3 logo p0 valignmiddle text-right topbutton mt10" >
+                <div class="col-sm-5 col-sm-offset-1 logo p0 valignmiddle text-right topbutton mt10" >
 					<div class="header">
 					  <div class="navbar navbar-default" role="navigation">
 						<!--div class="container"-->
@@ -50,7 +55,8 @@
 						  <div class="collapse navbar-collapse" id="js-navbar-collapse" style="padding:0;">
 
 							<ul class="nav navbar-nav">
-							  <li class="active"><a href="#/">Add Term</a></li>
+							  <li><a ng-href="#/allterms">All Terms</a></li>
+							  <li class="active"><a href="#/getdata">Add Term</a></li>
 							  <li><a ng-href="#/about">Verify Terms</a></li>
 							  <li><a class="btn-danger txtuppcase logout" style="color:#ffffff;" title="Logout" onclick="logout()"><span class="glyphicon glyphicon-off"></span></a></li>
 							</ul>
@@ -62,16 +68,19 @@
             </div>                    
              
             <div class="col-lg-12 clearfix mb10 p0 pt10 pb30 addtext mt30">    
-                <h3 class="pl15 pr15">Add New Word</h3> 
+                <h3 class="pl15 pr15" id="toptext">Term Add</h3> 
+                <h2 class="col-lg-12 clearfix text-center" style="color:white;font-weight:bold;margin:10px;">{{search.doc.term}}</h2>
                 <div class="col-lg-12 clearfix"> 
                 <form class="form-inline clearfix">
-                  <div class="form-group col-sm-3 ">
+				 <div class="col-md-12 col-md-offset-1">
+                  <div class="form-group col-sm-5 ">
 					 
-                    <input type="text" class="form-control chkval"  value="" name="term" ng-model="search.doc.term"  ng-model-options="{debounce: 700}" id="term" placeholder="New Transliterated Term"/>
+                    <input type="text" class="form-control chkval"  value="" name="term" ng-model="search.doc.term"  ng-model-options="{debounce: 700}" id="term" placeholder="New Transliterated Term" onfocus="changeterm()" />
                     <input type="hidden" id="keyid"  />
-                    <input type="hidden" id="keyrev"  />                                
+                    <input type="hidden" id="keyrev"  />  
+                    <label for="term">New Transliterated Term</label>                            
                   </div>
-                  <div class="form-group posrleative col-sm-3 ">
+                  <div class="form-group posrleative col-sm-5 ">
                     <input type="text" name="original" class="form-control chkval openautochoose" ng-model="editdata.original" placeholder="Arabic" />
 
                        <div class=" col-lg-12">
@@ -92,16 +101,22 @@
                                         <label><input type="checkbox"/> Word Five</label>
                                       </div>
                                 </div>
+                                
                    </div>
+                    <label for="original">Arabic</label>
                   </div>
-                  <div class="form-group posrleative col-sm-3 ">
+                  </div>
+                   <div class="col-md-12 col-md-offset-1">
+                  <div class="form-group posrleative col-sm-5 ">
                     <input type="text" name="reference"  class="form-control chkval" ng-model="editdata.ref" placeholder="KA p 25"/>
                      <span class="inputexm">e.g. Iqan pg 72</span>
+                      <label for="reference">Reference</label>
                   </div>
-				  <div class="form-group col-sm-3 ">
+				  <div class="form-group col-sm-5 ">
                     <input type="text" class="form-control chkval" name="definition" placeholder="Definition" ng-model="editdata.definition" />
+                    <label for="definition">Definition</label>
                   </div>
-
+				</div>
 			   </form>
                 </div>   
                
@@ -126,34 +141,33 @@
 							 <span class="glyphicon glyphicon-edit mr5"></span>Update Words</button>
                          <button type="submit" class="btn btn-danger pull-right mt20 mr20" id="Button2" style="display:none;" ng-click="deletedata();" >
 							 <span class="glyphicon glyphicon-trash mr5"></span>Delete</button>
-                           Exact Match <input type="checkbox" ng-model="strict"><br>
                   </div> 
                 </div>
                 
                 <div class="col-lg-12 clearfix mt30"> 
                        <div class="col-lg-12 clearfix autosearch-container pt20 pb20"> 
                            <div class="col-lg-12 clearfix"  ng-if="search.doc.term">
-                                    <h5 class="mb10 "><span class="mr5">{{(docs|filter:search:strict).length}}</span>Exact Matches</h5>  
+                                    <h5 class="mb10 "><span class="mr5">{{(docs|filter:search:true).length}}</span>Exact Matches</h5>  
                                         <ul>
-                                            <li  ng-repeat="doc in docs |filter:search:strict" >
-												<a href="javascript:void()">
+                                            <li  ng-repeat="docobj in docs |filter:search:true" >
+												<a ng-click="editdoc(docobj.doc._id,docobj.doc._rev);">
 													<span class="glyphicon glyphicon-edit mr5"></span>
-													{{doc.doc.term}}</a></li>
+													{{docobj.doc.term}}</a></li>
                                             
                                         </ul>
                             </div>
 
                             <div class="col-lg-12 clearfix mt0" ng-if="search.doc.term">
-                                    <h5 class="mb10 "><span class="mr5 ">{{(docs|filter:search).length}}</span>Partial Matches</h5>  
+                                    <h5 class="mb10 "><span class="mr5 ">{{(docs|myfilter:search.doc.term).length}}</span>Partial Matches</h5>  
                                        
                                        <!-------------------------------------------------------------------------------------------------------------->
 
                                        <div class="panel-group accentpanel" id="accordion" role="tablist" aria-multiselectable="true">
-                                              <div class="panel panel-default">
+                                              <div class="panel panel-default"  data-ng-repeat="doc in docs |myfilter:search.doc.term" >
                                                 <div class="panel-heading" role="tab" id="headingOne">
                                                   <h4 class="panel-title">
-                                                    <a class="rotateonclick"  data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                                        <span class="glyphicon glyphicon-play mr5 openPanel"></span> First Match<span> - 3</span>
+                                                    <a class="rotateonclick" ng-click="editdoc(doc.doc._id,doc.doc._rev);"  data-toggle="collapse" data-parent="#accordion" aria-expanded="true" aria-controls="collapseOne">
+                                                        <span class="glyphicon glyphicon-play mr5 openPanel"></span> {{doc.doc.term}}<span> - 3</span>
                                                     </a>
                                                   </h4>
                                                 </div>
@@ -186,7 +200,7 @@
                                                   </div>
                                                 </div>
                                               </div>
-                                              <div class="panel panel-default">
+                                              <!--div class="panel panel-default">
                                                 <div class="panel-heading" role="tab" id="headingTwo">
                                                   <h4 class="panel-title">
                                                     <a class="collapsed rotateonclick" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
@@ -229,7 +243,7 @@
                                                         </ul>
                                                   </div>
                                                 </div>
-                                              </div>
+                                              </div-->
                                             
                                             </div>
                                             <!-------------------------------------------------------------------------------------------->
@@ -242,119 +256,5 @@
                  </div>
             </div>
        <div>{{message}}</div>
-        <div class="col-lg-12 clearfix  mb10 p0  mt30">
-                <div role="tabpanel">
-                      <ul class="nav nav-tabs" role="tablist">
-                        <li role="presentation" class="active"><a data-target="#home" aria-controls="home" role="tab" data-toggle="tab">All</a></li>
-                        <li role="presentation"><a data-target="#profile" aria-controls="profile" role="tab" data-toggle="tab">Filtered</a></li>
-                      </ul>
-                      <div class="tab-content">
-                        <div role="tabpanel" class="tab-pane active" id="home">
-                            <h3>Terms Collected: {{count}}</h3>
-                            <input type="hidden" value={{count}} name="totalRows"  ng-model="rowxount" id="totalRows"/>
-                            <!----------------TABLE---------------------->
-                        <div class="table-responsive tablecontainer mt10" ng-controller="PaginationCtrl">
-                             <table class="table  table-bordered ">
-                                  <thead>
-                                     <tr>
-                                         <!--th>id</th-->
-                                         <th>Orig</th>
-                                         <th>Suggestion</th>   
-                                         <th>Reference</th> 
-                                         <th>Contributor</th> 
-                                         <th></th> 
-                                       </tr>
-                                   </thead>
-                      <tbody>
-						   
-                 <tr ng-repeat="doc in docs | filter:search | offset: currentPage*itemsPerPage | limitTo: itemsPerPage">
-						 
-                        <!--td class="id" ng-model="did">{{doc.doc.id}}</td-->
-                        <td class="term">{{doc.doc.original}}</td>
-                        <td class="term" ng-model="terms">{{doc.doc.term}}</td>
-                        <td class="ref">{{doc.doc.ref}}</td>
-                        <td class="user">{{doc.doc.user}}</td>
-                        <td class="action"><button type="button" class="btn btn-danger btn-xs remove" ng-click="deletedoc(doc.doc._id,doc.doc._rev);"><span class="glyphicon glyphicon-remove"></span></button>
-                        <button type="button" class="btn btn-primary btn-xs editbtn" ng-click="editdoc(doc.doc._id,doc.doc._rev);" ><span class="glyphicon glyphicon-edit"></span></button>
-                        </td>
-                    </tr>
-					
- <img id="spinner" ng-src="images/loading-x.gif" style="display:none;width:50px;height:50px;text-align:center;">
-                </table>
-                <div class="pagination" style="display:none;">
-						<ul>
-							<li ng-class="prevPageDisabled()">
-								<a href ng-click="prevPage()">« Prev</a>       
-							</li>
-							<li ng-repeat="n in range()" ng-class="{active: n == currentPage}" ng-click="setPage(n)">
-								<a >{{n+1}}</a>
-							</li>
-							<li ng-class="nextPageDisabled()">
-								<a href ng-click="nextPage()">Next »</a>
-							</li>
-						</ul>
-					</div>
-                        </div>
-                          <!--------------------TABLE-END------------------------->
-                        </div>
-                        <div role="tabpanel" class="tab-pane" id="profile">
-                          <!----------------TABLE---------------------->
-                            <div class="table-responsive tablecontainer mt20">
-                                 <table class="table  table-bordered">
-                                     <thead><tr> <th>Term</th> <th>Count</th> </tr></thead>
-                                            <tbody><tr>
-                                        <td class="term">Ab</td>
-                                        <td class="count">3</td>
-                                    </tr><tr>
-                                        <td class="term">Áb</td>
-                                        <td class="count">3</td>
-                                    </tr><tr>
-                                        <td class="term">Abá</td>
-                                        <td class="count">3</td>
-                                    </tr><tr>
-                                        <td class="term">‘Abá</td>
-                                        <td class="count">3</td>
-                                    </tr><tr>
-                                        <td class="term">Abá-Baṣír</td>
-                                        <td class="count">2</td>
-                                    </tr><tr>
-                                        <td class="term">‘Abá-Baṣír</td>
-                                        <td class="count">1</td>
-                                    </tr><tr>
-                                        <td class="term">Ábád</td>
-                                        <td class="count">3</td>
-                                    </tr><tr>
-                                        <td class="term">Ábádih</td>
-                                        <td class="count">1</td>
-                                    </tr><tr>
-                                        <td class="term">‘Abbás</td>
-                                        <td class="count">4</td>
-                                    </tr>
-
-                                 </table>
-                             </div>
-                          <!----------------TABLE-END--------------------->
-                        </  div>
-                      </div>
-                    </div>
-                        <!-- Modal -->
-                        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                          <div class="modal-dialog modalDialog">
-                            <div class="modal-content">
-                              <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                <h4 class="modal-title" id="myModalLabel">Confirm Row Delete</h4>
-                              </div>
-                              <div class="modal-body text-center">
-                                <h4>Are You Sure?</h4>
-                              </div>
-                              <div class="modal-footer text-center m0">
-                                <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
-                                <button type="button" class="btn btn-danger">Yes</button>
-                              </div>
-                            </div>
-                          </div>
-                    </div>
-         </div>
-        </div>
+        
 
