@@ -59,6 +59,7 @@
 							  <li class="active"><a href="#/getdata">Add Term</a></li>
 							  <li><a ng-href="#/about">Verify Terms</a></li>
 							  <li><a class="btn-danger txtuppcase logout" style="color:#ffffff;" title="Logout" onclick="logout()"><span class="glyphicon glyphicon-off"></span></a></li>
+							   <li><a  ng-href="#/settings"><span class="glyphicon glyphicon-cog"></span></a></li>
 							</ul>
 						  </div>
 						</div>
@@ -69,28 +70,28 @@
              
             <div class="col-lg-12 clearfix mb10 p0 pt10 pb30 addtext mt30">    
                 <h3 class="pl15 pr15" id="toptext">Term Add</h3> 
-                <h2 class="col-lg-12 clearfix text-center" style="color:white;font-weight:bold;margin:10px;margin-top:-60px;">{{search.doc.term}}</h2>
+                <h2 class="col-lg-12 clearfix text-center" id="heading-term" style="color:white;font-weight:bold;margin:10px;margin-top:-60px;">{{search.doc.term}}</h2>
                 <div class="col-lg-12 clearfix"> 
-                <form class="form-inline clearfix">
-				 <div class="col-md-12 ">
+                <form class="form-inline clearfix" id="addform">
+				 <div class="col-md-12 mb10">
                   <div class="form-group col-sm-6 ">
 					 
-                    <input type="text" class="form-control chkval"  value="" name="term" ng-model="search.doc.term"  ng-model-options="{debounce: 700}" id="term" placeholder="New Transliterated Term" onfocus="changeterm()" />
+                    <input type="text" class="form-control chkval"  value="" name="term"   id="term"  ng-model-options="{debounce: 700}" onfocus="changeterm()" ng-model="search.doc.term" />
                     <input type="hidden" id="keyid"  />
                     <input type="hidden" id="keyrev"  />  
                      <span class="inputexm">Term</span>
                     
                   </div>
                   <div class="form-group posrleative col-sm-6 ">
-					  <input type="text" name="reference"  class="form-control chkval" ng-model="editdata.ref" placeholder="KA p 25"/>
+					  <input type="text" name="reference"  class="form-control chkval" id="reference" ng-model="editdata.ref" value="" />
                      <span class="inputexm">Reference e.g. Iqan pg 72</span>
                      
                    
                   </div>
                   </div>
-                   <div class="col-md-12">
+                   <div class="col-md-12 mb10">
                   <div class="form-group posrleative col-sm-6 ">
-                     <input type="text" name="original" class="form-control chkval openautochoose" ng-model="editdata.original" placeholder="Arabic" />
+                     <input type="text" name="original" class="form-control chkval openautochoose" ng-model="editdata.original"  />
 
                        <div class=" col-lg-12">
                                 <div class=" autochoose">
@@ -112,11 +113,11 @@
                                 </div>
                                 
                    </div>
-                     <span class="inputexm">Arabic</span>
+                     <span class="inputexm">Original</span>
                      
                   </div>
 				  <div class="form-group col-sm-6 ">
-                    <input type="text" class="form-control chkval" name="definition" placeholder="Definition" ng-model="editdata.definition" />
+                    <input type="text" class="form-control chkval" name="definition" ng-model="editdata.definition" />
                     <span class="inputexm">Notes</span>
                   </div>
 				</div>
@@ -144,6 +145,8 @@
 							 <span class="glyphicon glyphicon-edit mr5"></span>Update Words</button>
                          <button type="submit" class="btn btn-danger pull-right mt20 mr20" id="Button2" style="display:none;" ng-click="deletedata();" >
 							 <span class="glyphicon glyphicon-trash mr5"></span>Delete</button>
+					      <button type="submit" class="btn btn-danger pull-right mt20 mr20" id="Button3" style="display:none;" ng-click="cancelUpdate();" >
+							 <span class="glyphicon glyphicon-remove mr5"></span>Cancel</button>
                   </div>  </div> 
                 </div>
                 

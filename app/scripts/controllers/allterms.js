@@ -53,7 +53,7 @@ var remoteDb='testdb';
         {
 			$scope.searchterm=v;
 			
-				$scope.checkValue(v);
+				//$scope.checkValue(v);
 			});
 			$scope.checkValue=function(searchterm)	{
 				angular.forEach($scope.users, function(value , key){
@@ -283,6 +283,32 @@ $scope.message='Error adding record';
 			}
 		});
 		return filtered;
+	}
+})
+
+.filter('newfilter',function(){
+	return function(items,search)
+	{
+		var filtered = [];
+		if(search)
+		{
+			angular.forEach(items, function(item) 
+			{
+				var string=item.doc.term;
+				if(string)
+				{
+					if( ((string.toLowerCase().indexOf(search.toLowerCase())) !=-1) && item.doc.verify==1) 
+					{          
+						filtered.push(item);
+					}
+				}
+			});
+			return filtered;
+		}
+		else
+		{
+			return items;
+		}
 	}
 })
 .controller("PaginationCtrl", function($scope) {

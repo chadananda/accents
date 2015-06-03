@@ -59,6 +59,7 @@
 							  <li><a href="#/getdata">Add Term</a></li>
 							  <li><a ng-href="#/about">Verify Terms</a></li>
 							  <li><a class="btn-danger txtuppcase logout" style="color:#ffffff;" title="Logout" onclick="logout()"><span class="glyphicon glyphicon-off"></span></a></li>
+							  <li><a  ng-href="#/settings"><span class="glyphicon glyphicon-cog"></span></a></li>
 							</ul>
 						  </div>
 						</div>
@@ -268,7 +269,7 @@
                       </ul>-->
                       <div class="tab-content">
                         <div role="tabpanel" class="tab-pane active" id="home">
-                            <h3>Terms Collected: {{(docs | filter:search).length}}</h3>
+                            <h3>Terms Collected: {{(docs | newfilter:search.doc.term).length}}</h3>
                             <input type="hidden" value="{{(docs | filter:search).length}}" name="totalRows" ng-model="rowxount" id="totalRows"/>
                             <!----------------TABLE---------------------->
                         <div class="table-responsive tablecontainer mt10" ng-controller="PaginationCtrl">
@@ -285,7 +286,7 @@
                                    </thead>
                       <tbody>
 						   
-                 <tr ng-repeat="doc in docs | filter:search | offset: currentPage*itemsPerPage | limitTo: itemsPerPage">
+                 <tr ng-repeat="doc in docs | newfilter:search.doc.term | offset: currentPage*itemsPerPage | limitTo: itemsPerPage">
 						 
                         <!--td class="id" ng-model="did">{{doc.doc.id}}</td-->
                         <td class="term">{{doc.doc.term}}</td>

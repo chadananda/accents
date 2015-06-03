@@ -98,6 +98,26 @@ var remoteDb='testdb';
         
     };
     
+     //////////////////////////Cancel update data in the form/////////////////////////////////////
+        
+        $scope.cancelUpdate = function() {
+			document.getElementById("keyid").value="";
+			document.getElementById("keyrev").value="";
+			document.getElementById("addform").reset();
+		$scope.addState();
+		$scope.docs=[];
+        
+    };
+    
+     $scope.addState = function() {
+		 document.getElementById("toptext").innerHTML="Term Add";
+		  document.getElementById("heading-term").innerHTML="";
+		
+			$('#Button2').css({ "display":"none" });
+			$('#Button3').css({ "display":"none" });	
+			$('#updateword').css({ "display":"none" });
+			$('#addword').css({ "display":"block" });
+	 };
       //////////////////////////single record data/////////////////////////////////////
         
         $scope.editdoc = function(id,rev) {
@@ -111,6 +131,8 @@ var remoteDb='testdb';
 	document.getElementById("keyrev").value=data._rev;
 	$('#addword').css({ "display":"none" });
 	$('#Button2').css({ "display":"block" });
+	$('#Button3').css({ "display":"block" });
+	
 	$('#updateword').css({ "display":"block" });
  document.getElementById("toptext").innerHTML="Term Edit";
 //   console.log(data);
@@ -159,7 +181,46 @@ var remoteDb='testdb';
 		var additemverify="1";
 		var otheritemverify="1";
 	}
-	//update all other items 
+	var data= JSON.stringify
+		({
+			"source": "Swarandeep",   
+			"original":original , 
+			"definition":definition, 
+			"type": "term", 
+			"user": "Swarandeep",
+			"term": term,
+			"ref":refrence,
+			"verify":additemverify
+		});
+	 if(confirm("Please Confirm the following updation:"+data))
+     {
+		
+		$http.post('http://'+domainRemoteDb+'/'+remoteDb+'/', data).
+		success(function(data, status, headers, config) {
+		console.log(status);
+		$scope.message='Record Added Successfully';
+		$http.get('http://'+domainRemoteDb+'/'+remoteDb+'/_all_docs?include_docs=true')
+		.success(function(data) 
+		{		
+			if(data.rows)
+			{
+				console.log(data.rows.doc);
+				$scope.docs=data.rows;
+				$scope.count=data.total_rows;
+			}          
+		})
+		.error(function(error) 
+		{
+			console.log(error);
+		});  
+	  }).
+	  error(function(data, status, headers, config) 
+	  {
+		console.log(status);
+		$scope.message='Error adding record';
+	  });
+	  
+	   //update all other items 
    for(var i = 0; i< $scope.finalItems.length; i++)
    {
 	  console.log($scope.finalItems[i].doc.original);
@@ -203,43 +264,14 @@ var remoteDb='testdb';
 			$scope.message='Error adding record';
 		});
 		
-   }  
-
-	var data= JSON.stringify
-	({
-		"source": "Swarandeep",   
-		"original":original , 
-		"definition":definition, 
-		"type": "term", 
-		"user": "Swarandeep",
-		"term": term,
-		"ref":refrence,
-		"verify":additemverify
-	});
-    $http.post('http://'+domainRemoteDb+'/'+remoteDb+'/', data).
-	success(function(data, status, headers, config) {
-	console.log(status);
-	$scope.message='Record Added Successfully';
-    $http.get('http://'+domainRemoteDb+'/'+remoteDb+'/_all_docs?include_docs=true')
-    .success(function(data) 
-    {		
-		if(data.rows)
-		{
-			console.log(data.rows.doc);
-			$scope.docs=data.rows;
-			$scope.count=data.total_rows;
-		}          
-    })
-    .error(function(error) 
-    {
-		console.log(error);
-    });  
-  }).
-  error(function(data, status, headers, config) 
-  {
-	console.log(status);
-	$scope.message='Error adding record';
-  });
+   }
+	 }
+	 else
+	 {
+		 return false;
+	 }
+	
+	
   
 };  
   
@@ -258,9 +290,11 @@ var remoteDb='testdb';
    // var newtrans=$scope.newtrans;
     var data= JSON.stringify({"source": "Swarandeep",   "original":original , "definition":definition, "type": "term", "user": "Swarandeep","term": term,"ref":refrence,"verify":"0"});
      $scope.message='Record Updated Successfully';
+     if(confirm("Please Confirm the following updation:"+data))
+     {
     $http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev, data).
   success(function(data, status, headers, config) {
-	 $http.get('http://'+domainRemoteDb+'/'+remoteDb+'all_docs?include_docs=true')
+	 $http.get('http://'+domainRemoteDb+'/'+remoteDb+'/'+'all_docs?include_docs=true')
         .success(function(data) {
 			
 		if(data.rows)
@@ -281,7 +315,11 @@ var remoteDb='testdb';
 	  console.log(status);
    //alert('eroro');
   });
-
+}
+else
+{
+	return false;
+}
 };    
     
      //////////////////////////Search data/////////////////////////////////////
@@ -329,6 +367,31 @@ var remoteDb='testdb';
 			}
 		});
 		return filtered;
+	}
+})
+.filter('newfilter',function(){
+	return function(items,search)
+	{
+		var filtered = [];
+		if(search)
+		{
+			angular.forEach(items, function(item) 
+			{
+				var string=item.doc.term;
+				if(string)
+				{
+					if( ((string.toLowerCase().indexOf(search.toLowerCase())) !=-1) && item.doc.verify==1) 
+					{          
+						filtered.push(item);
+					}
+				}
+			});
+			return filtered;
+		}
+		else
+		{
+			return items;
+		}
 	}
 })
 .controller("PaginationCtrl", function($scope) {

@@ -35,7 +35,10 @@ angular
         templateUrl: 'views/allrecords.html',
         controller: 'AlltermsCtrl'
       })
-      
+       .when('/settings', {
+        templateUrl: 'views/settings.html',
+        controller: 'SettingsCtrl'
+      })
       
        
       .otherwise({
