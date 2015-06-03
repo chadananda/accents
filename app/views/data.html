@@ -126,10 +126,10 @@
                 <div class="col-lg-12 clearfix  mt10   "> 
                   <div class="col-sm-6 clearfix ">
                          <div class="checkbox mt20 dispinblk">
-                            <label><input type="checkbox"/> Verified</label>
+                            <label><input type="checkbox" ng-model="verified"/> Verified</label>
                           </div>
                           <div class="checkbox mt20 dispinblk ml20">
-                            <label><input type="checkbox"/> Ambiguous</label>
+                            <label><input type="checkbox" ng-model="ambiguous"/> Ambiguous</label>
                           </div>
                           <div class="dispinblk ml30 playmic">
                              <a href="javascript:void();" class="disabled">  <img src="images/play.png" alt="mic" /></a>
@@ -139,7 +139,7 @@
                           </div>
                       </div>
                   <div class="col-sm-6 clearfix"><div class="col-sm-12 clearfix">
-                         <button type="submit" class="btn btn-warning pull-right mt20 " id="addword" ng-click="adddata();"><span class="glyphicon glyphicon-plus mr5"></span>Add Words</button>
+                         <button type="submit" class="btn btn-warning pull-right mt20 " id="addword" ng-click="adddata(docs);"><span class="glyphicon glyphicon-plus mr5"></span>Add Words</button>
                          <button type="submit" class="btn btn-warning pull-right mt20 " id="updateword" ng-click="updatedata();"  style="display:none;">
 							 <span class="glyphicon glyphicon-edit mr5"></span>Update Words</button>
                          <button type="submit" class="btn btn-danger pull-right mt20 mr20" id="Button2" style="display:none;" ng-click="deletedata();" >

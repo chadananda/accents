@@ -39,8 +39,42 @@ var remoteDb='testdb';
         .error(function(error) {
       //  console.log(error);
         });
-        
-       
+         $scope.users = 
+        [
+          {"aa": "á"}, 
+          {"'aa":'ʾā'},
+          {"'áa":'ʾā'},
+          {"'ā":'ʾā'},
+          {"'ʼā":'ʾā'},
+          {"gh":"ḡ"}
+        ];
+      
+        $scope.$watch("search.doc.term",function(v)
+        {
+			$scope.searchterm=v;
+			
+				$scope.checkValue(v);
+			});
+			$scope.checkValue=function(searchterm)	{
+				angular.forEach($scope.users, function(value , key){
+				
+					angular.forEach(value, function(val , key){
+						if(searchterm)
+						{
+							var indexval=searchterm.indexOf(key);
+							if(indexval!=-1)
+							{
+									var totallength=key.length;
+									searchterm=searchterm.replace(key,val);
+									var elem = document.getElementById('term');
+									  if(typeof elem !== 'undefined' && elem !== null) {
+										document.getElementById('term').value = searchterm;
+									  }
+							}
+						}
+				});
+				});
+			};
          //////////////////////////Delete data/////////////////////////////////////
         
         $scope.deletedoc = function(id,rev) {
@@ -257,10 +291,7 @@ $scope.message='Error adding record';
   $scope.currentPage = 0;
   $scope.items = [];
   $scope.totalRows=5334;
-   $scope.$watch("search.doc.term",function()
-        {
-			$scope.totalRows=document.getElementById('totalRows');
-			});
+  
   for (var i=0; i<$scope.totalRows; i++) {
 	
     $scope.items.push({ id: i, name: "name "+ i, description: "description " + i });

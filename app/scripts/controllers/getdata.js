@@ -125,42 +125,122 @@ var remoteDb='testdb';
     
     //////////////////////////Add data/////////////////////////////////////
     
-    $scope.adddata=function(){
+    $scope.adddata=function(items){
     var term=$scope.search.doc.term;
     var  original=$scope.editdata.original;
     var refrence=$scope.editdata.ref;
     var definition=$scope.editdata.definition;
-    //console.log(newterm);
-   // var newtrans=$scope.newtrans;
-var data= JSON.stringify({"source": "Swarandeep",   "original":original , "definition":definition, "type": "term", "user": "Swarandeep","term": term,"ref":refrence});
+    var verified=$scope.verified;
+    var ambiguous=$scope.ambiguous;
+    //FILTER FOR PARTIAL RECORDS
+    $scope.partialitems = $filter('myfilter')(items,term);
+    //FILTER FOR EXACT RECORDS
+    $scope.exactitems = $filter('filter',true)(items,{doc: {term: term}});
     
+    $scope.filteredItems =  $scope.partialitems.concat($scope.exactitems);
+    var uniqueid=[];
+    $scope.finalItems=[];
+    for(var i = 0; i< $scope.filteredItems.length; i++){  
+    if(uniqueid.indexOf($scope.filteredItems[i].id) === -1){
+        uniqueid.push($scope.filteredItems[i].id); 
+         $scope.finalItems.push($scope.filteredItems[i]);       
+    }        
+}
+    //console.log(JSON.stringify($scope.finalItems));
+    var additemverify="0";
+	var otheritemverify="0";
+    if(verified)
+    {
+		var additemverify="1";
+		var otheritemverify="0";
+	}
+	if(ambiguous)
+    {
+		var additemverify="1";
+		var otheritemverify="1";
+	}
+	//update all other items 
+   for(var i = 0; i< $scope.finalItems.length; i++)
+   {
+	  console.log($scope.finalItems[i].doc.original);
+	  var id=$scope.finalItems[i].id;
+	  var rev=$scope.finalItems[i].doc._rev;
+	  var data= JSON.stringify
+	   ({
+		   "source": "Swarandeep",   
+		   "original":$scope.finalItems[i].doc.original , 
+		   "definition":$scope.finalItems[i].doc.definition, 
+		   "type": "term", 
+		   "user": "Swarandeep",
+		   "term": $scope.finalItems[i].doc.term,
+		   "ref":  $scope.finalItems[i].doc.ref,
+		   "verify":otheritemverify
+		});
+		
+        $http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev, data).
+		success(function(data, status, headers, config) 
+		{
+			console.log(status);
+			$scope.message='Record Added Successfully';
+			$http.get('http://'+domainRemoteDb+'/'+remoteDb+'/_all_docs?include_docs=true')
+			.success(function(data) 
+			{			
+				if(data.rows)
+				{
+					console.log(data.rows.doc);
+					$scope.docs=data.rows;
+					$scope.count=data.total_rows;
+				}	
+			})
+			.error(function(error) 
+			{
+				console.log(error);
+			});
+		}).
+		error(function(data, status, headers, config) 
+		{
+			console.log(status);
+			$scope.message='Error adding record';
+		});
+		
+   }  
+
+	var data= JSON.stringify
+	({
+		"source": "Swarandeep",   
+		"original":original , 
+		"definition":definition, 
+		"type": "term", 
+		"user": "Swarandeep",
+		"term": term,
+		"ref":refrence,
+		"verify":additemverify
+	});
     $http.post('http://'+domainRemoteDb+'/'+remoteDb+'/', data).
-  success(function(data, status, headers, config) {
-	  console.log(status);
-	  $scope.message='Record Added Successfully';
-   $http.get('http://'+domainRemoteDb+'/'+remoteDb+'/_all_docs?include_docs=true')
-        .success(function(data) {
-			
+	success(function(data, status, headers, config) {
+	console.log(status);
+	$scope.message='Record Added Successfully';
+    $http.get('http://'+domainRemoteDb+'/'+remoteDb+'/_all_docs?include_docs=true')
+    .success(function(data) 
+    {		
 		if(data.rows)
 		{
-		console.log(data.rows.doc);
-		
-	$scope.docs=data.rows;
-	$scope.count=data.total_rows;
-		}	
-          
-        })
-        .error(function(error) {
-       console.log(error);
-        });
-  
+			console.log(data.rows.doc);
+			$scope.docs=data.rows;
+			$scope.count=data.total_rows;
+		}          
+    })
+    .error(function(error) 
+    {
+		console.log(error);
+    });  
   }).
-  error(function(data, status, headers, config) {
-	  console.log(status);
-$scope.message='Error adding record';
-   //alert('eroro');
+  error(function(data, status, headers, config) 
+  {
+	console.log(status);
+	$scope.message='Error adding record';
   });
-
+  
 };  
   
    //////////////////////////Update data/////////////////////////////////////
@@ -176,7 +256,7 @@ $scope.message='Error adding record';
     
     //console.log(newterm);
    // var newtrans=$scope.newtrans;
-    var data= JSON.stringify({"source": "Swarandeep",   "original":original , "definition":definition, "type": "term", "user": "Swarandeep","term": term,"ref":refrence});
+    var data= JSON.stringify({"source": "Swarandeep",   "original":original , "definition":definition, "type": "term", "user": "Swarandeep","term": term,"ref":refrence,"verify":"0"});
      $scope.message='Record Updated Successfully';
     $http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev, data).
   success(function(data, status, headers, config) {
