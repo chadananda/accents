@@ -70,7 +70,7 @@
              
             <div class="col-lg-12 clearfix mb10 p0 pt10 pb30 addtext mt30">    
                 <h3 class="pl15 pr15" id="toptext">Term Add</h3> 
-                <h2 class="col-lg-12 clearfix text-center" id="heading-term" style="color:white;font-weight:bold;margin:10px;margin-top:-60px;">{{search.doc.term}}</h2>
+                <h2 class="col-lg-12 clearfix text-center" id="heading-term" ng-bind-html="i2html(customi2html(search.doc.term))" style="color:white;font-weight:bold;margin:10px;margin-top:-60px;">{{search.doc.term}}</h2>
                 <div class="col-lg-12 clearfix"> 
                 <form class="form-inline clearfix" id="addform">
 				 <div class="col-md-12 mb10">
@@ -153,27 +153,30 @@
                 <div class="col-lg-12 clearfix mt30"> 
                        <div class="col-lg-12 clearfix autosearch-container pt20 pb20"> 
                            <div class="col-lg-12 clearfix"  ng-if="search.doc.term">
-                                    <h5 class="mb10 "><span class="mr5">{{(docs|filter:search:true).length}}</span>Exact Matches</h5>  
+							  
+                                    <h5 class="mb10 "><span class="mr5">{{(docs|filter:{doc:{ term: customi2html(search.doc.term) } }:true).length}}</span>Exact Matches</h5>  
                                         <ul>
-                                            <li  ng-repeat="docobj in docs |filter:search:true" >
+                                            <li  ng-repeat="docobj in docs |filter:{ doc: { term: customi2html(search.doc.term) }}:true" >
 												<a ng-click="editdoc(docobj.doc._id,docobj.doc._rev);">
 													<span class="glyphicon glyphicon-edit mr5"></span>
-													{{docobj.doc.term}}</a></li>
+													<span ng-bind-html="i2html(customi2html(docobj.doc.term))">{{docobj.doc.term}}</span></a></li>
                                             
                                         </ul>
                             </div>
 
                             <div class="col-lg-12 clearfix mt0" ng-if="search.doc.term">
-                                    <h5 class="mb10 "><span class="mr5 ">{{(docs|myfilter:search.doc.term).length}}</span>Partial Matches</h5>  
+							
+                                    <h5 class="mb10 "><span class="mr5 ">{{(docs|myfilter:customi2html(search.doc.term)).length}}</span>Partial Matches</h5>  
                                        
                                        <!-------------------------------------------------------------------------------------------------------------->
 
                                        <div class="panel-group accentpanel" id="accordion" role="tablist" aria-multiselectable="true">
-                                              <div class="panel panel-default"  data-ng-repeat="doc in docs |myfilter:search.doc.term" >
+										   
+                                              <div class="panel panel-default"  data-ng-repeat="doc in docs |myfilter:customi2html(search.doc.term)" >
                                                 <div class="panel-heading" role="tab" id="headingOne">
                                                   <h4 class="panel-title">
                                                     <a class="rotateonclick" ng-click="editdoc(doc.doc._id,doc.doc._rev);"  data-toggle="collapse" data-parent="#accordion" aria-expanded="true" aria-controls="collapseOne">
-                                                        <span class="glyphicon glyphicon-play mr5 openPanel"></span> {{doc.doc.term}}<span> - 3</span>
+                                                        <span class="glyphicon glyphicon-play mr5 openPanel"></span> <span ng-bind-html="i2html(customi2html(doc.doc.term))">{{doc.doc.term}}</span><span> - 3</span>
                                                     </a>
                                                   </h4>
                                                 </div>

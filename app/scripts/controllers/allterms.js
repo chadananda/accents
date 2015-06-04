@@ -8,17 +8,26 @@
  * Controller of the accentsApp
  */
 angular.module('accentsApp')
-  .controller('AlltermsCtrl', function ($scope,$http,getRecords,$window,$filter) {
-	   console.log('posts controllers loaded');
-  $scope.docs={};
+  .controller('AlltermsCtrl', function ($scope,$http,getRecords,$window,$filter,myConfig,Utils,$sce) {
+    $scope.docs={};
     $scope.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',
       'Karma'
     ];
     
-var domainRemoteDb='127.0.0.1:5986';
-var remoteDb='testdb';
+var domainRemoteDb=myConfig.remoteDbDomain;
+var remoteDb=myConfig.database;
+//===========Calling Utility Functions============//
+ $scope.i2html = function(text)
+ {
+	return $sce.trustAsHtml(Utils.ilm2HTML(text));
+ }
+ $scope.customi2html=function(text)
+ {
+	 return Utils.renderGlyph2UTF(text);
+ }
+ 
 	 //////////////////////////Fetch  data/////////////////////////////////////
 	// $scope.getAllData = function() {
 	$("#spinner").show();

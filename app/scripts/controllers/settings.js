@@ -8,35 +8,28 @@
  * Controller of the accentsApp
  */
 angular.module('accentsApp')
-  .controller('SettingsCtrl', function ($scope,$http,getRecords,$window,$filter) {
+  .controller('SettingsCtrl', function ($scope,$http,getRecords,$window,$filter,myConfig) {
     $scope.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',
       'Karma'
-    ];
- 
-  
-var domainRemoteDb='127.0.0.1:5986';
-var remoteDb='testdb';
-	 //////////////////////////Fetch  data/////////////////////////////////////
+    ]; 
+	var domainRemoteDb=myConfig.remoteDbDomain;
+	var remoteDb=myConfig.database;
+	//////////////////////////Fetch  data/////////////////////////////////////
 	// $scope.getAllData = function() {
 	$("#spinner").show();
-      getRecords.getAllData()
-        .success(function(data) {
-			
+	getRecords.getAllData()
+	.success(function(data) 
+	{			
 		if(data.rows)
-		{
-		//console.log(data.rows.doc);
-		
-	$scope.docs=data.rows;
-	$scope.count=data.total_rows;
-	$("#spinner").hide();
-	$(".pagination").css("display","block");
-		}	
-          
-        })
-        
-        
+		{		
+			$scope.docs=data.rows;
+			$scope.count=data.total_rows;
+			$("#spinner").hide();
+			$(".pagination").css("display","block");
+		}	          
+	})     
  //==========Change the verified field to 1 for all the records with original field value==========//
  $scope.changeVerify=function(alldocs){
 	  angular.forEach(alldocs, function(docs) {
@@ -62,20 +55,6 @@ var remoteDb='testdb';
 				{
 					console.log(status);
 					$scope.message='Record Added Successfully';
-				/*$http.get('http://'+domainRemoteDb+'/'+remoteDb+'/_all_docs?include_docs=true')
-					.success(function(data) 
-					{			
-						if(data.rows)
-						{
-							console.log(data.rows.doc);
-							$scope.docs=data.rows;
-							$scope.count=data.total_rows;
-						}	
-					})
-					.error(function(error) 
-					{
-						console.log(error);
-					});*/
 				}).
 				error(function(data, status, headers, config) 
 				{

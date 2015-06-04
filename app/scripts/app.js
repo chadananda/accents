@@ -17,6 +17,13 @@ angular
     'ngSanitize',
     'ngTouch'
   ])
+  //======DEFINE ALL CONSTANTS HERE=========/
+   .constant("myConfig", {
+        "url": "http://127.0.0.1:5986/3june2015/",
+        "remoteDbDomain":"127.0.0.1:5986",
+        "database":"3june2015"
+    })
+    //======ALL ROUTES AND CORRESSPONDING CONTROLLERS ARE DEFINED HERE=======/
   .config(function ($routeProvider) {
     $routeProvider
       .when('/', {
