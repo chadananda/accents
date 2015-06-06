@@ -19,9 +19,9 @@ angular
   ])
   //======DEFINE ALL CONSTANTS HERE=========/
    .constant("myConfig", {
-        "url": "http://127.0.0.1:5986/3june2015/",
-        "remoteDbDomain":"127.0.0.1:5986",
-        "database":"3june2015"
+        "url": "http://diacritics.iriscouch.com/accents_backup_01-05-15/",
+        "remoteDbDomain":"diacritics.iriscouch.com",
+        "database":"accents_backup_01-05-15"
     })
     //======ALL ROUTES AND CORRESSPONDING CONTROLLERS ARE DEFINED HERE=======/
   .config(function ($routeProvider) {

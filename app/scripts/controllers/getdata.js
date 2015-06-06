@@ -8,7 +8,7 @@
  * Controller of the accentsApp
  */
 angular.module('accentsApp')
-  .controller('getdataCtrl', function ($scope,$http,getRecords,$window,$filter,myConfig,Utils,$sce) {
+  .controller('getdataCtrl', function ($scope,$http,getRecords,$window,$filter,myConfig,Utils,$sce,docData) {
 	  
   $scope.docs={};
     $scope.awesomeThings = [
@@ -48,8 +48,16 @@ var remoteDb=myConfig.database;
         .error(function(error) {
       //  console.log(error);
         });
-        
-       
+       // alert(sessionStorage.list);
+   if(sessionStorage.length!=0)
+     {
+		 var arrayDoc=JSON.parse(docData.getFormData());
+		 var id=JSON.stringify(arrayDoc[0]['id']);
+		 id=id.replace(/"/g,'');
+		  var rev=JSON.stringify(arrayDoc[1]['rev']);
+		  rev=rev.replace(/"/g,'');
+		  setTimeout(function(){$scope.editdoc(id,rev)},3000);   
+	 }  
          //////////////////////////Delete data/////////////////////////////////////
         
         $scope.deletedoc = function(id,rev) {
@@ -150,7 +158,14 @@ var remoteDb=myConfig.database;
 	  //console.log(Status);
    //alert(status);
   });   
-     
+     if(sessionStorage.length!=0)
+     {
+		sessionStorage.clear();
+	 }
+	 else
+	 {
+		// alert("not ehre");
+	 }
         
     };
     
@@ -164,7 +179,7 @@ var remoteDb=myConfig.database;
     var verified=$scope.verified;
     var ambiguous=$scope.ambiguous;
     //FILTER FOR PARTIAL RECORDS
-    $scope.partialitems = $filter('myfilter')(items,term);
+    $scope.partialitems = $filter('myfilterData')(items,term);
     //FILTER FOR EXACT RECORDS
     $scope.exactitems = $filter('filter',true)(items,{doc: {term: term}});
     
@@ -360,7 +375,7 @@ else
   };
 })
 
-.filter('myfilter',function(){
+.filter('myfilterData',function(){
 	return function(items,search)
 	{
 		var filtered = [];
@@ -370,7 +385,7 @@ else
 			if(string)
 			{
 				if( ((string.toLowerCase().indexOf(search)) !=-1) && (string.length!= search.length)) 
-				{          
+				{      		
 					filtered.push(item);
 				}
 			}

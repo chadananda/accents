@@ -8,14 +8,14 @@
  * Controller of the accentsApp
  */
 angular.module('accentsApp')
-  .controller('AlltermsCtrl', function ($scope,$http,getRecords,$window,$filter,myConfig,Utils,$sce) {
+  .controller('AlltermsCtrl', function ($scope,$http,getRecords,$window,$filter,myConfig,Utils,$sce,docData) {
     $scope.docs={};
     $scope.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',
       'Karma'
     ];
-    
+  
 var domainRemoteDb=myConfig.remoteDbDomain;
 var remoteDb=myConfig.database;
 //===========Calling Utility Functions============//
@@ -28,6 +28,14 @@ var remoteDb=myConfig.database;
 	 return Utils.renderGlyph2UTF(text);
  }
  
+ //=========Pass document data to edit page=================//
+ $scope.editdocPage=function(docid,rev)
+ {
+	 //alert(docid+rev);
+	 var list=[{"id":docid},{"rev":rev}];
+	 docData.setFormData(list);
+	 window.location.href="http://localhost:9000/#/getdata";
+ };
 	 //////////////////////////Fetch  data/////////////////////////////////////
 	// $scope.getAllData = function() {
 	$("#spinner").show();

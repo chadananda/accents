@@ -8,7 +8,7 @@
  * Controller of the accentsApp
  */
 angular.module('accentsApp')
-  .controller('SettingsCtrl', function ($scope,$http,getRecords,$window,$filter,myConfig) {
+  .controller('SettingsCtrl', function ($scope,$http,getRecords,$window,$filter,myConfig,Utils,$sce,docData) {
     $scope.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',
@@ -16,6 +16,23 @@ angular.module('accentsApp')
     ]; 
 	var domainRemoteDb=myConfig.remoteDbDomain;
 	var remoteDb=myConfig.database;
+	//===========Calling Utility Functions============//
+ $scope.i2html = function(text)
+ {
+	return $sce.trustAsHtml(Utils.ilm2HTML(text));
+ }
+ $scope.customi2html=function(text)
+ {
+	 return Utils.renderGlyph2UTF(text);
+ }
+ //=========Pass document data to edit page=================//
+ $scope.editdocPage=function(docid,rev)
+ {
+	 //alert(docid+rev);
+	 var list=[{"id":docid},{"rev":rev}];
+	 docData.setFormData(list);
+	 window.location.href="http://localhost:9000/#/getdata";
+ };
 	//////////////////////////Fetch  data/////////////////////////////////////
 	// $scope.getAllData = function() {
 	$("#spinner").show();
