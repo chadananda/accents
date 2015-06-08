@@ -69,8 +69,11 @@ var remoteDb=myConfig.database;
         $scope.$watch("search.doc.term",function(v)
         {
 			$scope.searchterm=v;
-			
-				//$scope.checkValue(v);
+			if(v!="")
+			{
+				var changedTerm=$scope.customi2html(v);
+				document.getElementById('term').value = changedTerm;
+			}	
 			});
 			$scope.checkValue=function(searchterm)	{
 				angular.forEach($scope.users, function(value , key){
@@ -314,7 +317,10 @@ $scope.message='Error adding record';
 				var string=item.doc.term;
 				if(string)
 				{
-					if( ((string.toLowerCase().indexOf(search.toLowerCase())) !=-1) && item.doc.verify==1) 
+					string= string.replace("_","");
+					search=search.toLowerCase();
+					search= search.replace("_","");
+					if( ((string.toLowerCase().indexOf(search.toLowerCase())) !=-1) && item.doc.verify==1) 					
 					{          
 						filtered.push(item);
 					}
@@ -330,7 +336,7 @@ $scope.message='Error adding record';
 })
 .controller("PaginationCtrl", function($scope) {
 
-  $scope.itemsPerPage = 10;
+  $scope.itemsPerPage = 100;
   $scope.currentPage = 0;
   $scope.items = [];
   $scope.totalRows=5334;

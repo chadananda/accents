@@ -57,7 +57,18 @@ var remoteDb=myConfig.database;
 		  var rev=JSON.stringify(arrayDoc[1]['rev']);
 		  rev=rev.replace(/"/g,'');
 		  setTimeout(function(){$scope.editdoc(id,rev)},3000);   
-	 }  
+	 } 
+	 
+	    $scope.$watch("search.doc.term",function(v)
+        {
+			$scope.searchterm=v;
+			if(v!="")
+			{
+				var changedTerm=$scope.customi2html(v);
+				document.getElementById('term').value = changedTerm;
+			}			
+		});
+	  
          //////////////////////////Delete data/////////////////////////////////////
         
         $scope.deletedoc = function(id,rev) {
@@ -193,8 +204,8 @@ var remoteDb=myConfig.database;
     }        
 }
     //console.log(JSON.stringify($scope.finalItems));
-    var additemverify="0";
-	var otheritemverify="0";
+    var additemverify="1";
+	var otheritemverify="1";
     if(verified)
     {
 		var additemverify="1";
@@ -384,6 +395,9 @@ else
 			var string=item.doc.term;
 			if(string)
 			{
+				string= string.replace("_","");
+				search=search.toLowerCase();
+				search= search.replace("_","");
 				if( ((string.toLowerCase().indexOf(search)) !=-1) && (string.length!= search.length)) 
 				{      		
 					filtered.push(item);
