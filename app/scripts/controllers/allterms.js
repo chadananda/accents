@@ -306,7 +306,7 @@ $scope.message='Error adding record';
 	}
 })
 
-.filter('newfilter',function(){
+.filter('newfilter',['Utils',function(Utils){
 	return function(items,search)
 	{
 		var filtered = [];
@@ -318,9 +318,11 @@ $scope.message='Error adding record';
 				if(string)
 				{
 					string= string.replace("_","");
+					string=Utils.dotUndersRevert(string);
 					search=search.toLowerCase();
 					search= search.replace("_","");
-					if( ((string.toLowerCase().indexOf(search.toLowerCase())) !=-1) && item.doc.verify==1) 					
+					//if( ((string.toLowerCase().indexOf(search.toLowerCase())) !=-1) && item.doc.verify==1) 
+					if( ((string.toLowerCase().indexOf(search.toLowerCase())) !=-1))					
 					{          
 						filtered.push(item);
 					}
@@ -333,7 +335,7 @@ $scope.message='Error adding record';
 			return items;
 		}
 	}
-})
+}])
 .controller("PaginationCtrl", function($scope) {
 
   $scope.itemsPerPage = 100;

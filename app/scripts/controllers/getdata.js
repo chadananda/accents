@@ -28,6 +28,10 @@ var remoteDb=myConfig.database;
  {
 	 return Utils.renderGlyph2UTF(text);
  }
+ $scope.dotUnderRevert=function(text)
+ {
+	 return Utils.dotUndersRevert(text);
+ }
 	 //////////////////////////Fetch  data/////////////////////////////////////
 	// $scope.getAllData = function() {
 	$("#spinner").show();
@@ -375,9 +379,43 @@ else
         });
         
 	}
-    
-    
+
+    $scope.getAllRecords=function(key,docs){
+		if(document.getElementById("showDiv-"+key).innerHTML!="")
+		{
+			document.getElementById("showDiv-"+key).innerHTML="";
+			return false;
+		}
+		var filtered=new Array();
+		angular.forEach(docs, function(item) 
+		{
+			var string=item.doc.term;
+			if(string)
+			{
+				string= string.replace("_","");
+				string=string.toLowerCase();	
+				string=Utils.dotUndersRevert(string);		
+				if( ((string.indexOf(key)) !=-1) && (string.length== key.length)) 
+				{    	
+					filtered.push(item.doc);
+				}				
+			}
+			
+		});
+		var ReturnStringArray=new Array();
+		var ReturnString="";
+		angular.forEach(filtered,function(i){
+			if(i.verify==1)
+				ReturnString+="<a class='rotateonclick' ng-click='editdoc(i._id,i._rev);'>"+i.term+" <span class='glyphicon glyphicon-ok'></span></a><br/>";
+			else
+				ReturnString+="<a class='rotateonclick' ng-click='editdoc(i._id,i._rev);'>"+i.term+"</a><br/>";
+				console.log(i);
+			});
+	document.getElementById("showDiv-"+key).innerHTML=ReturnString;
+		//return filtered;
+	}
   })
+
 .filter('offset', function() {
   return function(input, start) {	 
    if (!input || !input.length) { return; }
@@ -386,27 +424,79 @@ else
   };
 })
 
-.filter('myfilterData',function(){
+.filter('myfilterData',['Utils',function(Utils){
 	return function(items,search)
 	{
+		var subArray={};
 		var filtered = [];
+		var mainArray={};
+		var count=1;
+		
 		angular.forEach(items, function(item) 
 		{
 			var string=item.doc.term;
 			if(string)
 			{
 				string= string.replace("_","");
+				string=string.toLowerCase();	
+				string=Utils.dotUndersRevert(string);		
 				search=search.toLowerCase();
 				search= search.replace("_","");
-				if( ((string.toLowerCase().indexOf(search)) !=-1) && (string.length!= search.length)) 
-				{      		
+				search=Utils.dotUndersRevert(search);	
+				if( ((string.indexOf(search)) !=-1) && (string.length!= search.length)) 
+				{ 
 					filtered.push(item);
-				}
+				}				
 			}
 		});
+		
 		return filtered;
-	}
-})
+	};
+	
+}])
+.filter('groupfilter',['Utils',function(Utils){
+	return function(items,search)
+	{
+		var subArray={};
+		var filtered = [];
+		var mainArray={};
+		var count=1;
+		
+		angular.forEach(items, function(item) 
+		{
+			var string=item.doc.term;
+			if(string)
+			{
+				string= string.replace("_","");
+				string=string.toLowerCase();	
+				string=Utils.dotUndersRevert(string);		
+				search=search.toLowerCase();
+				search= search.replace("_","");
+				search=Utils.dotUndersRevert(search);	
+				if( ((string.indexOf(search)) !=-1) && (string.length!= search.length)) 
+				{    	
+					if(string in mainArray)
+					{
+						var countnew=mainArray[string];	
+						countnew++;
+						mainArray[string]=countnew;	
+					}
+					else
+					{
+						count=1;
+						mainArray[string]=count;
+					}	
+					
+					filtered.push(item);
+				}				
+			}
+		});
+		return mainArray;
+	};
+	
+}])
+
+
 .filter('newfilter',function(){
 	return function(items,search)
 	{

@@ -76,7 +76,7 @@
 				 <div class="col-md-12 mb10">
                   <div class="form-group col-sm-6 ">
 					 
-                    <input type="text" class="form-control chkval"  value="" name="term"   id="term"  ng-model-options="{debounce: 700}" onfocus="changeterm()" ng-model="search.doc.term" />
+                    <input type="text" class="form-control chkval"  value="" name="term"   id="term" ng-model-options="{ debounce: 400 }" onfocus="changeterm()" ng-model="search.doc.term" />
                     <input type="hidden" id="keyid"  />
                     <input type="hidden" id="keyrev"  />  
                      <span class="inputexm">Term</span>
@@ -91,7 +91,7 @@
                   </div>
                    <div class="col-md-12">
                   <div class="form-group posrleative col-sm-6 ">
-                     <input type="text" name="original" class="form-control chkval openautochoose" ng-model="editdata.original" style="font-size:16px !important;" />
+                     <input type="text" name="original" class="form-control chkval openautochoose" ng-model="editdata.original" style="font-size:20px !important;" />
 
                        <div class=" col-lg-12">
                                 <div class=" autochoose">
@@ -154,7 +154,7 @@
                        <div class="col-lg-12 clearfix autosearch-container pt20 pb20"> 
                            <div class="col-lg-12 clearfix"  ng-if="search.doc.term">
 							  
-                                    <h5 class="mb10 "><span class="mr5">{{(docs|filter:{doc:{ term: customi2html(search.doc.term) } }:true).length}}</span>Exact Matches</h5>  
+                                    <h5 class="mb10 "><span class="mr5">{{(docs|filter:{doc:{ term: customi2html(search.doc.term) } }:true).length}}</span>Whole Word Matches</h5>  
                                         <ul>
                                             <li  ng-repeat="docobj in docs |filter:{ doc: { term: customi2html(search.doc.term) }}:true" >
 												<a ng-click="editdoc(docobj.doc._id,docobj.doc._rev);">
@@ -167,12 +167,16 @@
                             <div class="col-lg-12 clearfix mt0" ng-if="search.doc.term">
 							
                                     <h5 class="mb10 "><span class="mr5 ">{{(docs|myfilterData:customi2html(search.doc.term)).length}}</span>Partial Matches</h5>  
-                                       
-                                       <!-------------------------------------------------------------------------------------------------------------->
+                                       <div ng-repeat="(key, value)  in docs |groupfilter:customi2html(search.doc.term)" ng-click="getAllRecords('{{key}}',docs)">
+								  <span class="glyphicon glyphicon-play mr5 openPanel"></span>	{{key}}-{{value}}
+								<div id="showDiv-{{key}}" class="col-md-11 col-md-offset-1"></div>
+                               </div>
+                                       <!--------------------------------------------------------------------------------------------------------------
 
                                        <div class="panel-group accentpanel" id="accordion" role="tablist" aria-multiselectable="true">
 										   
-                                              <div class="panel panel-default"  data-ng-repeat="doc in docs |myfilterData:customi2html(search.doc.term)" >
+                                              <div class="panel panel-default"  data-ng-repeat="doc in docs |myfilterData:customi2html(search.doc.term)"  >
+                                              
                                                 <div class="panel-heading" role="tab" id="headingOne">
                                                   <h4 class="panel-title">
                                                     <a class="rotateonclick" ng-click="editdoc(doc.doc._id,doc.doc._rev);"  data-toggle="collapse" data-parent="#accordion" aria-expanded="true" aria-controls="collapseOne">
