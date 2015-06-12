@@ -11,6 +11,7 @@ angular.module('accentsApp')
   .controller('getdataCtrl', function ($scope,$http,getRecords,$window,$filter,myConfig,Utils,$sce,docData) {
 	  
   $scope.docs={};
+  $scope.filterresult={};
     $scope.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',
@@ -32,6 +33,18 @@ var remoteDb=myConfig.database;
  {
 	 return Utils.dotUndersRevert(text);
  }
+ //============On key up of the term textbox change the term=========//
+ $( "#term" ).keyup(function() {
+	 var term = $('#term').val();
+	 
+	 if(term!="")
+		{
+			var changedTerm=$scope.customi2html(term);
+			$("#term").val(changedTerm);
+			$("#heading-term").html(changedTerm);
+		}
+});
+
 	 //////////////////////////Fetch  data/////////////////////////////////////
 	// $scope.getAllData = function() {
 	$("#spinner").show();
@@ -63,7 +76,7 @@ var remoteDb=myConfig.database;
 		  setTimeout(function(){$scope.editdoc(id,rev)},3000);   
 	 } 
 	 
-	    $scope.$watch("search.doc.term",function(v)
+	    /*$scope.$watch("search.doc.term",function(v)
         {
 			$scope.searchterm=v;
 			if(v!="")
@@ -71,7 +84,7 @@ var remoteDb=myConfig.database;
 				var changedTerm=$scope.customi2html(v);
 				document.getElementById('term').value = changedTerm;
 			}			
-		});
+		});*/
 	  
          //////////////////////////Delete data/////////////////////////////////////
         
@@ -379,13 +392,7 @@ else
         });
         
 	}
-
     $scope.getAllRecords=function(key,docs){
-		if(document.getElementById("showDiv-"+key).innerHTML!="")
-		{
-			document.getElementById("showDiv-"+key).innerHTML="";
-			return false;
-		}
 		var filtered=new Array();
 		angular.forEach(docs, function(item) 
 		{
@@ -402,17 +409,9 @@ else
 			}
 			
 		});
-		var ReturnStringArray=new Array();
-		var ReturnString="";
-		angular.forEach(filtered,function(i){
-			if(i.verify==1)
-				ReturnString+="<a class='rotateonclick' ng-click='editdoc(i._id,i._rev);'>"+i.term+" <span class='glyphicon glyphicon-ok'></span></a><br/>";
-			else
-				ReturnString+="<a class='rotateonclick' ng-click='editdoc(i._id,i._rev);'>"+i.term+"</a><br/>";
-				console.log(i);
-			});
-	document.getElementById("showDiv-"+key).innerHTML=ReturnString;
-		//return filtered;
+		$scope.filterresult = filtered;
+		$scope.viewkey=key;
+		 document.getElementById("showDiv-"+key).style.display='block';
 	}
   })
 
@@ -439,14 +438,18 @@ else
 			{
 				string= string.replace("_","");
 				string=string.toLowerCase();	
-				string=Utils.dotUndersRevert(string);		
-				search=search.toLowerCase();
-				search= search.replace("_","");
-				search=Utils.dotUndersRevert(search);	
-				if( ((string.indexOf(search)) !=-1) && (string.length!= search.length)) 
-				{ 
-					filtered.push(item);
-				}				
+				string=Utils.dotUndersRevert(string);	
+				if(search)
+				{
+					search=search.toLowerCase();
+					search= search.replace("_","");
+					search=Utils.dotUndersRevert(search);	
+					if( ((string.indexOf(search)) !=-1) && (string.length!= search.length)) 
+					{ 
+						filtered.push(item);
+					}				
+				}	
+
 			}
 		});
 		
@@ -491,6 +494,7 @@ else
 				}				
 			}
 		});
+		//console.log(mainArray);
 		return mainArray;
 	};
 	

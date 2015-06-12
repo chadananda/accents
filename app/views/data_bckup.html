@@ -36,7 +36,7 @@
                     <button type="button" class="btn btn-default txtuppcase "><span class="glyphicon glyphicon-ok mr5"></span>Auto Correct</button>
                     <button type="button" class="btn btn-danger txtuppcase " title="Logout" onclick="logout()"><span class="glyphicon glyphicon-off"></span></button>
                  </div>
-                <div class="col-md-4 col-md-offset-2 col-sm-6 logo p0 valignmiddle text-right topbutton mt10" >
+                <div class="col-sm-5 col-sm-offset-1 logo p0 valignmiddle text-right topbutton mt10" >
 					<div class="header">
 					  <div class="navbar navbar-default" role="navigation">
 						<!--div class="container"-->
@@ -52,14 +52,14 @@
 							<!--a class="navbar-brand" href="#/">accents</a-->
 						  </div>
 
-						  <div class="collapse navbar-collapse" id="js-navbar-collapse" >
+						  <div class="collapse navbar-collapse" id="js-navbar-collapse" style="padding:0;">
 
 							<ul class="nav navbar-nav">
 							  <li><a ng-href="#/allterms">All Terms</a></li>
-							  <li class="active"><a href="#/getdata">Add</a></li>
-							  <li><a ng-href="#/about">Verify</a></li>
-							  <li><a class="btn-danger txtuppcase logout" title="Logout" onclick="logout()"><span class="glyphicon glyphicon-off"></span></a></li>
-							   <li><a style="margin-left:10px;" ng-href="#/settings"><span class="glyphicon glyphicon-cog"></span></a></li>
+							  <li class="active"><a href="#/getdata">Add Term</a></li>
+							  <li><a ng-href="#/about">Verify Terms</a></li>
+							  <li><a class="btn-danger txtuppcase logout" style="color:#ffffff;" title="Logout" onclick="logout()"><span class="glyphicon glyphicon-off"></span></a></li>
+							   <li><a  ng-href="#/settings"><span class="glyphicon glyphicon-cog"></span></a></li>
 							</ul>
 						  </div>
 						</div>
@@ -68,18 +68,15 @@
                 </div>
             </div>                    
              
-            <div class="col-lg-12 clearfix mb10 p0 pt10 pb30 addtext mt30"> 
-				<div class="col-lg-12 mobile-margin">
-					 <h3 class="pl15 pr15" id="toptext">Term Add</h3> 
-					<h2 class="col-lg-12 clearfix text-center" id="heading-term" style="color:white;font-weight:bold;margin:10px;margin-top:-60px;"></h2>
-				</div>   
-               
+            <div class="col-lg-12 clearfix mb10 p0 pt10 pb30 addtext mt30">    
+                <h3 class="pl15 pr15" id="toptext">Term Add</h3> 
+                <h2 class="col-lg-12 clearfix text-center" id="heading-term" ng-bind-html="i2html(customi2html(search.doc.term))" style="color:white;font-weight:bold;margin:10px;margin-top:-60px;">{{search.doc.term}}</h2>
                 <div class="col-lg-12 clearfix"> 
                 <form class="form-inline clearfix" id="addform">
 				 <div class="col-md-12 mb10">
                   <div class="form-group col-sm-6 ">
 					 
-                    <input type="text" class="form-control chkval"  value="" name="term"   id="term" ng-model-options="{ debounce: 700 }" onfocus="changeterm()" ng-keyup="filterData(this)" ng-model="search.doc.term" />
+                    <input type="text" class="form-control chkval"  value="" name="term"   id="term" ng-model-options="{ debounce: 400 }" onfocus="changeterm()" ng-model="search.doc.term" />
                     <input type="hidden" id="keyid"  />
                     <input type="hidden" id="keyrev"  />  
                      <span class="inputexm">Term</span>
@@ -130,12 +127,12 @@
                 <div class="col-lg-12 clearfix  mt10   "> 
                   <div class="col-sm-6 clearfix ">
                          <div class="checkbox mt20 dispinblk">
-                            <label style="padding-left:13px;"><input type="checkbox" ng-model="verified"/> Verified</label>
+                            <label><input type="checkbox" ng-model="verified"/> Verified</label>
                           </div>
-                          <div class="checkbox mt20 dispinblk">
-                            <label style="padding-left:10px;"><input type="checkbox" ng-model="ambiguous"/> Ambiguous</label>
+                          <div class="checkbox mt20 dispinblk ml20">
+                            <label><input type="checkbox" ng-model="ambiguous"/> Ambiguous</label>
                           </div>
-                          <div class="dispinblk ml10 playmic">
+                          <div class="dispinblk ml30 playmic">
                              <a href="javascript:void();" class="disabled">  <img src="images/play.png" alt="mic" /></a>
                           </div>
                           <div class="dispinblk ml10 playmic">
@@ -152,8 +149,8 @@
 							 <span class="glyphicon glyphicon-remove mr5"></span>Cancel</button>
                   </div>  </div> 
                 </div>
-
-                <div ng-if="(docs|myfilterData:customi2html(search.doc.term)).length!=0" class="col-lg-12 clearfix mt30"> 
+                
+                <div class="col-lg-12 clearfix mt30"> 
                        <div class="col-lg-12 clearfix autosearch-container pt20 pb20"> 
                            <div class="col-lg-12 clearfix"  ng-if="search.doc.term">
 							  
@@ -168,30 +165,12 @@
                             </div>
 
                             <div class="col-lg-12 clearfix mt0" ng-if="search.doc.term">
-								<h5 class="mb10 "><span class="mr5 ">{{(docs|myfilterData:customi2html(search.doc.term)).length}}</span>Partial Matches</h5>  
-								<div ng-repeat="(key, value)  in docs |groupfilter:customi2html(search.doc.term)" class="searchGroup">
-									<span ng-click="getAllRecords('{{key}}',docs)"  class="glyphicon glyphicon-play mr5 openPanel"></span>	{{key}}-{{value}}
-									<div id="showDiv-{{key}}" class="col-md-11 col-md-offset-1" ng-show="viewkey==key">
-										
-										<div ng-repeat="t in filterresult">
-											<span ng-bind-html="i2html(customi2html(t.term))">{{t.term}}</span>
-												<span class="glyphicon glyphicon-ok" ng-if="t.verify==1"></span>
-												<span class="glyphicon glyphicon-edit" ng-click="editdoc(t._id,t._rev);"></span>
-												<span class="glyphicon glyphicon-remove" ng-click="deletedoc(t._id,t._rev);" ></span>
-											</div>
-									</div>
-								</div>
-
-								
-									<!--div ng-repeat="filterres in filterresult">
-										<div ng-if="(filterres.verify)==1">
-											<a href='javascript:void(0)' class='rotateonclick' ng-click='editdoc(filterres._id,filterres._rev);'>{{filterres.term}} <span class='glyphicon glyphicon-ok'></span></a><br/>
-										</div>
-										<div ng-if="(filterres.verify)==0">
-											<a href='javascript:void(0)' class='rotateonclick' ng-click='editdoc(filterres._id,filterres._rev);'>{{filterres.term}}</a>
-										</div>
-									</div-->
-                               
+							
+                                    <h5 class="mb10 "><span class="mr5 ">{{(docs|myfilterData:customi2html(search.doc.term)).length}}</span>Partial Matches</h5>  
+                                       <div ng-repeat="(key, value)  in docs |groupfilter:customi2html(search.doc.term)" ng-click="getAllRecords('{{key}}',docs)">
+								  <span class="glyphicon glyphicon-play mr5 openPanel"></span>	{{key}}-{{value}}
+								<div id="showDiv-{{key}}" class="col-md-11 col-md-offset-1"></div>
+                               </div>
                                        <!--------------------------------------------------------------------------------------------------------------
 
                                        <div class="panel-group accentpanel" id="accordion" role="tablist" aria-multiselectable="true">
@@ -281,9 +260,9 @@
                                             
                                             </div>
                                             <!-------------------------------------------------------------------------------------------->
-                      </div>
-              </div>
-                
+                            </div>
+                         </div>
+                </div> 
                 
                  <div class="col-lg-12 clearfix">                 
                      <h5 class="blankalert"> Ref & Term can't be blank</h5>

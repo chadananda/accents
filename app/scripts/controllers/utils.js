@@ -83,7 +83,7 @@ angular.module('accentsApp')
 
         word = word.replace(/\’/g, '');
         word = word.replace(/\‘/g, '');
-        word = word.replace(/\-/g, '');
+      //  word = word.replace(/\-/g, '');
         word = word.replace(/\_/g, '');
 
         return word;

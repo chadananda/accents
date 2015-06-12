@@ -2,20 +2,21 @@
 
 /**
  * @ngdoc function
- * @name accentsApp.controller:alltermsCtrl
+ * @name accentsApp.controller:getdataCtrl
  * @description
- * # alltermsCtrl
+ * # getdataCtrl
  * Controller of the accentsApp
  */
 angular.module('accentsApp')
-  .controller('AlltermsCtrl', function ($scope,$http,getRecords,$window,$filter,myConfig,Utils,$sce,docData) {
-    $scope.docs={};
+  .controller('getdataCtrl', function ($scope,$http,getRecords,$window,$filter,myConfig,Utils,$sce,docData) {
+	  
+  $scope.docs={};
     $scope.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',
       'Karma'
     ];
-  
+    
 var domainRemoteDb=myConfig.remoteDbDomain;
 var remoteDb=myConfig.database;
 //===========Calling Utility Functions============//
@@ -27,24 +28,10 @@ var remoteDb=myConfig.database;
  {
 	 return Utils.renderGlyph2UTF(text);
  }
-  //============On key up of the term textbox change the term=========//
- $( "#term" ).keyup(function() {
-	 var term = $('#term').val();
-	 
-	 if(term!="")
-		{
-			var changedTerm=$scope.customi2html(term);
-			$("#term").val(changedTerm);
-			$("#heading-term").html(changedTerm);
-		}
-});
- //=========Pass document data to edit page=================//
- $scope.editdocPage=function(docid,rev)
+ $scope.dotUnderRevert=function(text)
  {
-	 var list=[{"id":docid},{"rev":rev}];
-	 docData.setFormData(list);
-	 window.location.href="http://localhost:9000/#/getdata";
- };
+	 return Utils.dotUndersRevert(text);
+ }
 	 //////////////////////////Fetch  data/////////////////////////////////////
 	// $scope.getAllData = function() {
 	$("#spinner").show();
@@ -65,45 +52,27 @@ var remoteDb=myConfig.database;
         .error(function(error) {
       //  console.log(error);
         });
-         $scope.users = 
-        [
-          {"aa": "á"}, 
-          {"'aa":'ʾā'},
-          {"'áa":'ʾā'},
-          {"'ā":'ʾā'},
-          {"'ʼā":'ʾā'},
-          {"gh":"ḡ"}
-        ];
-      
-      /*  $scope.$watch("search.doc.term",function(v)
+       // alert(sessionStorage.list);
+   if(sessionStorage.length!=0)
+     {
+		 var arrayDoc=JSON.parse(docData.getFormData());
+		 var id=JSON.stringify(arrayDoc[0]['id']);
+		 id=id.replace(/"/g,'');
+		  var rev=JSON.stringify(arrayDoc[1]['rev']);
+		  rev=rev.replace(/"/g,'');
+		  setTimeout(function(){$scope.editdoc(id,rev)},3000);   
+	 } 
+	 
+	    $scope.$watch("search.doc.term",function(v)
         {
 			$scope.searchterm=v;
 			if(v!="")
 			{
 				var changedTerm=$scope.customi2html(v);
 				document.getElementById('term').value = changedTerm;
-			}	
-			});*/
-			$scope.checkValue=function(searchterm)	{
-				angular.forEach($scope.users, function(value , key){
-				
-					angular.forEach(value, function(val , key){
-						if(searchterm)
-						{
-							var indexval=searchterm.indexOf(key);
-							if(indexval!=-1)
-							{
-									var totallength=key.length;
-									searchterm=searchterm.replace(key,val);
-									var elem = document.getElementById('term');
-									  if(typeof elem !== 'undefined' && elem !== null) {
-										document.getElementById('term').value = searchterm;
-									  }
-							}
-						}
-				});
-				});
-			};
+			}			
+		});
+	  
          //////////////////////////Delete data/////////////////////////////////////
         
         $scope.deletedoc = function(id,rev) {
@@ -161,10 +130,30 @@ var remoteDb=myConfig.database;
         
     };
     
+     //////////////////////////Cancel update data in the form/////////////////////////////////////
+        
+        $scope.cancelUpdate = function() {
+			document.getElementById("keyid").value="";
+			document.getElementById("keyrev").value="";
+			document.getElementById("addform").reset();
+		$scope.addState();
+		$scope.docs=[];
+        
+    };
+    
+     $scope.addState = function() {
+		 document.getElementById("toptext").innerHTML="Term Add";
+		  document.getElementById("heading-term").innerHTML="";
+		
+			$('#Button2').css({ "display":"none" });
+			$('#Button3').css({ "display":"none" });	
+			$('#updateword').css({ "display":"none" });
+			$('#addword').css({ "display":"block" });
+	 };
       //////////////////////////single record data/////////////////////////////////////
         
         $scope.editdoc = function(id,rev) {
-			
+			console.log('called');
        	$http.get('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev+'&include_docs=true').
 		success(function(data, status, headers, config) {
 	//  console.log(Status);
@@ -174,6 +163,8 @@ var remoteDb=myConfig.database;
 	document.getElementById("keyrev").value=data._rev;
 	$('#addword').css({ "display":"none" });
 	$('#Button2').css({ "display":"block" });
+	$('#Button3').css({ "display":"block" });
+	
 	$('#updateword').css({ "display":"block" });
  document.getElementById("toptext").innerHTML="Term Edit";
 //   console.log(data);
@@ -182,48 +173,145 @@ var remoteDb=myConfig.database;
 	  //console.log(Status);
    //alert(status);
   });   
-     
+     if(sessionStorage.length!=0)
+     {
+		sessionStorage.clear();
+	 }
+	 else
+	 {
+		// alert("not ehre");
+	 }
         
     };
     
     //////////////////////////Add data/////////////////////////////////////
     
-    $scope.adddata=function(){
+    $scope.adddata=function(items){
     var term=$scope.search.doc.term;
     var  original=$scope.editdata.original;
     var refrence=$scope.editdata.ref;
     var definition=$scope.editdata.definition;
-    //console.log(newterm);
-   // var newtrans=$scope.newtrans;
-var data= JSON.stringify({"source": "Swarandeep",   "original":original , "definition":definition, "type": "term", "user": "Swarandeep","term": term,"ref":refrence});
+    var verified=$scope.verified;
+    var ambiguous=$scope.ambiguous;
+    //FILTER FOR PARTIAL RECORDS
+    $scope.partialitems = $filter('myfilterData')(items,term);
+    //FILTER FOR EXACT RECORDS
+    $scope.exactitems = $filter('filter',true)(items,{doc: {term: term}});
     
-    $http.post('http://'+domainRemoteDb+'/'+remoteDb+'/', data).
-  success(function(data, status, headers, config) {
-	  console.log(status);
-	  $scope.message='Record Added Successfully';
-   $http.get('http://'+domainRemoteDb+'/'+remoteDb+'/_all_docs?include_docs=true')
-        .success(function(data) {
-			
-		if(data.rows)
-		{
-		console.log(data.rows.doc);
+    $scope.filteredItems =  $scope.partialitems.concat($scope.exactitems);
+    var uniqueid=[];
+    $scope.finalItems=[];
+    for(var i = 0; i< $scope.filteredItems.length; i++){  
+    if(uniqueid.indexOf($scope.filteredItems[i].id) === -1){
+        uniqueid.push($scope.filteredItems[i].id); 
+         $scope.finalItems.push($scope.filteredItems[i]);       
+    }        
+}
+    //console.log(JSON.stringify($scope.finalItems));
+    var additemverify="1";
+	var otheritemverify="1";
+    if(verified)
+    {
+		var additemverify="1";
+		var otheritemverify="0";
+	}
+	if(ambiguous)
+    {
+		var additemverify="1";
+		var otheritemverify="1";
+	}
+	var data= JSON.stringify
+		({
+			"source": "Swarandeep",   
+			"original":original , 
+			"definition":definition, 
+			"type": "term", 
+			"user": "Swarandeep",
+			"term": term,
+			"ref":refrence,
+			"verify":additemverify
+		});
+	 if(confirm("Please Confirm the following updation:"+data))
+     {
 		
-	$scope.docs=data.rows;
-	$scope.count=data.total_rows;
-		}	
-          
-        })
-        .error(function(error) {
-       console.log(error);
-        });
+		$http.post('http://'+domainRemoteDb+'/'+remoteDb+'/', data).
+		success(function(data, status, headers, config) {
+		console.log(status);
+		$scope.message='Record Added Successfully';
+		$http.get('http://'+domainRemoteDb+'/'+remoteDb+'/_all_docs?include_docs=true')
+		.success(function(data) 
+		{		
+			if(data.rows)
+			{
+				console.log(data.rows.doc);
+				$scope.docs=data.rows;
+				$scope.count=data.total_rows;
+			}          
+		})
+		.error(function(error) 
+		{
+			console.log(error);
+		});  
+	  }).
+	  error(function(data, status, headers, config) 
+	  {
+		console.log(status);
+		$scope.message='Error adding record';
+	  });
+	  
+	   //update all other items 
+   for(var i = 0; i< $scope.finalItems.length; i++)
+   {
+	  console.log($scope.finalItems[i].doc.original);
+	  var id=$scope.finalItems[i].id;
+	  var rev=$scope.finalItems[i].doc._rev;
+	  var data= JSON.stringify
+	   ({
+		   "source": "Swarandeep",   
+		   "original":$scope.finalItems[i].doc.original , 
+		   "definition":$scope.finalItems[i].doc.definition, 
+		   "type": "term", 
+		   "user": "Swarandeep",
+		   "term": $scope.finalItems[i].doc.term,
+		   "ref":  $scope.finalItems[i].doc.ref,
+		   "verify":otheritemverify
+		});
+		
+        $http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev, data).
+		success(function(data, status, headers, config) 
+		{
+			console.log(status);
+			$scope.message='Record Added Successfully';
+			$http.get('http://'+domainRemoteDb+'/'+remoteDb+'/_all_docs?include_docs=true')
+			.success(function(data) 
+			{			
+				if(data.rows)
+				{
+					console.log(data.rows.doc);
+					$scope.docs=data.rows;
+					$scope.count=data.total_rows;
+				}	
+			})
+			.error(function(error) 
+			{
+				console.log(error);
+			});
+		}).
+		error(function(data, status, headers, config) 
+		{
+			console.log(status);
+			$scope.message='Error adding record';
+		});
+		
+   }
+	 }
+	 else
+	 {
+		 return false;
+	 }
+	
+	
   
-  }).
-  error(function(data, status, headers, config) {
-	  console.log(status);
-$scope.message='Error adding record';
-   //alert('eroro');
-  });
-
 };  
   
    //////////////////////////Update data/////////////////////////////////////
@@ -239,11 +327,13 @@ $scope.message='Error adding record';
     
     //console.log(newterm);
    // var newtrans=$scope.newtrans;
-    var data= JSON.stringify({"source": "Swarandeep",   "original":original , "definition":definition, "type": "term", "user": "Swarandeep","term": term,"ref":refrence});
+    var data= JSON.stringify({"source": "Swarandeep",   "original":original , "definition":definition, "type": "term", "user": "Swarandeep","term": term,"ref":refrence,"verify":"0"});
      $scope.message='Record Updated Successfully';
+     if(confirm("Please Confirm the following updation:"+data))
+     {
     $http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev, data).
   success(function(data, status, headers, config) {
-	 $http.get('http://'+domainRemoteDb+'/'+remoteDb+'all_docs?include_docs=true')
+	 $http.get('http://'+domainRemoteDb+'/'+remoteDb+'/'+'all_docs?include_docs=true')
         .success(function(data) {
 			
 		if(data.rows)
@@ -264,7 +354,11 @@ $scope.message='Error adding record';
 	  console.log(status);
    //alert('eroro');
   });
-
+}
+else
+{
+	return false;
+}
 };    
     
      //////////////////////////Search data/////////////////////////////////////
@@ -285,9 +379,43 @@ $scope.message='Error adding record';
         });
         
 	}
-    
-    
+
+    $scope.getAllRecords=function(key,docs){
+		if(document.getElementById("showDiv-"+key).innerHTML!="")
+		{
+			document.getElementById("showDiv-"+key).innerHTML="";
+			return false;
+		}
+		var filtered=new Array();
+		angular.forEach(docs, function(item) 
+		{
+			var string=item.doc.term;
+			if(string)
+			{
+				string= string.replace("_","");
+				string=string.toLowerCase();	
+				string=Utils.dotUndersRevert(string);		
+				if( ((string.indexOf(key)) !=-1) && (string.length== key.length)) 
+				{    	
+					filtered.push(item.doc);
+				}				
+			}
+			
+		});
+		var ReturnStringArray=new Array();
+		var ReturnString="";
+		angular.forEach(filtered,function(i){
+			if(i.verify==1)
+				ReturnString+="<a class='rotateonclick' ng-click='editdoc(i._id,i._rev);'>"+i.term+" <span class='glyphicon glyphicon-ok'></span></a><br/>";
+			else
+				ReturnString+="<a class='rotateonclick' ng-click='editdoc(i._id,i._rev);'>"+i.term+"</a><br/>";
+				
+			});
+	document.getElementById("showDiv-"+key).innerHTML=ReturnString;
+		//return filtered;
+	}
   })
+
 .filter('offset', function() {
   return function(input, start) {	 
    if (!input || !input.length) { return; }
@@ -296,26 +424,80 @@ $scope.message='Error adding record';
   };
 })
 
-.filter('myfilter',function(){
+.filter('myfilterData',['Utils',function(Utils){
 	return function(items,search)
 	{
+		var subArray={};
 		var filtered = [];
+		var mainArray={};
+		var count=1;
+		
 		angular.forEach(items, function(item) 
 		{
 			var string=item.doc.term;
 			if(string)
 			{
-				if( ((string.toLowerCase().indexOf(search)) !=-1) && (string.length!= search.length)) 
-				{          
+				string= string.replace("_","");
+				string=string.toLowerCase();	
+				string=Utils.dotUndersRevert(string);		
+				search=search.toLowerCase();
+				search= search.replace("_","");
+				search=Utils.dotUndersRevert(search);	
+				if( ((string.indexOf(search)) !=-1) && (string.length!= search.length)) 
+				{ 
 					filtered.push(item);
-				}
+				}				
 			}
 		});
+		
 		return filtered;
-	}
-})
+	};
+	
+}])
+.filter('groupfilter',['Utils',function(Utils){
+	return function(items,search)
+	{
+		var subArray={};
+		var filtered = [];
+		var mainArray={};
+		var count=1;
+		
+		angular.forEach(items, function(item) 
+		{
+			var string=item.doc.term;
+			if(string)
+			{
+				string= string.replace("_","");
+				string=string.toLowerCase();	
+				string=Utils.dotUndersRevert(string);		
+				search=search.toLowerCase();
+				search= search.replace("_","");
+				search=Utils.dotUndersRevert(search);	
+				if( ((string.indexOf(search)) !=-1) && (string.length!= search.length)) 
+				{    	
+					if(string in mainArray)
+					{
+						var countnew=mainArray[string];	
+						countnew++;
+						mainArray[string]=countnew;	
+					}
+					else
+					{
+						count=1;
+						mainArray[string]=count;
+					}	
+					
+					filtered.push(item);
+				}				
+			}
+		});
+		return mainArray;
+	};
+	
+}])
 
-.filter('newfilter',['Utils',function(Utils){
+
+.filter('newfilter',function(){
 	return function(items,search)
 	{
 		var filtered = [];
@@ -326,12 +508,7 @@ $scope.message='Error adding record';
 				var string=item.doc.term;
 				if(string)
 				{
-					string= string.replace("_","");
-					string=Utils.dotUndersRevert(string);
-					search=search.toLowerCase();
-					search= search.replace("_","");
-					//if( ((string.toLowerCase().indexOf(search.toLowerCase())) !=-1) && item.doc.verify==1) 
-					if( ((string.toLowerCase().indexOf(search.toLowerCase())) !=-1))					
+					if( ((string.toLowerCase().indexOf(search.toLowerCase())) !=-1) && item.doc.verify==1) 
 					{          
 						filtered.push(item);
 					}
@@ -344,14 +521,17 @@ $scope.message='Error adding record';
 			return items;
 		}
 	}
-}])
+})
 .controller("PaginationCtrl", function($scope) {
 
-  $scope.itemsPerPage = 100;
+  $scope.itemsPerPage = 10;
   $scope.currentPage = 0;
   $scope.items = [];
   $scope.totalRows=5334;
-  
+   $scope.$watch("search.doc.term",function()
+        {
+			$scope.totalRows=document.getElementById('totalRows');
+			});
   for (var i=0; i<$scope.totalRows; i++) {
 	
     $scope.items.push({ id: i, name: "name "+ i, description: "description " + i });

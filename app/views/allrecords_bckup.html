@@ -36,7 +36,7 @@
                     <button type="button" class="btn btn-default txtuppcase "><span class="glyphicon glyphicon-ok mr5"></span>Auto Correct</button>
                     <button type="button" class="btn btn-danger txtuppcase " title="Logout" onclick="logout()"><span class="glyphicon glyphicon-off"></span></button>
                  </div>
-                <div class="col-md-4 col-md-offset-2 col-sm-6 logo p0 valignmiddle text-right topbutton mt10" >
+                <div class="col-sm-5 col-sm-offset-1 logo p0 valignmiddle text-right topbutton mt10" >
 					<div class="header">
 					  <div class="navbar navbar-default" role="navigation">
 						<!--div class="container"-->
@@ -52,12 +52,12 @@
 							<!--a class="navbar-brand" href="#/">accents</a-->
 						  </div>
 
-						  <div class="collapse navbar-collapse" id="js-navbar-collapse">
+						  <div class="collapse navbar-collapse" id="js-navbar-collapse" style="padding:0;">
 
 							<ul class="nav navbar-nav">
 								 <li class="active"><a ng-href="#/allterms">All Terms</a></li>
-							  <li><a href="#/getdata">Add</a></li>
-							  <li><a ng-href="#/about">Verify</a></li>
+							  <li><a href="#/getdata">Add Term</a></li>
+							  <li><a ng-href="#/about">Verify Terms</a></li>
 							  <li><a class="btn-danger txtuppcase logout" style="color:#ffffff;" title="Logout" onclick="logout()"><span class="glyphicon glyphicon-off"></span></a></li>
 							  <li><a  ng-href="#/settings"><span class="glyphicon glyphicon-cog"></span></a></li>
 							</ul>
@@ -68,12 +68,10 @@
                 </div>
             </div>
             <div class="col-lg-12 clearfix mb10 p0 pt10 pb30 addtext mt30">
-				<div class="col-lg-12 text-center mb10 mt10 ">
-					<!--h2 ng-bind-html="i2html(customi2html(search.doc.term))" style="color:#ffffff"></h2-->
-				</div>
+				<div class="col-lg-12 text-center mb10 mt10 "><h2 ng-bind-html="i2html(customi2html(search.doc.term))" style="color:#ffffff"></h2></div>
 				<h3 id="toptext" class="nb"><!--class="pl15 pr15"-->
-						<label class="col-sm-2 col-md-1" for="inputEmail3">Filter: </label>
-						<div class="col-sm-10 col-md-11">
+						<label class="col-sm-1" for="inputEmail3">Filter: </label>
+						<div class="col-sm-11">
 							<input type="text" size="150" onfocus="changeterm()" placeholder="Search Transliterated Term" id="term" ng-model-options="{debounce: 2000}" ng-model="search.doc.term" name="term" value="" class="form-control chkval ng-pristine ng-untouched ng-valid">
 						</div>
 
@@ -272,7 +270,7 @@
                       </ul>-->
                       <div class="tab-content">
                         <div role="tabpanel" class="tab-pane active" id="home">
-                            <h3>Matching Terms: {{(docs | newfilter:customi2html(search.doc.term)).length}}</h3>
+                            <h3>Terms Collected: {{(docs | newfilter:customi2html(search.doc.term)).length}}</h3>
                             <input type="hidden" value="{{(docs | filter:search).length}}" name="totalRows" ng-model="rowxount" id="totalRows"/>
                             <!----------------TABLE---------------------->
                         <div class="table-responsive tablecontainer mt10" ng-controller="PaginationCtrl">							
@@ -296,16 +294,14 @@
                         <td class="term" ng-model="terms">{{doc.doc.ref}}</td>
                         <td class="ref">{{doc.doc.original}}</td>
                         <td class="user">{{doc.doc.definition}}</td>
-                        <td class="action" style="width:65px;"><button type="button" class="btn btn-danger btn-xs remove" ng-click="deletedoc(doc.doc._id,doc.doc._rev);"><span class="glyphicon glyphicon-remove"></span></button>
+                        <td class="action"><button type="button" class="btn btn-danger btn-xs remove" ng-click="deletedoc(doc.doc._id,doc.doc._rev);"><span class="glyphicon glyphicon-remove"></span></button>
                         <button type="button" class="btn btn-primary btn-xs editbtn" ng-click="editdocPage(doc.doc._id,doc.doc._rev);" ><span class="glyphicon glyphicon-edit"></span></button>
                         </td>
                     </tr>
 					
  <img id="spinner" ng-src="images/loading-x.gif" style="display:none;width:50px;height:50px;text-align:center;">
                 </table>
-                <div ng-if="(docs | newfilter:customi2html(search.doc.term)).length!=0">
-					<!-- code to render a large video block-->
-					<div class="pagination" style="display:none;">
+                <div class="pagination" style="display:none;">
 						<ul>
 							<li ng-class="prevPageDisabled()">
 								<a href ng-click="prevPage()">« Prev</a>       
@@ -318,9 +314,6 @@
 							</li>
 						</ul>
 					</div>
-				</div>
-                
-                
                         </div>
                           <!--------------------TABLE-END------------------------->
                         </div>
