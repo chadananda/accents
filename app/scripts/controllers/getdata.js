@@ -41,7 +41,7 @@ var remoteDb=myConfig.database;
 		{
 			var changedTerm=$scope.customi2html(term);
 			$("#term").val(changedTerm);
-			$("#heading-term").html(changedTerm);
+			$("#heading-term").html(Utils.ilm2HTML(changedTerm));
 		}
 });
 
@@ -456,6 +456,30 @@ else
 		return filtered;
 	};
 	
+}])
+.filter('wholeWordFilter',['Utils',function(Utils){
+	return function(items,search)
+	{
+		var filtered = [];
+		angular.forEach(items, function(item) 
+		{
+			var string=item.doc.term;
+			if(string)
+			{
+				string= string.replace("_","");
+				string=string.toLowerCase();	
+				string=Utils.dotUndersRevert(string);		
+				search=search.toLowerCase();
+				search= search.replace("_","");
+				search=Utils.dotUndersRevert(search);	
+				if( ((string.indexOf(search)) !=-1) && (string.length== search.length)) 
+				{  
+					filtered.push(item);
+				}				
+			}
+		});
+		return filtered;
+	}
 }])
 .filter('groupfilter',['Utils',function(Utils){
 	return function(items,search)

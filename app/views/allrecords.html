@@ -36,7 +36,7 @@
                     <button type="button" class="btn btn-default txtuppcase "><span class="glyphicon glyphicon-ok mr5"></span>Auto Correct</button>
                     <button type="button" class="btn btn-danger txtuppcase " title="Logout" onclick="logout()"><span class="glyphicon glyphicon-off"></span></button>
                  </div>
-                <div class="col-md-4 col-md-offset-2 col-sm-6 logo p0 valignmiddle text-right topbutton mt10" >
+                <div class="col-md-4 col-md-offset-2 col-sm-6 logo p0 custom-width-media valignmiddle text-right topbutton mt10" >
 					<div class="header">
 					  <div class="navbar navbar-default" role="navigation">
 						<!--div class="container"-->
@@ -73,8 +73,8 @@
 				</div>
 				<h3 id="toptext" class="nb"><!--class="pl15 pr15"-->
 						<label class="col-sm-2 col-md-1" for="inputEmail3">Filter: </label>
-						<div class="col-sm-10 col-md-11">
-							<input type="text" size="150" onfocus="changeterm()" placeholder="Search Transliterated Term" id="term" ng-model-options="{debounce: 2000}" ng-model="search.doc.term" name="term" value="" class="form-control chkval ng-pristine ng-untouched ng-valid">
+						<div class="col-sm-10 col-md-10 col-md-offset-1">
+							<input type="text" size="150" onfocus="changeterm()" placeholder="Search Transliterated Term" id="term" ng-model-options="{debounce: 500}" ng-model="search.doc.term" name="term" value="" class="form-control chkval ng-pristine ng-untouched ng-valid">
 						</div>
 
 				</h3>
@@ -289,10 +289,10 @@
                                    </thead>
                       <tbody>
 						   
-                 <tr ng-repeat="doc in docs | newfilter:customi2html(search.doc.term) | offset: currentPage*itemsPerPage | limitTo: itemsPerPage">
+                 <tr ng-repeat="doc in docs | newfilter:customi2html(search.doc.term)| orderBy:'doc.term' | offset: currentPage*itemsPerPage | limitTo: itemsPerPage">
 						 
                         <!--td class="id" ng-model="did">{{doc.doc.id}}</td-->
-                        <td class="term" ng-bind-html="i2html(customi2html(doc.doc.term))">{{doc.doc.term}}{{i2html(doc.doc.term)}}</td>
+                        <td class="term" ng-bind-html="i2html(customi2html(doc.doc.term))"></td>
                         <td class="term" ng-model="terms">{{doc.doc.ref}}</td>
                         <td class="ref">{{doc.doc.original}}</td>
                         <td class="user">{{doc.doc.definition}}</td>

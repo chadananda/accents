@@ -125,11 +125,18 @@ body{background:url('../images/bodybg.png') repeat; }
     max-width: 100px;
     z-index: 99;
 }
+.mobile-margin{
+			margin-bottom:60px;
+		}
 }
 
 /* Medium Devices, Desktops */
-@media only screen and (min-width : 992px) {
-
+@media only screen and (min-width : 992px)  and (max-width:1200px){
+.custom-width-media
+{
+ margin-left: 0;
+    width: 45%;
+}
 }
 
 /* Large Devices, Wide Screens */
@@ -137,6 +144,9 @@ body{background:url('../images/bodybg.png') repeat; }
 .navbar-collapse{
 	padding:0px;
 }
+/*custom width */
+@media only screen and (min-width : 991px) and (max-width:1200px) {
+
 
 }
 

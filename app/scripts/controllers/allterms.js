@@ -285,6 +285,12 @@ $scope.message='Error adding record';
         });
         
 	}
+	
+	//=================Sorting function=======================//
+	$scope.customSort=function(items){
+		items.sort();
+		return items;
+	}
     
     
   })
@@ -330,6 +336,7 @@ $scope.message='Error adding record';
 					string=Utils.dotUndersRevert(string);
 					search=search.toLowerCase();
 					search= search.replace("_","");
+					search=Utils.dotUndersRevert(search);
 					//if( ((string.toLowerCase().indexOf(search.toLowerCase())) !=-1) && item.doc.verify==1) 
 					if( ((string.toLowerCase().indexOf(search.toLowerCase())) !=-1))					
 					{          
@@ -337,12 +344,14 @@ $scope.message='Error adding record';
 					}
 				}
 			});
-			return filtered;
+			
 		}
 		else
 		{
-			return items;
+			filtered= items;
 		}
+		
+		return filtered;
 	}
 }])
 .controller("PaginationCtrl", function($scope) {
