@@ -134,6 +134,8 @@ var remoteDb=myConfig.database;
 		success(function(data, status, headers, config) {
 	//  console.log(Status);
    console.log(status);
+   if(status==200)
+	location.reload();
   }).
   error(function(data, status, headers, config) {
 	  //console.log(Status);
@@ -176,6 +178,7 @@ var remoteDb=myConfig.database;
 	document.getElementById("keyrev").value=data._rev;
 	$('#addword').css({ "display":"none" });
 	$('#Button2').css({ "display":"block" });
+	//$( "#Button2" ).attr( "ng-click", "deletedata('"+id+"','"+rev+"');" );
 	$('#Button3').css({ "display":"block" });
 	
 	$('#updateword').css({ "display":"block" });
@@ -556,10 +559,7 @@ else
   $scope.currentPage = 0;
   $scope.items = [];
   $scope.totalRows=5334;
-   $scope.$watch("search.doc.term",function()
-        {
-			$scope.totalRows=document.getElementById('totalRows');
-			});
+  
   for (var i=0; i<$scope.totalRows; i++) {
 	
     $scope.items.push({ id: i, name: "name "+ i, description: "description " + i });

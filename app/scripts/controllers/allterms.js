@@ -75,15 +75,25 @@ var remoteDb=myConfig.database;
           {"gh":"ḡ"}
         ];
       
-      /*  $scope.$watch("search.doc.term",function(v)
+       $scope.$watch("search.doc.term",function(v)
         {
 			$scope.searchterm=v;
 			if(v!="")
 			{
-				var changedTerm=$scope.customi2html(v);
-				document.getElementById('term').value = changedTerm;
+				
+				$scope.partialitems = $filter('newfilter')($scope.docs,v);
+				if($scope.partialitems.length!=null)
+				{
+					var count=$scope.partialitems.length;
+				}
+				else
+				{
+					var count=3031;
+				}
+				
+				$scope.paginationFunc(count);
 			}	
-			});*/
+		});
 			$scope.checkValue=function(searchterm)	{
 				angular.forEach($scope.users, function(value , key){
 				
@@ -291,7 +301,70 @@ $scope.message='Error adding record';
 		items.sort();
 		return items;
 	}
-    
+    $scope.paginationFunc=function(count){
+		$scope.itemsPerPage = 100;
+  $scope.currentPage = 0;
+  $scope.items = [];
+  $scope.totalRows=count;
+  for (var i=0; i<$scope.totalRows; i++) {
+	
+    $scope.items.push({ id: i, name: "name "+ i, description: "description " + i });
+  }
+}
+  $scope.range = function(total) {
+	  var  rangeSize= (Math.floor(total/100))+1;
+	  if(rangeSize>5)
+	  {
+		  rangeSize=5
+	  }
+	  else
+	  {
+		  rangeSize=rangeSize;
+	  }
+	
+   // var rangeSize = 5;
+    var ret = [];
+    var start;
+
+    start = $scope.currentPage;
+    if ( start > $scope.pageCount()-rangeSize ) {
+      start = $scope.pageCount()-rangeSize+1;
+    }
+
+    for (var i=start; i<start+rangeSize; i++) {
+      ret.push(i);
+    }
+    return ret;
+  };
+
+  $scope.prevPage = function() {
+    if ($scope.currentPage > 0) {
+      $scope.currentPage--;
+    }	
+  };
+
+  $scope.prevPageDisabled = function() {
+    return $scope.currentPage === 0 ? "disabled" : "";
+  };
+
+  $scope.pageCount = function() {
+    return Math.ceil($scope.items.length/$scope.itemsPerPage)-1;
+  };
+
+  $scope.nextPage = function() {
+    if ($scope.currentPage < $scope.pageCount()) {
+      $scope.currentPage++;
+    }
+  };
+
+  $scope.nextPageDisabled = function() {
+    return $scope.currentPage === $scope.pageCount() ? "disabled" : "";
+  };
+
+  $scope.setPage = function(n) {
+    $scope.currentPage = n;
+  };
+
     
   })
 .filter('offset', function() {
@@ -354,92 +427,7 @@ $scope.message='Error adding record';
 		return filtered;
 	}
 }])
-.controller("PaginationCtrl", function($scope) {
 
-  $scope.itemsPerPage = 100;
-  $scope.currentPage = 0;
-  $scope.items = [];
-  $scope.totalRows=5334;
-  
-  for (var i=0; i<$scope.totalRows; i++) {
-	
-    $scope.items.push({ id: i, name: "name "+ i, description: "description " + i });
-  }
-
-  $scope.range = function() {
-    var rangeSize = 5;
-    var ret = [];
-    var start;
-
-    start = $scope.currentPage;
-    if ( start > $scope.pageCount()-rangeSize ) {
-      start = $scope.pageCount()-rangeSize+1;
-    }
-
-    for (var i=start; i<start+rangeSize; i++) {
-      ret.push(i);
-    }
-    return ret;
-  };
-
-  $scope.prevPage = function() {
-    if ($scope.currentPage > 0) {
-      $scope.currentPage--;
-    }
-  };
-
-  $scope.prevPageDisabled = function() {
-    return $scope.currentPage === 0 ? "disabled" : "";
-  };
-
-  $scope.pageCount = function() {
-    return Math.ceil($scope.items.length/$scope.itemsPerPage)-1;
-  };
-
-  $scope.nextPage = function() {
-    if ($scope.currentPage < $scope.pageCount()) {
-      $scope.currentPage++;
-    }
-  };
-
-  $scope.nextPageDisabled = function() {
-    return $scope.currentPage === $scope.pageCount() ? "disabled" : "";
-  };
-
-  $scope.setPage = function(n) {
-    $scope.currentPage = n;
-  };
-
-});
-
-//~ .filter('exact', function(){
-  //~ return function(items, search){
-    //~ var matching = [], matches, falsely = true;
-    //~ 
-    //~ // Return the items unchanged if all filtering attributes are falsy
-    //~ angular.forEach(search, function(value, key){
-      //~ falsely = falsely && !value;
-    //~ });
-    //~ if(falsely){
-      //~ return items;
-    //~ }
-    //~ 
-    //~ angular.forEach(items, function(item){ // e.g. { title: "ball" }
-      //~ matches = true;
-      //~ angular.forEach(search, function(value, key){ // e.g. 'all', 'title'
-        //~ if(!!value){ // do not compare if value is empty
-          //~ matches = matches && (item[key] === value);  
-          //~ //console.log('here');
-        //~ }
-      //~ });
-      //~ if(matches){
-        //~ matching.push(item);  
-      //~ }
-    //~ });
-  //~ // console.log(matching);
-    //~ return matching;
-  //~ }
-//~ });
 
 
 

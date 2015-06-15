@@ -115,8 +115,10 @@ body{background:url('../images/bodybg.png') repeat; }
 		 }
 	}
 /* Extra Small Devices, Phones */ 
-@media only screen and (min-width : 480px) {
-
+@media only screen and (min-width : 320px) and (max-width : 480px) {
+.mr20 {
+    margin-right: 0px !important;
+}
 }
 
 /* Small Devices, Tablets */
@@ -127,7 +129,11 @@ body{background:url('../images/bodybg.png') repeat; }
 }
 .mobile-margin{
 			margin-bottom:60px;
-		}
+		}	
+.ml10 {
+    margin-left: 0px !important;
+}
+		
 }
 
 /* Medium Devices, Desktops */
@@ -137,6 +143,9 @@ body{background:url('../images/bodybg.png') repeat; }
  margin-left: 0;
     width: 45%;
 }
+.mobile-margin{
+			margin-bottom:60px;
+		}
 }
 
 /* Large Devices, Wide Screens */

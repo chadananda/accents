@@ -275,7 +275,7 @@
                             <h3>Matching Terms: {{(docs | newfilter:customi2html(search.doc.term)).length}}</h3>
                             <input type="hidden" value="{{(docs | filter:search).length}}" name="totalRows" ng-model="rowxount" id="totalRows"/>
                             <!----------------TABLE---------------------->
-                        <div class="table-responsive tablecontainer mt10" ng-controller="PaginationCtrl">							
+                        <div class="table-responsive tablecontainer mt10" >							
                              <table class="table  table-bordered ">
                                   <thead>
                                      <tr>
@@ -303,14 +303,14 @@
 					
  <img id="spinner" ng-src="images/loading-x.gif" style="display:none;width:50px;height:50px;text-align:center;">
                 </table>
-                <div ng-if="(docs | newfilter:customi2html(search.doc.term)).length!=0">
+                <div ng-if="(docs | newfilter:customi2html(search.doc.term)).length>=itemsPerPage">
 					<!-- code to render a large video block-->
-					<div class="pagination" style="display:none;">
+					<div class="pagination">
 						<ul>
 							<li ng-class="prevPageDisabled()">
 								<a href ng-click="prevPage()">« Prev</a>       
 							</li>
-							<li ng-repeat="n in range()" ng-class="{active: n == currentPage}" ng-click="setPage(n)">
+							<li ng-repeat="n in range((docs | newfilter:customi2html(search.doc.term)).length)" ng-class="{active: n == currentPage}" ng-click="setPage(n)">
 								<a >{{n+1}}</a>
 							</li>
 							<li ng-class="nextPageDisabled()">
