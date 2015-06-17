@@ -79,7 +79,7 @@
 				 <div class="col-md-12 mb10">
                   <div class="form-group col-sm-6 ">
 					 
-                    <input type="text" class="form-control chkval"  value="" name="term"   id="term" ng-model-options="{ debounce: 500 }" onfocus="changeterm()" ng-keyup="filterData(this)" ng-model="search.doc.term" />
+                    <input type="text" class="form-control chkval" name="term" id="term" ng-model-options="{ debounce: 250 }" ng-model="search.doc.term" />
                     <input type="hidden" id="keyid"  />
                     <input type="hidden" id="keyrev"  />  
                      <span class="inputexm">Term</span>
@@ -144,7 +144,7 @@
                       </div>
                   <div class="col-sm-7 col-md-7 clearfix"><div class="col-sm-12 clearfix">
                          <button type="submit" class="btn btn-warning pull-right mt20 " id="addword" ng-click="adddata(docs);"><span class="glyphicon glyphicon-plus mr5"></span>Add Term</button>
-                         <button type="submit" class="btn btn-warning pull-right mt20 " id="updateword" ng-click="updatedata();"  style="display:none;">
+                         <button type="submit" class="btn btn-warning pull-right mt20 " id="updateword" ng-click="updatedata(docs);"  style="display:none;">
 							 <span class="glyphicon glyphicon-edit mr5"></span>Update</button>
                          <button type="submit" class="btn btn-danger pull-right mt20 mr20" id="Button2" style="display:none;" ng-click="deletedata();" >
 							 <span class="glyphicon glyphicon-trash mr5"></span>Delete</button>
@@ -152,143 +152,35 @@
 							 <span class="glyphicon glyphicon-remove mr5"></span>Cancel</button>
                   </div>  </div> 
                 </div>
-
-                <div ng-if="(docs|myfilterData:customi2html(search.doc.term)).length!=0" class="col-lg-12 clearfix mt30"> 
-                       <div class="col-lg-12 clearfix autosearch-container pt20 pb20"> 
-                           <div class="col-lg-12 clearfix"  ng-if="search.doc.term">
-							  
-                                    <h5 class="mb10 "><span class="mr5">{{(docs|wholeWordFilter: customi2html(search.doc.term)).length}}</span>Whole Word Matches</h5>  
-                                       <!-- <ul>
-                                            <li  ng-repeat="docobj in docs |wholeWordFilter: customi2html(search.doc.term)" >
-												<a ng-click="editdoc(docobj.doc._id,docobj.doc._rev);">
-													<span class="glyphicon glyphicon-edit mr5"></span>
-													<span ng-bind-html="i2html(customi2html(docobj.doc.term))">{{docobj.doc.term}}</span></a></li>
-                                            
-                                        </ul>-->
-                                        <div ng-repeat="docobj in docs |wholeWordFilter: customi2html(search.doc.term)"  class="col-md-11 col-md-offset-1" >
-											<span ng-bind-html="i2html(customi2html(docobj.doc.term))">{{docobj.doc.term}}</span>
-												<span class="glyphicon glyphicon-ok" ng-if="docobj.doc.verify==1"></span>
-												<span class="glyphicon glyphicon-edit" ng-click="editdoc(docobj.doc._id,docobj.doc._rev);"></span>
-												<span class="glyphicon glyphicon-remove" ng-click="deletedoc(docobj.doc._id,docobj.doc._rev);" ></span>
-											</div>
-                            </div>
-
-                            <div class="col-lg-12 clearfix mt0" ng-if="search.doc.term">
-								<h5 class="mb10 "><span class="mr5 ">{{(docs|myfilterData:customi2html(search.doc.term)).length}}</span>Partial Matches</h5>  
-								<div ng-repeat="(key, value)  in docs |groupfilter:customi2html(search.doc.term)" class="searchGroup">
-									<span ng-click="getAllRecords('{{key}}',docs)"  class="glyphicon glyphicon-play mr5 openPanel"></span>	{{key}}-{{value}}
-									<div id="showDiv-{{key}}" class="col-md-11 col-md-offset-1" ng-show="viewkey==key">
-										
-										<div ng-repeat="t in filterresult">
-											<span ng-bind-html="i2html(customi2html(t.term))">{{t.term}}</span>
-												<span class="glyphicon glyphicon-ok" ng-if="t.verify==1"></span>
-												<span class="glyphicon glyphicon-edit" ng-click="editdoc(t._id,t._rev);"></span>
-												<span class="glyphicon glyphicon-remove" ng-click="deletedoc(t._id,t._rev);" ></span>
-											</div>
+				<!--=========================SIMPLE EDIT AND SEARCH=============================-->
+				<div class="col-lg-12 clearfix mt30" > 
+					<div class="col-lg-12 clearfix  pt20 pb20"> 
+						<div class="col-lg-12 clearfix autosearch-container"  ng-if="search.doc.term">
+							<h5 class="mb10 "><span class="mr5">{{(docs|wholeWordFilter: customi2html(search.doc.term)).length}}</span>Whole Word Matches</h5>                                        
+							<div ng-repeat="docobj in docs |wholeWordFilter: customi2html(search.doc.term)"  class="col-md-11 col-md-offset-1" >
+								<span ng-bind-html="i2html(customi2html(docobj.doc.term))">{{docobj.doc.term}}</span>
+								<span class="glyphicon glyphicon-ok ml10" ng-if="docobj.doc.verify==1"></span>
+								<span class="glyphicon glyphicon-edit ml10" ng-click="editdoc(docobj.doc._id,docobj.doc._rev);"></span>
+								<span class="glyphicon glyphicon-remove ml10" ng-click="deletedoc(docobj.doc._id,docobj.doc._rev);" ></span>
+							</div>
+						</div>
+						<div class="col-lg-12 clearfix mt0 autosearch-container" ng-if="search.doc.term">
+							<h5 class="mb10 "><span class="mr5 ">{{(docs|myfilterData:customi2html(search.doc.term)).length}}</span>Partial Matches</h5>  
+							<div ng-repeat="(key, value)  in docs |groupfilter:customi2html(search.doc.term)" class="searchGroup">
+								<span ng-click="getAllRecords('{{key}}',docs)"  class="glyphicon glyphicon-play mr5 openPanel"></span>	{{key}}-{{value}}
+								<div id="showDiv-{{key}}" class="col-md-11 col-md-offset-1" ng-show="viewkey==key">
+									<div ng-repeat="t in filterresult" >
+										<span ng-bind-html="i2html(customi2html(t.term))">{{t.term}}</span>
+										<span class="glyphicon glyphicon-ok ml10" ng-if="t.verify==1"></span>
+										<span class="glyphicon glyphicon-edit ml10" ng-click="editdoc(t._id,t._rev);"></span>
+										<span class="glyphicon glyphicon-remove ml10" ng-click="deletedoc(t._id,t._rev);" ></span>
 									</div>
 								</div>
-
-								
-									<!--div ng-repeat="filterres in filterresult">
-										<div ng-if="(filterres.verify)==1">
-											<a href='javascript:void(0)' class='rotateonclick' ng-click='editdoc(filterres._id,filterres._rev);'>{{filterres.term}} <span class='glyphicon glyphicon-ok'></span></a><br/>
-										</div>
-										<div ng-if="(filterres.verify)==0">
-											<a href='javascript:void(0)' class='rotateonclick' ng-click='editdoc(filterres._id,filterres._rev);'>{{filterres.term}}</a>
-										</div>
-									</div-->
-                               
-                                       <!--------------------------------------------------------------------------------------------------------------
-
-                                       <div class="panel-group accentpanel" id="accordion" role="tablist" aria-multiselectable="true">
-										   
-                                              <div class="panel panel-default"  data-ng-repeat="doc in docs |myfilterData:customi2html(search.doc.term)"  >
-                                              
-                                                <div class="panel-heading" role="tab" id="headingOne">
-                                                  <h4 class="panel-title">
-                                                    <a class="rotateonclick" ng-click="editdoc(doc.doc._id,doc.doc._rev);"  data-toggle="collapse" data-parent="#accordion" aria-expanded="true" aria-controls="collapseOne">
-                                                        <span class="glyphicon glyphicon-play mr5 openPanel"></span> <span ng-bind-html="i2html(customi2html(doc.doc.term))">{{doc.doc.term}}</span><span> - 3</span>
-                                                    </a>
-                                                  </h4>
-                                                </div>
-                                                <div id="collapseOne" class="panel-collapse collapse " role="tabpanel" aria-labelledby="headingOne">
-                                                  <div class="panel-body">
-                                                         <ul>
-                                                            <li class="clearfix pt5 pb5" ><a href="javascript:void()">First Match</a> 
-                                                                <div class="pull-right">
-                                                                <a href="javascript:void()"><span class="glyphicon glyphicon-trash mr5 ml5 deleteIcon pull-right "></span></a>
-                                                                <a href="javascript:void()"><span class="glyphicon glyphicon-edit mr5 ml5 pull-right"></span></a>
-                                                                <a href="javascript:void()"><span class="glyphicon glyphicon-play-circle mr5 ml5 playIcon pull-right"></span></a>
-                                                                </div>
-                                                             </li>
-                                                             <li class="clearfix pt5 pb5" ><a href="javascript:void()">First Match</a> 
-                                                                <div class="pull-right">
-                                                                <a href="javascript:void()"><span class="glyphicon glyphicon-trash mr5 ml5 deleteIcon pull-right "></span></a>
-                                                                <a href="javascript:void()"><span class="glyphicon glyphicon-edit mr5 ml5 pull-right"></span></a>
-                                                                <a href="javascript:void()"><span class="glyphicon glyphicon-play-circle mr5 ml5 playIcon pull-right"></span></a>
-                                                                </div>
-                                                             </li>
-                                                             <li class="clearfix pt5 pb5" ><a href="javascript:void()">First Match</a> 
-                                                                <div class="pull-right">
-                                                                <a href="javascript:void()"><span class="glyphicon glyphicon-trash mr5 ml5 deleteIcon pull-right "></span></a>
-                                                                <a href="javascript:void()"><span class="glyphicon glyphicon-edit mr5 ml5 pull-right"></span></a>
-                                                                <a href="javascript:void()"><span class="glyphicon glyphicon-play-circle mr5 ml5 playIcon pull-right"></span></a>
-                                                                </div>
-                                                             </li>
-                                                           
-                                                        </ul>
-                                                  </div>
-                                                </div>
-                                              </div>
-                                              <!--div class="panel panel-default">
-                                                <div class="panel-heading" role="tab" id="headingTwo">
-                                                  <h4 class="panel-title">
-                                                    <a class="collapsed rotateonclick" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                                                      <span class="glyphicon glyphicon-play mr5 openPanel"></span> Second Match<span> - 4</span>
-                                                    </a>
-                                                  </h4>
-                                                </div>
-                                                <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
-                                                  <div class="panel-body">
-                                                         <ul>
-                                                            <li class="clearfix pt5 pb5" ><a href="javascript:void()">S First Match</a> 
-                                                                <div class="pull-right">
-                                                                <a href="javascript:void()"><span class="glyphicon glyphicon-trash mr5 ml5 deleteIcon pull-right "></span></a>
-                                                                <a href="javascript:void()"><span class="glyphicon glyphicon-edit mr5 ml5 pull-right"></span></a>
-                                                                <a href="javascript:void()"><span class="glyphicon glyphicon-play-circle mr5 ml5 playIcon pull-right"></span></a>
-                                                                </div>
-                                                             </li>
-                                                             <li class="clearfix pt5 pb5" ><a href="javascript:void()">S First Match</a> 
-                                                                <div class="pull-right">
-                                                                <a href="javascript:void()"><span class="glyphicon glyphicon-trash mr5 ml5 deleteIcon pull-right "></span></a>
-                                                                <a href="javascript:void()"><span class="glyphicon glyphicon-edit mr5 ml5 pull-right"></span></a>
-                                                                <a href="javascript:void()"><span class="glyphicon glyphicon-play-circle mr5 ml5 playIcon pull-right"></span></a>
-                                                                </div>
-                                                             </li>
-                                                             <li class="clearfix pt5 pb5" ><a href="javascript:void()">S First Match</a> 
-                                                                <div class="pull-right">
-                                                                <a href="javascript:void()"><span class="glyphicon glyphicon-trash mr5 ml5 deleteIcon pull-right "></span></a>
-                                                                <a href="javascript:void()"><span class="glyphicon glyphicon-edit mr5 ml5 pull-right"></span></a>
-                                                                <a href="javascript:void()"><span class="glyphicon glyphicon-play-circle mr5 ml5 playIcon pull-right"></span></a>
-                                                                </div>
-                                                             </li>
-                                                             <li class="clearfix pt5 pb5" ><a href="javascript:void()">S First Match</a> 
-                                                                <div class="pull-right">
-                                                                <a href="javascript:void()"><span class="glyphicon glyphicon-trash mr5 ml5 deleteIcon pull-right "></span></a>
-                                                                <a href="javascript:void()"><span class="glyphicon glyphicon-edit mr5 ml5 pull-right"></span></a>
-                                                                <a href="javascript:void()"><span class="glyphicon glyphicon-play-circle mr5 ml5 playIcon pull-right"></span></a>
-                                                                </div>
-                                                             </li>
-                                                           
-                                                        </ul>
-                                                  </div>
-                                                </div>
-                                              </div-->
-                                            
-                                            </div>
-                                            <!-------------------------------------------------------------------------------------------->
-                      </div>
-              </div>
+							</div>
+						</div>
+					</div>
+				</div>
+                
                 
                 
                  <div class="col-lg-12 clearfix">                 

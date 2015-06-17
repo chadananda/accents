@@ -43,7 +43,7 @@ var remoteDb=myConfig.database;
  {
 	 var list=[{"id":docid},{"rev":rev}];
 	 docData.setFormData(list);
-	 window.location.href="http://localhost:9000/#/getdata";
+	 window.location.href="/#/getdata";
  };
 	 //////////////////////////Fetch  data/////////////////////////////////////
 	// $scope.getAllData = function() {
