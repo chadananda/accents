@@ -268,13 +268,15 @@ var remoteDb=myConfig.database;
 		var additemverify="1";
 		var otheritemverify="1";
 	}
+	  var sessionArray= JSON.parse( localStorage.getItem("session-user"));
+	var userName=sessionArray.username;
 	var data= JSON.stringify
 		({
-			"source": "Swarandeep",   
+			"source": userName,   
 			"original":original , 
 			"definition":definition, 
 			"type": "term", 
-			"user": "Swarandeep",
+			"user": userName,
 			"term": term,
 			"ref":refrence,
 			"verify":additemverify
@@ -306,7 +308,7 @@ var remoteDb=myConfig.database;
 		console.log(status);
 		$scope.message='Error adding record';
 	  });
-	  
+	
 	   //update all other items 
    for(var i = 0; i< $scope.finalItems.length; i++)
    {
@@ -315,11 +317,11 @@ var remoteDb=myConfig.database;
 	  var rev=$scope.finalItems[i].doc._rev;
 	  var data= JSON.stringify
 	   ({
-		   "source": "Swarandeep",   
+		   "source": userName,   
 		   "original":$scope.finalItems[i].doc.original , 
 		   "definition":$scope.finalItems[i].doc.definition, 
 		   "type": "term", 
-		   "user": "Swarandeep",
+		   "user": userName,
 		   "term": $scope.finalItems[i].doc.term,
 		   "ref":  $scope.finalItems[i].doc.ref,
 		   "verify":otheritemverify
