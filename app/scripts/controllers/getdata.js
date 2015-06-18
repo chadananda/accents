@@ -35,9 +35,7 @@ var remoteDb=myConfig.database;
  }
  //============On key up of the term textbox change the term=========//
  $( "#term" ).keyup(function() {
-	 
-	 var term = $('#term').val();
-	 
+	 var term = $('#term').val();	 
 	 if(term!="")
 		{
 			var changedTerm=$scope.customi2html(term);
@@ -84,6 +82,9 @@ var remoteDb=myConfig.database;
 			$("#term").val(changedTerm);
 			$("#heading-term").html(Utils.ilm2HTML(changedTerm));
 		}
+		setTimeout(function(){
+			$("#term").trigger("change");
+		},100);
 	 }; 
 	 //===============All docs function======================//
 	 $scope.allDocsFunc=function()
@@ -426,20 +427,6 @@ var remoteDb=myConfig.database;
 		$http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev, data).
 		success(function(data, status, headers, config) 
 		{
-			//~ $http.get('http://'+domainRemoteDb+'/'+remoteDb+'/'+'_all_docs?include_docs=true')
-			//~ .success(function(data) 
-			//~ {			
-				//~ if(data.rows)
-				//~ {
-					//~ console.log(data.rows.doc);
-					//~ $scope.docs=data.rows;
-					//~ $scope.count=data.total_rows;
-				//~ }	          
-			//~ })
-			//~ .error(function(error) 
-			//~ {
-				//~ console.log(error);
-			//~ });
 			 for(var i = 0; i< $scope.finalItems.length; i++)
 			{
 			  var id=$scope.finalItems[i].id;
@@ -649,8 +636,6 @@ var remoteDb=myConfig.database;
 	};
 	
 }])
-
-
 .filter('newfilter',function(){
 	return function(items,search)
 	{
@@ -733,37 +718,3 @@ var remoteDb=myConfig.database;
   };
 
 });
-
-//~ .filter('exact', function(){
-  //~ return function(items, search){
-    //~ var matching = [], matches, falsely = true;
-    //~ 
-    //~ // Return the items unchanged if all filtering attributes are falsy
-    //~ angular.forEach(search, function(value, key){
-      //~ falsely = falsely && !value;
-    //~ });
-    //~ if(falsely){
-      //~ return items;
-    //~ }
-    //~ 
-    //~ angular.forEach(items, function(item){ // e.g. { title: "ball" }
-      //~ matches = true;
-      //~ angular.forEach(search, function(value, key){ // e.g. 'all', 'title'
-        //~ if(!!value){ // do not compare if value is empty
-          //~ matches = matches && (item[key] === value);  
-          //~ //console.log('here');
-        //~ }
-      //~ });
-      //~ if(matches){
-        //~ matching.push(item);  
-      //~ }
-    //~ });
-  //~ // console.log(matching);
-    //~ return matching;
-  //~ }
-//~ });
-
-
-
-
-

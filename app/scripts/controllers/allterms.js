@@ -45,6 +45,23 @@ var remoteDb=myConfig.database;
 	 docData.setFormData(list);
 	 window.location.href="/#/getdata";
  };
+ //===============All docs function======================//
+	 $scope.allDocsFunc=function()
+	 {
+		 $http.get('http://'+domainRemoteDb+'/'+remoteDb+'/_all_docs?include_docs=true')
+		.success(function(data) 
+		{
+			if(data.rows)
+			{		
+				$scope.docs=data.rows;
+				$scope.count=data.total_rows;
+			}	
+		})
+		.error(function(error) 
+		{
+			console.log(error);
+		});
+	 };
 	 //////////////////////////Fetch  data/////////////////////////////////////
 	// $scope.getAllData = function() {
 	$("#spinner").show();
@@ -88,9 +105,10 @@ var remoteDb=myConfig.database;
 				}
 				else
 				{
-					var count=3031;
+					var count=2989;
 				}
-				
+				 $scope.allDocsFunc();
+				 console.log($scope.count);
 				$scope.paginationFunc(count);
 			}	
 		});

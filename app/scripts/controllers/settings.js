@@ -105,7 +105,6 @@ angular.module('accentsApp')
  
  //===================Delete Duplicate Records================//
  $scope.deleteDuplicate=function(alldocs){
-	 console.log('here');
 	 angular.forEach(alldocs, function(docs) {
 		
 		 angular.forEach(alldocs,function(doc)
