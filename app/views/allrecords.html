@@ -285,6 +285,7 @@
                                          <th>Original</th> 
                                          <th>Notes</th> 
                                          <th></th> 
+                                         <th></th> 
                                        </tr>
                                    </thead>
                       <tbody>
@@ -296,6 +297,9 @@
                         <td class="term" ng-model="terms">{{doc.doc.ref}}</td>
                         <td class="ref">{{doc.doc.original}}</td>
                         <td class="user">{{doc.doc.definition}}</td>
+                          <td class="user">
+							  <div>{{(doc.doc.verify && doc.doc.verify==1 )  ? "Verified" : "Ambiguous"}}</div>							  
+						</td>
                         <td class="action" style="width:65px;"><button type="button" class="btn btn-danger btn-xs remove" ng-click="deletedoc(doc.doc._id,doc.doc._rev);"><span class="glyphicon glyphicon-remove"></span></button>
                         <button type="button" class="btn btn-primary btn-xs editbtn" ng-click="editdocPage(doc.doc._id,doc.doc._rev);" ><span class="glyphicon glyphicon-edit"></span></button>
                         </td>

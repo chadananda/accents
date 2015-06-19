@@ -43,6 +43,12 @@ var remoteDb=myConfig.database;
 			$("#heading-term").html(Utils.ilm2HTML(changedTerm));
 		}
 });
+//Every checkboxes in the page
+$('.checkbox input:checkbox').click(function() {
+    $('.checkbox input:checkbox').not(this).prop('checked', false);
+});  
+
+
 	 //////////////////////////Fetch  data/////////////////////////////////////
 	// $scope.getAllData = function() {
 	$("#spinner").show();
@@ -233,138 +239,133 @@ var remoteDb=myConfig.database;
 			
 		};
     
-    //////////////////////////Add data/////////////////////////////////////
-    
-    $scope.adddata=function(items){
-    var term=$scope.search.doc.term;
-    var  original=$scope.editdata.original;
-    var refrence=$scope.editdata.ref;
-    var definition=$scope.editdata.definition;
-    var verified=$scope.verified;
-    var ambiguous=$scope.ambiguous;
-    //FILTER FOR PARTIAL RECORDS
-    $scope.partialitems = $filter('myfilterData')(items,term);
-    //FILTER FOR EXACT RECORDS
-    $scope.exactitems = $filter('filter',true)(items,{doc: {term: term}});
-    
-    $scope.filteredItems =  $scope.partialitems.concat($scope.exactitems);
-    var uniqueid=[];
-    $scope.finalItems=[];
-    for(var i = 0; i< $scope.filteredItems.length; i++){  
-    if(uniqueid.indexOf($scope.filteredItems[i].id) === -1){
-        uniqueid.push($scope.filteredItems[i].id); 
-         $scope.finalItems.push($scope.filteredItems[i]);       
-    }        
-}
-    //console.log(JSON.stringify($scope.finalItems));
-    var additemverify="1";
-	var otheritemverify="1";
-    if(verified)
-    {
-		var additemverify="1";
-		var otheritemverify="0";
-	}
-	if(ambiguous)
-    {
-		var additemverify="1";
-		var otheritemverify="1";
-	}
-	  var sessionArray= JSON.parse( localStorage.getItem("session-user"));
-	var userName=sessionArray.username;
-	var data= JSON.stringify
-		({
-			"source": userName,   
-			"original":original , 
-			"definition":definition, 
-			"type": "term", 
-			"user": userName,
-			"term": term,
-			"ref":refrence,
-			"verify":additemverify
-		});
-	 if(confirm("Please Confirm the following updation:"+data))
-     {
-		
-		$http.post('http://'+domainRemoteDb+'/'+remoteDb+'/', data).
-		success(function(data, status, headers, config) {
-		console.log(status);
-		$scope.message='Record Added Successfully';
-		$http.get('http://'+domainRemoteDb+'/'+remoteDb+'/_all_docs?include_docs=true')
-		.success(function(data) 
-		{		
-			if(data.rows)
-			{
-				console.log(data.rows.doc);
-				$scope.docs=data.rows;
-				$scope.count=data.total_rows;
-			}          
-		})
-		.error(function(error) 
-		{
-			console.log(error);
-		});  
-	  }).
-	  error(function(data, status, headers, config) 
-	  {
-		console.log(status);
-		$scope.message='Error adding record';
-	  });
-	
-	   //update all other items 
-   for(var i = 0; i< $scope.finalItems.length; i++)
+    //=====================================Add a new term===================================//
+   $scope.adddata=function(items)
    {
-	  console.log($scope.finalItems[i].doc.original);
-	  var id=$scope.finalItems[i].id;
-	  var rev=$scope.finalItems[i].doc._rev;
-	  var data= JSON.stringify
-	   ({
-		   "source": userName,   
-		   "original":$scope.finalItems[i].doc.original , 
-		   "definition":$scope.finalItems[i].doc.definition, 
-		   "type": "term", 
-		   "user": userName,
-		   "term": $scope.finalItems[i].doc.term,
-		   "ref":  $scope.finalItems[i].doc.ref,
-		   "verify":otheritemverify
-		});
-		
-        $http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev, data).
-		success(function(data, status, headers, config) 
+		var term=$scope.search.doc.term;
+		var original=$scope.editdata.original;
+		var refrence=$scope.editdata.ref;
+		var definition=$scope.editdata.definition;
+		var verified=$scope.verified;
+		var ambiguous=$scope.ambiguous;
+		//FILTER FOR WHOLE WORD MATCHES
+		$scope.wholeWordMatches = $filter('wholeWordFilter')(items,term);
+		var sessionArray= JSON.parse( localStorage.getItem("session-user"));
+		var userName=sessionArray.username;		
+		if(verified)
 		{
-			console.log(status);
-			$scope.message='Record Added Successfully';
-			$http.get('http://'+domainRemoteDb+'/'+remoteDb+'/_all_docs?include_docs=true')
-			.success(function(data) 
-			{			
-				if(data.rows)
-				{
-					console.log(data.rows.doc);
-					$scope.docs=data.rows;
-					$scope.count=data.total_rows;
-				}	
-			})
-			.error(function(error) 
+			var additemverify="1";
+			var allRef=[];
+			var matchTerms=[];
+			allRef.push(refrence);
+			angular.forEach($scope.wholeWordMatches ,function(match)
 			{
-				console.log(error);
+				var z = ({"id":match.doc._id,"rev":match.doc._rev});
+				allRef.push(match.doc.ref);
+				matchTerms.push(z);
+			});	
+			var allReferences=allRef.join();
+			var data= JSON.stringify
+			({
+				"source": userName,   
+				"original":original , 
+				"definition":definition, 
+				"type": "term", 
+				"user": userName,
+				"term": term,
+				"ref":allReferences,
+				"verify":additemverify
 			});
-		}).
-		error(function(data, status, headers, config) 
+			
+			if(confirm("Please Confirm the following Addition:"+data))
+			{	
+				$http.post('http://'+domainRemoteDb+'/'+remoteDb+'/', data).
+				success(function(data, status, headers, config) 
+				{
+					console.log(status);
+					$scope.message='Record Added Successfully';
+					angular.forEach(matchTerms ,function(match)
+					{
+						$http.delete('http://'+domainRemoteDb+'/'+remoteDb+'/'+match.id+'?rev='+match.rev).
+						success(function(data, status, headers, config) 
+						{
+							console.log(status);
+						}).
+						error(function(data, status, headers, config) 
+						{
+							console.log(status);
+						});
+					});					
+				}).
+				error(function(data, status, headers, config) 
+				{
+					console.log(status);
+					$scope.message='Error Adding record';
+				});
+			}	
+		}
+		if(ambiguous)
 		{
-			console.log(status);
-			$scope.message='Error adding record';
-		});
-		
-   }
-	 }
-	 else
-	 {
-		 return false;
-	 }
-	
-	
-  
-};  
-  
+			var additemverify="0";
+			var otheritemverify="0";
+			var data= JSON.stringify
+			({
+				"source": userName,   
+				"original":original , 
+				"definition":definition, 
+				"type": "term", 
+				"user": userName,
+				"term": term,
+				"ref":refrence,
+				"verify":additemverify
+			});
+			
+			if(confirm("Please Confirm the following Addition:"+data))
+			{	
+				$http.post('http://'+domainRemoteDb+'/'+remoteDb+'/', data).
+				success(function(data, status, headers, config) 
+				{
+					console.log(status);
+					$scope.message='Record Added Successfully';
+					//update all other items 
+				    for(var i = 0; i< $scope.wholeWordMatches.length; i++)
+					{	
+						console.log($scope.wholeWordMatches[i].doc.original);
+						var id=$scope.wholeWordMatches[i].id;
+						var rev=$scope.wholeWordMatches[i].doc._rev;
+						var data= JSON.stringify
+						({
+						   "source": userName,   
+						   "original":$scope.wholeWordMatches[i].doc.original , 
+						   "definition":$scope.wholeWordMatches[i].doc.definition, 
+						   "type": "term", 
+						   "user": userName,
+						   "term": $scope.wholeWordMatches[i].doc.term,
+						   "ref":  $scope.wholeWordMatches[i].doc.ref,
+						   "verify":otheritemverify
+						});
+						$http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev, data).
+						success(function(data, status, headers, config) 
+						{
+							console.log(status);
+							$scope.message='Record Added Successfully';
+						}).
+						error(function(data, status, headers, config) 
+						{
+							console.log(status);
+							$scope.message='Error adding record';
+						});
+						
+					}		
+				}).
+				error(function(data, status, headers, config) 
+				{
+					console.log(status);
+					$scope.message='Error Adding record';
+				});
+			}
+		}
+   };
    //////////////////////////Update data/////////////////////////////////////
 
     $scope.updatedata=function(items){
@@ -580,9 +581,9 @@ var remoteDb=myConfig.database;
 			if(string)
 			{
 				string= string.replace("_","");
-				string=string.toLowerCase();	
+				//string=string.toLowerCase();	
 				string=Utils.dotUndersRevert(string);		
-				search=search.toLowerCase();
+				//search=search.toLowerCase();
 				search= search.replace("_","");
 				search=Utils.dotUndersRevert(search);	
 				if( ((string.indexOf(search)) !=-1) && (string.length== search.length)) 
