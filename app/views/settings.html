@@ -71,59 +71,150 @@
 				<h3 class="pl15 pr15">Utilities</h3>
 				<div class="panel-box">
 					<div class="row mb10">
-						<div class="col-sm-10">
+						<div class="col-sm-5">
 							<button class="btn btn-primary btn-block" ng-click="deleteDuplicate(docs)">
 								<span class="glyphicon glyphicon-trash mr5"></span>
 								Delete Duplicate Data
 							</button>
 						</div>
+						<div class="col-sm-5">
+							<button type="button" class="btn btn-primary btn-circle" id="firstClick" ng-click="slideShow('firstBox');">
+								<span class="glyphicon glyphicon-question-sign"></span>
+							</button>
+						</div>
+					</div>
+					<div class="row" id="firstBox" style="display:none;">
+						<div class="col-sm-5">
+							<div class="well first-well">
+								<h4>Delete Duplicate Data</h4>
+								<p>Delete Duplicate Data</p>
+							</div>
+						</div>
 					</div>
 					<div class="row mb10">
-						<div class="col-sm-10">
+						<div class="col-sm-5">
 							<button class="btn btn-success btn-block" ng-click="changeVerify(docs)">
 								<span class="glyphicon glyphicon-wrench mr5"></span>
 								Set original to Verified
 							</button>
 						</div>
-					</div>
+						<div class="col-sm-5">
+								<button type="button" class="btn btn-success btn-circle"  ng-click="slideShow('secBox');">
+									<span class="glyphicon glyphicon-question-sign"></span>
+								</button>
+							</div>
+						</div>
+						<div class="row" id="secBox" style="display:none;">
+							<div class="col-sm-5">
+								<div class="well second-well">
+									<h4>Set original to Verified</h4>
+									<p>Set original to Verified</p>
+								</div>
+							</div>
+						</div>
 					<div class="row mb10">
-						<div class="col-sm-10">
+						<div class="col-sm-5">
 							<button class="btn btn-info btn-block" ng-click="addFamilyField(docs)">
 								<span class="glyphicon glyphicon-th-list mr5"></span>
 								Add "Word Family" Field
 							</button>
 						</div>
+						<div class="col-sm-5">
+							<button type="button" class="btn btn-info btn-circle"  ng-click="slideShow('thirdBox');">
+								<span class="glyphicon glyphicon-question-sign"></span>
+							</button>
+						</div>
+					</div>
+					<div class="row" id="thirdBox" style="display:none;">
+						<div class="col-sm-5">
+							<div class="well third-well">
+								<h4>Add "Word Family" Field</h4>
+								<p>Add "Word Family" Field</p>
+							</div>
+						</div>
 					</div>
 					<div class="row mb10">
-						<div class="col-sm-10">
+						<div class="col-sm-5">
 							<button class="btn btn-warning btn-block" ng-click="compressVerify(docs)">
 								<span class="glyphicon glyphicon-compressed mr5"></span>
 								Compress Verified Records
 							</button>
 						</div>
+						<div class="col-sm-5">
+								<button type="button" class="btn btn-warning btn-circle"  ng-click="slideShow('fourthBox');">
+									<span class="glyphicon glyphicon-question-sign"></span>
+								</button>
+							</div>
+						</div>
+					<div class="row" id="fourthBox" style="display:none;">
+						<div class="col-sm-5">
+							<div class="well fourth-well">
+								<h4>Compress Verified Records</h4>
+								<p>Compress Verified Records</p>
+							</div>
+						</div>
 					</div>
 					<div class="row mb10">
-						<div class="col-sm-10">
-							<button class="btn btn-info btn-block" ng-click="markAmbiguous(docs)">
+						<div class="col-sm-5">
+							<button class="btn btn-danger btn-block" ng-click="markAmbiguous(docs)">
 								<span class="glyphicon glyphicon-exclamation-sign mr5"></span>
 								Mark Ambiguous
 							</button>
 						</div>
+						<div class="col-sm-5">
+								<button type="button" class="btn btn-danger btn-circle"  ng-click="slideShow('fifthBox');">
+									<span class="glyphicon glyphicon-question-sign"></span>
+								</button>
+							</div>
+						</div>
+					<div class="row" id="fifthBox" style="display:none;">
+						<div class="col-sm-5">
+							<div class="well fifth-well">
+								<h4>Mark Ambiguous</h4>
+								<p>Mark Ambiguous</p>
+							</div>
+						</div>
 					</div>
 					<div class="row mb10">
-						<div class="col-sm-10">
-							<button class="btn btn-warning btn-block" ng-click="cleanupRecords(docs)">
+						<div class="col-sm-5">
+							<button class="btn btn-primary btn-block" ng-click="cleanupRecords(docs)">
 								<span class="glyphicon glyphicon-remove-sign mr5"></span>
 								Cleanup Records
 							</button>
 						</div>
+						<div class="col-sm-5">
+								<button type="button" class="btn btn-primary btn-circle"  ng-click="slideShow('sixthBox');">
+									<span class="glyphicon glyphicon-question-sign"></span>
+								</button>
+							</div>
+						</div>
+					<div class="row" id="sixthBox" style="display:none;">
+						<div class="col-sm-5">
+							<div class="well sixth-well">
+								<h4>Cleanup Records</h4>
+								<p>Cleanup Records</p>
+							</div>
+						</div>
 					</div>
 					<div class="row mb10">
-						<div class="col-sm-10">
-							<button class="btn btn-info btn-block" ng-click="showVerifyView(docs)">
+						<div class="col-sm-5">
+							<button class="btn btn-success btn-block" ng-click="showVerifyView(docs)">
 								<span class="glyphicon glyphicon-check mr5"></span>
 								Verify View
 							</button>
+						</div>
+						<div class="col-sm-5">
+								<button type="button" class="btn btn-success btn-circle"  ng-click="slideShow('seventhBox');">
+									<span class="glyphicon glyphicon-question-sign"></span>
+								</button>
+							</div>
+						</div>
+					<div class="row" id="seventhBox" style="display:none;">
+						<div class="col-sm-5">
+							<div class="well seventh-well">
+								<h4>Verify View</h4>
+								<p>Verify View</p>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -132,22 +223,18 @@
                  </div>
 				
             </div> 
-        <div class="col-lg-12 clearfix  mb10 p0 mt10"><!--mt30-->
+            <!--
+        <div class="col-lg-12 clearfix  mb10 p0 mt10">
                 <div role="tabpanel">
-                     <!-- <ul class="nav nav-tabs" role="tablist">
-                        <li role="presentation" class="active"><a data-target="#home" aria-controls="home" role="tab" data-toggle="tab">All</a></li>
-                        <li role="presentation"><a data-target="#profile" aria-controls="profile" role="tab" data-toggle="tab">Filtered</a></li>
-                      </ul>-->
                       <div class="tab-content">
                         <div role="tabpanel" class="tab-pane active" id="home">
                             <h3>Terms Collected: {{(docs | newfilter:search.doc.term).length}}</h3>
                             <input type="hidden" value="{{(docs | filter:search).length}}" name="totalRows" ng-model="rowxount" id="totalRows"/>
-                            <!----------------TABLE---------------------->
+                            <!----------------TABLE---------------------
                         <div class="table-responsive tablecontainer mt10" ng-controller="PaginationCtrl">
                              <table class="table  table-bordered ">
                                   <thead>
                                      <tr>
-                                         <!--th>id</th-->
                                          <th>Term</th>
                                          <th>Reference</th>   
                                          <th>Original</th> 
@@ -159,7 +246,7 @@
 						   
                  <tr ng-repeat="doc in docs | newfilter:search.doc.term | offset: currentPage*itemsPerPage | limitTo: itemsPerPage">
 						 
-                        <!--td class="id" ng-model="did">{{doc.doc.id}}</td-->
+                        <!--td class="id" ng-model="did">{{doc.doc.id}}</td->
                         <td class="term" ng-bind-html="i2html(customi2html(doc.doc.term))">{{doc.doc.term}}</td>
                         <td class="term" ng-model="terms">{{doc.doc.ref}}</td>
                         <td class="ref">{{doc.doc.original}}</td>
@@ -185,10 +272,10 @@
 						</ul>
 					</div>
                         </div>
-                          <!--------------------TABLE-END------------------------->
+                          <!--------------------TABLE-END-------------------------
                         </div>
                         <div role="tabpanel" class="tab-pane" id="profile">
-                          <!----------------TABLE---------------------->
+                          <!----------------TABLE---------------------- 
                             <div class="table-responsive tablecontainer mt20">
                                  <table class="table  table-bordered">
                                      <thead><tr> <th>Term</th> <th>Count</th> </tr></thead>

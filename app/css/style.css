@@ -1,7 +1,7 @@
 
     
 body{background:url('../images/bodybg.png') repeat; }
-.forkme{position:absolute; right:0; top:0;}
+.forkme{position:absolute; right:0; top:0;z-index: 9;}
 .nb{border:0!important;}
 .m0{margin:0 !important;}.p0{padding:0 !important;}.m5{margin:5px;}.m10{margin:10px;}.m15{margin:15px;}.m20{margin:20px;}.mlr0{margin-left:0; margin-right:0;}.mtb0{margin-top:0; margin-bottom:0;}
 .p0{padding:0px;}.p2{padding:2px;}.p5{padding:5px;}.p10{padding:10px;}.p15{padding:15px;}.p20{padding:20px;}.p25{padding:25px;}.plr0{padding-left:0; padding-right:0;}.ptb0{padding-top:0; padding-bottom:0;}
@@ -24,11 +24,11 @@ body{background:url('../images/bodybg.png') repeat; }
 .logo img{max-width:86px;}
 .logo h3{color:#999999;}
 .logo p{font-size:12px; color:#999999;}
- #main-container{ border:1px solid #f0f0f0; max-width:992px; background:#ffffff;}
+ #main-container{ border:1px solid #f0f0f0; /*max-width:992px;*/ background:#ffffff;}
 .inputexm{/*position:absolute;*/  left:20px; bottom:-16px; font-size:10px; color:#999999; font-style:italic;} 
 .addtext{background:#333333; color:#fefefe;}
 .addtext h3{border-bottom:1px solid #3d3d3d; padding-bottom:10px; margin-top:5px; margin-bottom:20px;}
-.remove{padding:3px;float: left; height: 22px; width: 22px;}
+.remove{padding:0px;float: left; height: 22px; width: 22px;}
 .tablecontainer th{   text-transform: uppercase;  background: #2D5D76;border: none !important;color: #fff;text-align: center }
 .tablecontainer td{text-align:center; border-bottom:1px solid #f0f0f0; }
 .tablecontainer tr{-webkit-transition: all 0.2s ease-in-out;-moz-transition: all 0.2s ease-in-out;  -o-transition: all 0.2s ease-in-out;transition: all 0.2s ease-in-out;}
@@ -219,7 +219,7 @@ body{background:url('../images/bodybg.png') repeat; }
 .pagination-mini ul>li>a,.pagination-mini ul>li>span{padding:0 6px;font-size:10.5px;}
 .fltlft{float:left;}
 
-.editbtn{height: 22px !important; width: 22px !important;}
+.editbtn{padding:0px;height: 22px; width: 22px;}
 .searchGroup:hover{cursor:pointer;}
 .panel-box {
     margin-left: 111px;
@@ -230,4 +230,42 @@ body{background:url('../images/bodybg.png') repeat; }
     font-size: 16px ; 
     font-weight: bold;
     text-transform: uppercase;
+}
+.btn-circle {
+  width: 30px;
+  height: 30px;
+  padding: 6px 0;   
+  border-radius: 15px !important;
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.428571429;
+}
+
+.well.first-well {
+    background-color: #87b6dd;
+    border-color: #428bca;
+}
+.well.second-well {
+    background-color: #94d094;
+    border-color: #5cb85c;
+}
+.well.third-well {
+    background-color: #bee6f2;
+    border-color: #5bc0de;
+}
+.well.fourth-well {
+    background-color: #f9deb7;
+    border-color: #f0ad4e;
+}	
+.well.fifth-well {
+    background-color: #e89896;
+    border-color: #d9534f;
+}
+.well.sixth-well{
+	background-color: #87b6dd;
+    border-color: #428bca;
+}
+.well.seventh-well{
+	background-color: #94d094;
+    border-color: #5cb85c;
 }

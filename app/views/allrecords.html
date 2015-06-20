@@ -298,7 +298,11 @@
                         <td class="ref">{{doc.doc.original}}</td>
                         <td class="user">{{doc.doc.definition}}</td>
                           <td class="user">
-							  <div>{{(doc.doc.verify && doc.doc.verify==1 )  ? "Verified" : "Ambiguous"}}</div>							  
+							  <div  ng-show="doc.doc.verify">
+								   <div ng-show="doc.doc.verify==1"><span class='glyphicon glyphicon-ok-circle'></span></div>
+								   <div ng-show="doc.doc.verify==0"><span class='glyphicon glyphicon-question-sign'></span></div>		
+							  </div>
+							 					  
 						</td>
                         <td class="action" style="width:65px;"><button type="button" class="btn btn-danger btn-xs remove" ng-click="deletedoc(doc.doc._id,doc.doc._rev);"><span class="glyphicon glyphicon-remove"></span></button>
                         <button type="button" class="btn btn-primary btn-xs editbtn" ng-click="editdocPage(doc.doc._id,doc.doc._rev);" ><span class="glyphicon glyphicon-edit"></span></button>
