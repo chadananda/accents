@@ -15,14 +15,14 @@
 		//$('#checkedStrict').trigger('click');
 	}                                                              
 </script>
-   <a href="javascript:void();"> <img src="images/forkme.png" alt="forkme" class="img-responsive forkme" /></a>
-        <div class="container  clearfix"  id="main-container" ng-controller="SettingsCtrl">
+   <!-- <a href="javascript:void();"> <img src="images/forkme.png" alt="forkme" class="img-responsive forkme" /></a>-->
+        <div class="container  clearfix"  id="main-container" ng-controller="getdataCtrl">
             <div class="col-lg-12 clearfix  mb10 p0 pt10 pb10">
                 <div class="col-sm-6 logo p0 valignmiddle mt10">
                       <div class="media">
                           <div class="media-left pull-left">
                             <a href="index.html">
-                                <img src="images/logo.png" alt="logo" class="img-responsive dispinblk valignmiddle" />
+                                <img src="images/ocean-logo.svg" alt="logo" class="img-responsive dispinblk valignmiddle" />
                             </a>
                           </div>
                           <div class="media-body">
@@ -36,7 +36,7 @@
                     <button type="button" class="btn btn-default txtuppcase "><span class="glyphicon glyphicon-ok mr5"></span>Auto Correct</button>
                     <button type="button" class="btn btn-danger txtuppcase " title="Logout" onclick="logout()"><span class="glyphicon glyphicon-off"></span></button>
                  </div>
-                <div class="col-md-4 col-md-offset-2 col-sm-6 logo custom-width-media p0 valignmiddle text-right topbutton mt10" >
+                <div class="col-md-4 col-md-offset-2 col-sm-5 custom-width-media logo p0 valignmiddle text-right topbutton mt10" >
 					<div class="header">
 					  <div class="navbar navbar-default" role="navigation">
 						<!--div class="container"-->
@@ -52,39 +52,40 @@
 							<!--a class="navbar-brand" href="#/">accents</a-->
 						  </div>
 
-						  <div class="collapse navbar-collapse" id="js-navbar-collapse">
+						  <div class="collapse navbar-collapse" id="js-navbar-collapse" >
 
 							<ul class="nav navbar-nav">
-								 <li><a ng-href="#/allterms">All Terms</a></li>
+							  <li><a ng-href="#/allterms">All Terms</a></li>
 							  <li><a href="#/getdata">Add</a></li>
-							  <li><a ng-href="#/about">Verify</a></li>
-							  <li><a class="btn-danger txtuppcase logout" style="color:#ffffff;" title="Logout" onclick="logout()"><span class="glyphicon glyphicon-off"></span></a></li>
-							  <li class="active"><a  ng-href="#/settings"><span class="glyphicon glyphicon-cog"></span></a></li>
+							 <!-- <li><a ng-href="#/about">Verify</a></li>-->
+							  <li><a class="btn-danger txtuppcase logout" title="Logout" onclick="logout()"><span class="glyphicon glyphicon-off"></span></a></li>
+							   <li class="active"><a ng-href="#/settings"><span class="glyphicon glyphicon-cog"></span></a></li>
 							</ul>
 						  </div>
 						</div>
 					  <!--/div-->
 					</div>
                 </div>
-            </div>
+            </div>                    
+             
             <div class="col-lg-12 clearfix mb10 p0 pt10 pb30 addtext mt30">
 				<h3 class="pl15 pr15">Utilities</h3>
 				<div class="panel-box">
 					<div class="row mb10">
-						<div class="col-sm-5">
+						<div class="col-sm-10 col-xs-10">
 							<button class="btn btn-primary btn-block" ng-click="deleteDuplicate(docs)">
 								<span class="glyphicon glyphicon-trash mr5"></span>
 								Delete Duplicate Data
 							</button>
 						</div>
-						<div class="col-sm-5">
+						<div class="col-sm-2 col-xs-2" >
 							<button type="button" class="btn btn-primary btn-circle" id="firstClick" ng-click="slideShow('firstBox');">
-								<span class="glyphicon glyphicon-question-sign"></span>
+								<span class="glyphicon glyphicon-question-sign" style="color:white;"></span>
 							</button>
 						</div>
 					</div>
 					<div class="row" id="firstBox" style="display:none;">
-						<div class="col-sm-5">
+						<div class="col-sm-10 col-xs-10">
 							<div class="well first-well">
 								<h4>Delete Duplicate Data</h4>
 								<p>Delete Duplicate Data</p>
@@ -92,20 +93,20 @@
 						</div>
 					</div>
 					<div class="row mb10">
-						<div class="col-sm-5">
+						<div class="col-sm-10 col-xs-10">
 							<button class="btn btn-success btn-block" ng-click="changeVerify(docs)">
 								<span class="glyphicon glyphicon-wrench mr5"></span>
 								Set original to Verified
 							</button>
 						</div>
-						<div class="col-sm-5">
+						<div class="col-sm-2 col-xs-2" >
 								<button type="button" class="btn btn-success btn-circle"  ng-click="slideShow('secBox');">
-									<span class="glyphicon glyphicon-question-sign"></span>
+									<span class="glyphicon glyphicon-question-sign" style="color:white;"></span>
 								</button>
 							</div>
 						</div>
 						<div class="row" id="secBox" style="display:none;">
-							<div class="col-sm-5">
+							<div class="col-sm-10 col-xs-10">
 								<div class="well second-well">
 									<h4>Set original to Verified</h4>
 									<p>Set original to Verified</p>
@@ -113,20 +114,20 @@
 							</div>
 						</div>
 					<div class="row mb10">
-						<div class="col-sm-5">
+						<div class="col-sm-10 col-xs-10">
 							<button class="btn btn-info btn-block" ng-click="addFamilyField(docs)">
 								<span class="glyphicon glyphicon-th-list mr5"></span>
 								Add "Word Family" Field
 							</button>
 						</div>
-						<div class="col-sm-5">
+						<div class="col-sm-2 col-xs-2" >
 							<button type="button" class="btn btn-info btn-circle"  ng-click="slideShow('thirdBox');">
-								<span class="glyphicon glyphicon-question-sign"></span>
+								<span class="glyphicon glyphicon-question-sign" style="color:white;"></span>
 							</button>
 						</div>
 					</div>
 					<div class="row" id="thirdBox" style="display:none;">
-						<div class="col-sm-5">
+						<div class="col-sm-10 col-xs-10">
 							<div class="well third-well">
 								<h4>Add "Word Family" Field</h4>
 								<p>Add "Word Family" Field</p>
@@ -134,20 +135,20 @@
 						</div>
 					</div>
 					<div class="row mb10">
-						<div class="col-sm-5">
+						<div class="col-sm-10 col-xs-10">
 							<button class="btn btn-warning btn-block" ng-click="compressVerify(docs)">
 								<span class="glyphicon glyphicon-compressed mr5"></span>
 								Compress Verified Records
 							</button>
 						</div>
-						<div class="col-sm-5">
+						<div class="col-sm-2 col-xs-2" >
 								<button type="button" class="btn btn-warning btn-circle"  ng-click="slideShow('fourthBox');">
-									<span class="glyphicon glyphicon-question-sign"></span>
+									<span class="glyphicon glyphicon-question-sign" style="color:white;"></span>
 								</button>
 							</div>
 						</div>
 					<div class="row" id="fourthBox" style="display:none;">
-						<div class="col-sm-5">
+						<div class="col-sm-10 col-xs-10">
 							<div class="well fourth-well">
 								<h4>Compress Verified Records</h4>
 								<p>Compress Verified Records</p>
@@ -155,20 +156,20 @@
 						</div>
 					</div>
 					<div class="row mb10">
-						<div class="col-sm-5">
+						<div class="col-sm-10 col-xs-10">
 							<button class="btn btn-danger btn-block" ng-click="markAmbiguous(docs)">
 								<span class="glyphicon glyphicon-exclamation-sign mr5"></span>
 								Mark Ambiguous
 							</button>
 						</div>
-						<div class="col-sm-5">
+						<div class="col-sm-2 col-xs-2" >
 								<button type="button" class="btn btn-danger btn-circle"  ng-click="slideShow('fifthBox');">
-									<span class="glyphicon glyphicon-question-sign"></span>
+									<span class="glyphicon glyphicon-question-sign" style="color:white;"></span>
 								</button>
 							</div>
 						</div>
 					<div class="row" id="fifthBox" style="display:none;">
-						<div class="col-sm-5">
+						<div class="col-sm-10 col-xs-10">
 							<div class="well fifth-well">
 								<h4>Mark Ambiguous</h4>
 								<p>Mark Ambiguous</p>
@@ -176,20 +177,20 @@
 						</div>
 					</div>
 					<div class="row mb10">
-						<div class="col-sm-5">
+						<div class="col-sm-10 col-xs-10">
 							<button class="btn btn-primary btn-block" ng-click="cleanupRecords(docs)">
 								<span class="glyphicon glyphicon-remove-sign mr5"></span>
 								Cleanup Records
 							</button>
 						</div>
-						<div class="col-sm-5">
+						<div class="col-sm-2 col-xs-2" >
 								<button type="button" class="btn btn-primary btn-circle"  ng-click="slideShow('sixthBox');">
-									<span class="glyphicon glyphicon-question-sign"></span>
+									<span class="glyphicon glyphicon-question-sign" style="color:white;"></span>
 								</button>
 							</div>
 						</div>
 					<div class="row" id="sixthBox" style="display:none;">
-						<div class="col-sm-5">
+						<div class="col-sm-10 col-xs-10">
 							<div class="well sixth-well">
 								<h4>Cleanup Records</h4>
 								<p>Cleanup Records</p>
@@ -197,20 +198,20 @@
 						</div>
 					</div>
 					<div class="row mb10">
-						<div class="col-sm-5">
+						<div class="col-sm-10 col-xs-10">
 							<button class="btn btn-success btn-block" ng-click="showVerifyView(docs)">
 								<span class="glyphicon glyphicon-check mr5"></span>
 								Verify View
 							</button>
 						</div>
-						<div class="col-sm-5">
+						<div class="col-sm-2 col-xs-2" >
 								<button type="button" class="btn btn-success btn-circle"  ng-click="slideShow('seventhBox');">
-									<span class="glyphicon glyphicon-question-sign"></span>
+									<span class="glyphicon glyphicon-question-sign" style="color:white;"></span>
 								</button>
 							</div>
 						</div>
 					<div class="row" id="seventhBox" style="display:none;">
-						<div class="col-sm-5">
+						<div class="col-sm-10 col-xs-10">
 							<div class="well seventh-well">
 								<h4>Verify View</h4>
 								<p>Verify View</p>

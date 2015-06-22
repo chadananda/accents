@@ -161,29 +161,51 @@ angular.module('accentsApp')
 	//==================For add family field in the docs====================//
 	$scope.addFamilyField=function(items)
 	{
-		//~ var filtered = [];
-		//~ var i=1;
-		//~ angular.forEach(items, function(item) 
-		//~ {
-			//~ if(i==10)
-				//~ return false;
-			//~ var string=item.doc.term;
-			//~ if(string)
-			//~ {
-				//~ string= string.replace("_","");	
-				//~ string=Utils.dotUndersRevert(string);	
-				//~ 
-				//~ var f = {}; 
-				//~ f[string] = string;
-				//~ if("al-Faraqlit" in filtered)
-				//~ {
-					//~ console.log("string");
-					//~ console.log(string);
-				//~ }
-				//~ filtered.push(f);			
-			//~ }
-			//~ i++;
-			//~ console.log(filtered);
-		//~ });
+		var filtered = [];
+		//var i=1;
+		angular.forEach(items, function(item) 
+		{
+			//if(i==10)
+				//return false;
+			var string=item.doc.term;
+			if(string)
+			{
+				string= string.replace("_","");	
+				string=Utils.dotUndersRevert(string);
+				var id=item.doc._id;
+				var rev=item.doc._rev;
+				var original=item.doc.original;
+				var definition=item.doc.definition;
+				var term=item.doc.term;
+				var refrence=item.doc.ref;
+				var additemverify=item.doc.verify;
+				var sessionArray= JSON.parse( localStorage.getItem("session-user"));
+				var userName=sessionArray.username;
+				var data= JSON.stringify(
+											{
+												"source": userName,   
+												"original":original , 
+												"definition":definition, 
+												"type": "term", 
+												"user": userName,
+												"term": term,
+												"ref":refrence,
+												"verify":additemverify,
+												"wordfamily":string
+											}
+										); 
+				//console.log(data);
+				$http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev, data).
+				success(function(data, status, headers, config) 
+				{
+					console.log(status);
+				}).
+				error(function(data, status, headers, config) 
+				{
+					console.log(status);
+				});
+			}
+			//i++;
+		});
 	}
  });
