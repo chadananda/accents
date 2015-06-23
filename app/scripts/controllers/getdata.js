@@ -528,7 +528,63 @@ $('.checkbox input:checkbox').click(function() {
 		 document.getElementById("showDiv-"+key).style.display='block';
 	}
   })
-
+.filter('singlegroupFilter',['Utils',function(Utils){
+	return function(items,search)
+	{
+		var subArray=[];
+		var filtered = [];
+		var mainArray={};
+		var count=1;
+		
+		angular.forEach(items, function(item) 
+		{
+			var string=item.doc.term;
+			if(string)
+			{
+				string= string.replace("_","");
+				string=string.toLowerCase();	
+				string=Utils.dotUndersRevert(string);		
+				search=search.toLowerCase();
+				search= search.replace("_","");
+				search=Utils.dotUndersRevert(search);	
+				if( ((string.indexOf(search)) !=-1) && (string.length!= search.length)) 
+				{    	
+					if(string in mainArray)
+					{
+						var countnew=mainArray[string];	
+						countnew++;
+						mainArray[string]=countnew;	
+					}
+					else
+					{
+						count=1;
+						mainArray[string]=count;
+						filtered.push(item);
+					}	
+				}				
+			}
+		});
+		//~ angular.forEach(mainArray, function(key,item) 
+		//~ {
+			//~ angular.forEach(filtered,function(it){
+				//~ var string1=it.doc.term;
+				//~ string1= string1.replace("_","");
+				//~ string1=string1.toLowerCase();	
+				//~ string1=Utils.dotUndersRevert(string1);	
+				//~ if(key==1)
+				//~ {
+					//~ if(string1.indexOf(item)!=-1)
+					//~ {
+						//~ subArray.push(it);
+					//~ }
+				//~ }
+				//~ 
+			//~ });
+		//~ });
+		//~ console.log(subArray);
+		return filtered;
+	};
+	}])
 .filter('offset', function() {
   return function(input, start) {	 
    if (!input || !input.length) { return; }

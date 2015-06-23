@@ -208,4 +208,32 @@ angular.module('accentsApp')
 			//i++;
 		});
 	}
+	//==========================COMPRESS RECORDS TO PACK ALL REFERENCES IN ONE SINGLE VERIFIED RECORD===============================//
+	$scope.compressVerify=function(docs)
+	{
+		var groupFamily=[];
+		var mainGroup=[];
+		var count=1;
+		angular.forEach(docs, function(item) 
+		{
+				var family=item.doc.wordfamily; 	
+				if(family in groupFamily)
+				{
+					var countnew=groupFamily[family];	
+					countnew++;
+					groupFamily[family]=countnew;
+					// mainGroup[family][countnew]=item;
+				}
+				else
+				{
+					count=1;
+					groupFamily[family]=count;
+					//~ mainGroup.push([][]); 
+					//~ mainGroup[family][count] = item;
+				}	
+					
+		});
+		//console.log(mainGroup);
+		
+	}
  });
