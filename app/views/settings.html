@@ -78,7 +78,7 @@
 						<div class="col-sm-10 col-xs-10">
 							<button class="btn btn-primary btn-block" ng-click="deleteDuplicate(docs)">
 								<span class="glyphicon glyphicon-trash" style="float: left !important;margin-left: 2% !important;"></span>
-								Delete Duplicate Data
+								 Cleanup Database
 							</button>
 						</div>
 						<div class="col-sm-2 col-xs-2" >
@@ -90,11 +90,32 @@
 					<div class="row" id="firstBox" style="display:none;">
 						<div class="col-sm-10 col-xs-10">
 							<div class="well first-well">
-								<h4>Delete Duplicate Data</h4>
-								<p>Delete Duplicate Data</p>
+								<h4>Cleanup Database</h4>
+								<p>
+									
+
+
+									<ul>
+										<li>
+											Remove records which exactly match another record -- 
+											comparing the four primary content fields which are:   
+											<b>term, source, original </b>and<b> definition</b>
+										</li>
+										<li>
+											Add a <b>word-family</b> field to all records missing this field
+										</li>
+										<li>
+											Remove all but the following fields:
+											<ul>
+												<li><b>term, source, original, definition, type, user, word-family, verified, ambiguous, audio, _id</b> and <b> _rev</b></li>
+											</ul>
+										</li>
+									</ul>
+								</p>
 							</div>
 						</div>
 					</div>
+					<!--
 					<div class="row mb10">
 						<div class="col-sm-10 col-xs-10">
 							<button class="btn btn-success btn-block" ng-click="changeVerify(docs)">
@@ -115,7 +136,7 @@
 									<p>Set original to Verified</p>
 								</div>
 							</div>
-						</div>
+						</div>						
 					<div class="row mb10">
 						<div class="col-sm-10 col-xs-10">
 							<button class="btn btn-info btn-block" ng-click="addFamilyField(docs)">
@@ -137,11 +158,12 @@
 							</div>
 						</div>
 					</div>
+					-->
 					<div class="row mb10">
 						<div class="col-sm-10 col-xs-10">
-							<button class="btn btn-warning btn-block" ng-click="compressVerify(docs)">
+							<button class="btn btn-warning btn-block" ng-click="changeVerify(docs)">
 								<span class="glyphicon glyphicon-compressed" style="float: left !important;margin-left: 2% !important;"></span>
-								Compress Verified Records
+								Compress Records
 							</button>
 						</div>
 						<div class="col-sm-2 col-xs-2" >
@@ -153,11 +175,23 @@
 					<div class="row" id="fourthBox" style="display:none;">
 						<div class="col-sm-10 col-xs-10">
 							<div class="well fourth-well">
-								<h4>Compress Verified Records</h4>
-								<p>Compress Verified Records</p>
+								<h4>Compress Records</h4>
+								<p>
+									<ul>
+										<li>Set all fields with an <b>original</b> entry to <b>verified</b>.</li>
+										<li>
+											If a word-family group contains more than one verified record, set each to <b>ambiguous</b>
+											<ul>
+												<li>For all word families with at least one ambiguous record, mark all other records in that word family as ambiguous</li>
+											</ul>
+										</li>
+										<li>For each word family containing just one verified record, delete non-verified records -- appending their <b>reference</b> values to the <b>reference</b> field of the one remaining verified record. (Comma + space delimited)</li>										
+									</ul>
+								</p>
 							</div>
 						</div>
 					</div>
+					<!--
 					<div class="row mb10">
 						<div class="col-sm-10 col-xs-10">
 							<button class="btn btn-danger btn-block" ng-click="markAmbiguous(docs)">
@@ -222,6 +256,7 @@
 						</div>
 					</div>
 				</div>
+				-->
 				<div class="col-lg-12 clearfix">                 
                      <h5 class="blankalert" style="display:block;"> {{message}}</h5>
                  </div>

@@ -86,31 +86,16 @@ angular.module('accentsApp')
 			console.log(docs.id+"no original");
 		  }
     });
-     $http.get('http://'+domainRemoteDb+'/'+remoteDb+'/_all_docs?include_docs=true')
-					.success(function(data) 
-					{
-						if(data.rows)
-						{
-							console.log(data.rows.doc);
-							$scope.docs=data.rows;
-							$scope.count=data.total_rows;
-							$("#spinner").hide();
-						}	
-					})
-					.error(function(error) 
-					{
-					console.log(error);
-					});
+    $scope.setAmbiguous(alldocs);
  };
  
  
  //===================Delete Duplicate Records================//
  $scope.deleteDuplicate=function(alldocs){
-	 angular.forEach(alldocs, function(docs) {
-		
+	 angular.forEach(alldocs, function(docs) {		
 		 angular.forEach(alldocs,function(doc)
 		 {
-		  if(doc.doc.term==docs.doc.term && doc.doc.original==docs.doc.original && doc.doc.definition==docs.doc.definition && doc.id!=docs.id)
+		  if(doc.doc.term==docs.doc.term && doc.doc.original==docs.doc.original && doc.doc.definition==docs.doc.definition && doc.doc.source==docs.doc.source)
 		  {
 				if(doc.doc.verify && doc.doc.verify=="1")
 				{
@@ -119,10 +104,10 @@ angular.module('accentsApp')
 				}
 				else
 				{
-					var id=doc.id;
+					var id=doc.id; 
 					var rev=doc.doc._rev;
 				}
-				
+				//console.log(id);
 				$http.delete('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev).
 				success(function(data, status, headers, config) 
 				{
@@ -132,26 +117,14 @@ angular.module('accentsApp')
 				error(function(data, status, headers, config) 
 				{
 					$scope.message='Error Deleting Record';
-				}); 
+				});
+				
 		  }
 		});
 		
 	 });
-	 $http.get('http://'+domainRemoteDb+'/'+remoteDb+'/_all_docs?include_docs=true')
-					.success(function(data) 
-					{
-						if(data.rows)
-						{
-							console.log(data.rows.doc);
-							$scope.docs=data.rows;
-							$scope.count=data.total_rows;
-							$("#spinner").hide();
-						}	
-					})
-					.error(function(error) 
-					{
-					console.log(error);
-					});
+	 $scope.addFamilyField(alldocs);
+	 $scope.removeUnusedData(alldocs);
  };
 	//==================For slide toggle of help divs====================//
 	$scope.slideShow=function(calledId)
@@ -162,11 +135,8 @@ angular.module('accentsApp')
 	$scope.addFamilyField=function(items)
 	{
 		var filtered = [];
-		//var i=1;
 		angular.forEach(items, function(item) 
 		{
-			//if(i==10)
-				//return false;
 			var string=item.doc.term;
 			if(string)
 			{
@@ -194,7 +164,6 @@ angular.module('accentsApp')
 												"wordfamily":string
 											}
 										); 
-				//console.log(data);
 				$http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev, data).
 				success(function(data, status, headers, config) 
 				{
@@ -205,9 +174,85 @@ angular.module('accentsApp')
 					console.log(status);
 				});
 			}
-			//i++;
 		});
 	}
+	//==================SET EACH RECORD IN A WORD FAMILY GROUP TO AMBIGUOUS IF MORE THAN ONE VERIFIED OR IF NONE===============//
+	$scope.setAmbiguous=function(docs)
+	{
+		var groupFamily={};
+		var count=1;
+		console.log('calledhere');
+		angular.forEach(docs,function(doc)
+		{
+			var family=doc.doc.wordfamily; 
+			if(family in groupFamily)
+			{
+				var countnew=groupFamily[family];	
+				countnew++;
+				groupFamily[family]=countnew;
+			}
+			else
+			{
+				count=1;
+				groupFamily[family]=count;
+			}
+		});
+		var i=1;
+		angular.forEach(groupFamily,function(item,key)
+		{
+			//~ if( i==20)
+				//~ return false;
+			var mainArray=[];
+			angular.forEach(docs,function(doc)
+			{
+				if(key==doc.doc.wordfamily)
+				{
+					mainArray.push(doc);
+				}
+			});
+			//console.log(mainArray.length);
+			var countVerified=0;
+			var countAmbiguous=0;
+			var arrlength=mainArray.length;
+			for(var j=0;j<arrlength;j++)
+			{
+				var verifyVal=mainArray[j].doc.verify;
+				if(verifyVal)
+				{
+					if(verifyVal==1)
+					{
+						countVerified++;
+					}
+					if(verifyVal==0)
+					{
+						countAmbiguous++;
+					}
+				}
+			}
+			for(var j=0;j<arrlength;j++)
+			{
+				if(countVerified==1)
+				{
+					console.log("just one verified record");
+				}
+				else if(countVerified>1)
+				{
+					console.log("again set all as ambiguous");
+				}
+				else if(countAmbiguous>=1)
+				{
+					console.log("set all ambiguous");
+				}
+				else
+				{
+					console.log("do nothing");
+				}
+			}
+			
+			i++;
+		});
+	}
+	
 	//==========================COMPRESS RECORDS TO PACK ALL REFERENCES IN ONE SINGLE VERIFIED RECORD===============================//
 	$scope.compressVerify=function(docs)
 	{
@@ -235,5 +280,60 @@ angular.module('accentsApp')
 		});
 		//console.log(mainGroup);
 		
+	}
+	//==================================REMOVING UNUSED DATA IN DOCUMENTS=========================================//
+	$scope.removeUnusedData=function(docs)
+	{
+		angular.forEach(docs, function(item) 
+		{
+			var id=item.doc._id;
+			var rev=item.doc._rev;
+			var term=item.doc.term;
+			var source=item.doc.source;
+			var original=item.doc.original;
+			var definition=item.doc.definition;
+			var type=item.doc.type;
+			var user=item.doc.user;
+			var wordfamily=item.doc.wordfamily;
+			if(item.doc.ref)
+			{
+				var ref=item.doc.ref;
+			}
+			else
+			{
+				var ref="";
+			}
+			
+			if(item.doc.verify)
+			{
+				var verify=item.doc.verify;
+			}
+			else
+			{
+				var verify=0;
+			}
+			var data= JSON.stringify(
+								{
+									"source": source,   
+									"original":original , 
+									"definition":definition, 
+									"type": type, 
+									"user": user,
+									"term": term,
+									"ref":ref,
+									"verify":verify,
+									"wordfamily":wordfamily
+								}
+							);
+			$http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev, data).
+			success(function(data, status, headers, config) 
+			{
+				console.log(status);
+			}).
+			error(function(data, status, headers, config) 
+			{
+				console.log(status);
+			});
+		});
 	}
  });
