@@ -304,7 +304,7 @@ $('.checkbox input:checkbox').click(function() {
 				});
 			}	
 		}
-		if(ambiguous)
+		else if(ambiguous)
 		{
 			var additemverify="0";
 			var otheritemverify="0";
@@ -364,6 +364,38 @@ $('.checkbox input:checkbox').click(function() {
 					$scope.message='Error Adding record';
 				});
 			}
+		}
+		else
+		{
+			var additemverify="0";
+			var otheritemverify="0";
+			var data= JSON.stringify
+			({
+				"source": userName,   
+				"original":original , 
+				"definition":definition, 
+				"type": "term", 
+				"user": userName,
+				"term": term,
+				"ref":refrence,
+				"verify":additemverify
+			});
+			
+			if(confirm("Please Confirm the following Addition:"+data))
+			{	
+				$http.post('http://'+domainRemoteDb+'/'+remoteDb+'/', data).
+				success(function(data, status, headers, config) 
+				{
+					console.log(status);
+					$scope.message='Record Added Successfully';							
+				}).
+				error(function(data, status, headers, config) 
+				{
+					console.log(status);
+					$scope.message='Error Adding record';
+				});
+			}
+			
 		}
    };
    //////////////////////////Update data/////////////////////////////////////
@@ -514,7 +546,7 @@ $('.checkbox input:checkbox').click(function() {
 			if(string)
 			{
 				string= string.replace("_","");
-				string=string.toLowerCase();	
+				//string=string.toLowerCase();	
 				string=Utils.dotUndersRevert(string);		
 				if( ((string.indexOf(key)) !=-1) && (string.length== key.length)) 
 				{    	
@@ -525,7 +557,9 @@ $('.checkbox input:checkbox').click(function() {
 		});
 		$scope.filterresult = filtered;
 		$scope.viewkey=key;
+		 document.getElementById("sideIcon").className = "glyphicon glyphicon-chevron-down mr5 openPanel";
 		 document.getElementById("showDiv-"+key).style.display='block';
+		 
 	}
   })
 .filter('singlegroupFilter',['Utils',function(Utils){
@@ -535,6 +569,7 @@ $('.checkbox input:checkbox').click(function() {
 		var filtered = [];
 		var mainArray={};
 		var count=1;
+		var wordFamily=[];
 		
 		angular.forEach(items, function(item) 
 		{
@@ -542,9 +577,9 @@ $('.checkbox input:checkbox').click(function() {
 			if(string)
 			{
 				string= string.replace("_","");
-				string=string.toLowerCase();	
+				//string=string.toLowerCase();	
 				string=Utils.dotUndersRevert(string);		
-				search=search.toLowerCase();
+				//search=search.toLowerCase();
 				search= search.replace("_","");
 				search=Utils.dotUndersRevert(search);	
 				if( ((string.indexOf(search)) !=-1) && (string.length!= search.length)) 
@@ -559,29 +594,42 @@ $('.checkbox input:checkbox').click(function() {
 					{
 						count=1;
 						mainArray[string]=count;
-						filtered.push(item);
+						
 					}	
 				}				
 			}
 		});
-		//~ angular.forEach(mainArray, function(key,item) 
-		//~ {
-			//~ angular.forEach(filtered,function(it){
-				//~ var string1=it.doc.term;
-				//~ string1= string1.replace("_","");
-				//~ string1=string1.toLowerCase();	
-				//~ string1=Utils.dotUndersRevert(string1);	
-				//~ if(key==1)
-				//~ {
-					//~ if(string1.indexOf(item)!=-1)
-					//~ {
-						//~ subArray.push(it);
-					//~ }
-				//~ }
-				//~ 
-			//~ });
-		//~ });
-		//~ console.log(subArray);
+		angular.forEach(mainArray,function(value,key)
+		{
+			if(value==1)
+			{
+				angular.forEach(items, function(item) 
+				{
+					var string=item.doc.wordfamily;
+					if(string)
+					{
+							
+						if( ((string.indexOf(key)) !=-1) && (string.length== key.length)) 
+						{   
+								filtered.push(item); 
+								return false;
+						}				
+					}
+					else
+					{
+						var string=item.doc.term;
+						string= string.replace("_","");
+						string=Utils.dotUndersRevert(string);
+						if( ((string.indexOf(key)) !=-1) && (string.length== key.length)) 
+						{    
+								filtered.push(item); 
+								return false;
+						}
+					}
+				});
+			}
+			
+		});
 		return filtered;
 	};
 	}])
@@ -607,11 +655,11 @@ $('.checkbox input:checkbox').click(function() {
 			if(string)
 			{
 				string= string.replace("_","");
-				string=string.toLowerCase();	
+				//string=string.toLowerCase();	
 				string=Utils.dotUndersRevert(string);	
 				if(search)
 				{
-					search=search.toLowerCase();
+				//	search=search.toLowerCase();
 					search= search.replace("_","");
 					search=Utils.dotUndersRevert(search);	
 					if( ((string.indexOf(search)) !=-1) && (string.length!= search.length)) 
@@ -665,9 +713,9 @@ $('.checkbox input:checkbox').click(function() {
 			if(string)
 			{
 				string= string.replace("_","");
-				string=string.toLowerCase();	
+				//string=string.toLowerCase();	
 				string=Utils.dotUndersRevert(string);		
-				search=search.toLowerCase();
+				//search=search.toLowerCase();
 				search= search.replace("_","");
 				search=Utils.dotUndersRevert(search);	
 				if( ((string.indexOf(search)) !=-1) && (string.length!= search.length)) 
@@ -683,13 +731,55 @@ $('.checkbox input:checkbox').click(function() {
 						count=1;
 						mainArray[string]=count;
 					}	
-					
-					filtered.push(item);
 				}				
 			}
 		});
 		//console.log(mainArray);
 		return mainArray;
+	};
+	
+}])
+.filter('groupfiltercount',['Utils',function(Utils){
+	return function(items,search)
+	{
+		var subArray={};
+		var filtered = [];
+		var mainArray={};
+		var count=1;
+		
+		angular.forEach(items, function(item) 
+		{
+			var string=item.doc.term;
+			if(string)
+			{
+				string= string.replace("_","");
+				//string=string.toLowerCase();	
+				string=Utils.dotUndersRevert(string);		
+				//search=search.toLowerCase();
+				search= search.replace("_","");
+				search=Utils.dotUndersRevert(search);	
+				if( ((string.indexOf(search)) !=-1) && (string.length!= search.length)) 
+				{    	
+					if(string in mainArray)
+					{
+						var countnew=mainArray[string];	
+						countnew++;
+						mainArray[string]=countnew;	
+					}
+					else
+					{
+						count=1;
+						mainArray[string]=count;
+					}	
+				}				
+			}
+		});
+		var sum=0;
+		angular.forEach(mainArray,function(it)
+		{
+			sum=sum+it;
+		});
+		return sum;
 	};
 	
 }])
