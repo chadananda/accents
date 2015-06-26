@@ -200,17 +200,19 @@ angular.module('accentsApp')
 		var i=1;
 		angular.forEach(groupFamily,function(item,key)
 		{
-			//~ if( i==20)
+			//~ if( i==200)
 				//~ return false;
 			var mainArray=[];
 			angular.forEach(docs,function(doc)
 			{
-				if(key==doc.doc.wordfamily)
+				var searchString=doc.doc.term;
+				searchString= searchString.replace("_","");
+				searchString=Utils.dotUndersRevert(searchString);	
+				if(key==searchString)
 				{
 					mainArray.push(doc);
 				}
 			});
-			//console.log(mainArray.length);
 			var countVerified=0;
 			var countAmbiguous=0;
 			var arrlength=mainArray.length;
@@ -229,28 +231,175 @@ angular.module('accentsApp')
 					}
 				}
 			}
+			
+			var refArr=[];
+			
 			for(var j=0;j<arrlength;j++)
 			{
 				if(countVerified==1)
 				{
-					console.log("just one verified record");
-				}
-				else if(countVerified>1)
-				{
-					console.log("again set all as ambiguous");
-				}
-				else if(countAmbiguous>=1)
-				{
-					console.log("set all ambiguous");
+					//console.log("just one verified record");
+					if(mainArray[j].doc.verify && mainArray[j].doc.verify==1)
+					{
+						var id=mainArray[j].doc._id;
+						var rev=mainArray[j].doc._rev;
+						var source=mainArray[j].doc.source;
+						var term=mainArray[j].doc.term;
+						var type=mainArray[j].doc.type;
+						var user=mainArray[j].doc.user;
+						var wordfamily=mainArray[j].doc.wordfamily;
+						if(mainArray[j].doc.original)
+						{
+							var original=mainArray[j].doc.original;
+						}
+						else
+						{
+							var original="";
+						}
+						if(mainArray[j].doc.definition)
+						{
+							var definition=mainArray[j].doc.definition;
+						}
+						else
+						{
+							var definition="";
+						}
+						if(mainArray[j].doc.ref)
+						{
+							var ref=mainArray[j].doc.ref;
+							if(refArr.indexOf(ref)==-1)
+								refArr.push(ref);
+						}
+						
+						var verify=mainArray[j].doc.verify;					
+						
+					}
+					else
+					{
+						if(mainArray[j].doc.ref)
+						{
+							var ref=mainArray[j].doc.ref;
+							if(refArr.indexOf(ref)==-1)
+								refArr.push(ref);
+						}
+						var delid=mainArray[j].doc._id;
+						var delrev=mainArray[j].doc._rev;
+						$http.delete('http://'+domainRemoteDb+'/'+remoteDb+'/'+delid+'?rev='+delrev).
+						success(function(data,status, headers, config) 
+						{
+							console.log(status);
+						}).
+						error(function(data, status, headers, config) 
+						{
+							console.log(status);
+						}); 
+					}
+					if(j==(arrlength-1))
+						{
+							 var allReferences=refArr.join();
+							 var data= JSON.stringify(
+								{
+									"source": source,   
+									"original":original , 
+									"definition":definition, 
+									"type": type, 
+									"user": user,
+									"term": term,
+									"ref":allReferences,
+									"verify":verify,
+									"wordfamily":wordfamily
+								}
+							);
+							$http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev, data).
+							success(function(data, status, headers, config) 
+							{
+								console.log(status);
+							}).
+							error(function(data, status, headers, config) 
+							{
+								console.log(status);
+							});
+							console.log(data);
+						}
 				}
 				else
 				{
-					console.log("do nothing");
+					//console.log("set all ambiguous");
+					var id=mainArray[j].doc._id;
+					var rev=mainArray[j].doc._rev;
+					var source=mainArray[j].doc.source;
+					var term=mainArray[j].doc.term;
+					var type=mainArray[j].doc.type;
+					var user=mainArray[j].doc.user;
+					var wordfamily=mainArray[j].doc.wordfamily;
+					if(mainArray[j].doc.original)
+					{
+						var original=mainArray[j].doc.original;
+					}
+					else
+					{
+						var original="";
+					}
+					if(mainArray[j].doc.definition)
+					{
+						var definition=mainArray[j].doc.definition;
+					}
+					else
+					{
+						var definition="";
+					}
+					if(mainArray[j].doc.ref)
+					{
+						var ref=mainArray[j].doc.ref;
+					}
+					else
+					{
+						var ref="";
+					}
+					var verify="0";
+					var data= JSON.stringify(
+								{
+									"source": source,   
+									"original":original , 
+									"definition":definition, 
+									"type": type, 
+									"user": user,
+									"term": term,
+									"ref":ref,
+									"verify":verify,
+									"wordfamily":wordfamily
+								}
+							);
+				$http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev, data).
+				success(function(data, status, headers, config) 
+				{
+					console.log(status);
+				}).
+				error(function(data, status, headers, config) 
+				{
+					console.log(status);
+				});
+				//	console.log(id);
 				}
+				
+				//~ else if(countVerified>1)
+				//~ {
+					//~ console.log("2-"+mainArray[j].doc.term);
+					//~ console.log("again set all as ambiguous");
+				//~ }
+				//~ else if(countAmbiguous>=1)
+				//~ {
+					//~ console.log("3-"+mainArray[j].doc.term);
+					//~ console.log("set all ambiguous");
+				//~ }
+				
 			}
-			
+		
+	
 			i++;
+			//console.log(mainArray);
 		});
+		
 	}
 	
 	//==========================COMPRESS RECORDS TO PACK ALL REFERENCES IN ONE SINGLE VERIFIED RECORD===============================//
@@ -335,5 +484,29 @@ angular.module('accentsApp')
 				console.log(status);
 			});
 		});
+	}
+	
+	$scope.unique = function(origArr) 
+	{
+		var newArr = [],
+		origLen = origArr.length,
+		found, x, y;
+		for (x = 0; x < origLen; x++) 
+		{
+			found = undefined;
+			for (y = 0; y < newArr.length; y++) 
+			{
+				if (origArr[x] === newArr[y]) 
+				{
+					found = true;
+					break;
+				}
+			}
+			if (!found) 
+			{
+				newArr.push(origArr[x]);
+			}
+		}
+		return newArr;
 	}
  });
