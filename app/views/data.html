@@ -71,7 +71,7 @@
             <div class="col-lg-12 clearfix mb10 p0 pt10 pb30 addtext mt30"> 
 				<div class="col-lg-12 mobile-margin">
 					 <h2 class="pl15 pr15" id="toptext" style="font-weight:bold;">Term Add</h2> 
-					<h2 class="col-lg-12 clearfix text-center" id="heading-term" style="color:white;font-weight:bold;margin:10px;margin-top:-60px;"></h2>
+					<h2 class="col-lg-12 clearfix text-center" id="heading-term" style="color:white;font-weight:bold;margin:10px;margin-top:-42px;"></h2>
 				</div>   
                
                 <div class="col-lg-12 clearfix"> 
@@ -173,7 +173,7 @@
 						<div class="col-lg-12 clearfix mt0 autosearch-container" ng-if="search.doc.term">
 							<h5 class="mb10 "><span class="mr5 ">{{(docs|groupfiltercount:customi2html(search.doc.term))}}</span>Partial Matches</h5>  
 							<div ng-repeat="(key, value)  in docs |groupfilter:customi2html(search.doc.term)" class="searchGroup" ng-click="getAllRecords('{{key}}',docs)"  ng-show="value!=1" >
-								<span   class="glyphicon glyphicon-play mr5 openPanel" id="sideIcon"></span>	<u>{{key}}</u>-({{value}})
+								<span   class="glyphicon glyphicon-play mr5 openPanel" id="sideIcon-{{key}}"></span>	<u>{{key}}</u>-({{value}})
 								<div id="showDiv-{{key}}" class="col-md-11 col-md-offset-1" ng-show="viewkey==key && value!=1">
 									<div ng-repeat="t in filterresult" >
 										<span ng-bind-html="i2html(customi2html(t.term))">{{t.term}}</span>

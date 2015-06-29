@@ -546,7 +546,7 @@ $('.checkbox input:checkbox').click(function() {
 			if(string)
 			{
 				string= string.replace("_","");
-				//string=string.toLowerCase();	
+				string=string.toLowerCase();	
 				string=Utils.dotUndersRevert(string);		
 				if( ((string.indexOf(key)) !=-1) && (string.length== key.length)) 
 				{    	
@@ -557,7 +557,8 @@ $('.checkbox input:checkbox').click(function() {
 		});
 		$scope.filterresult = filtered;
 		$scope.viewkey=key;
-		 document.getElementById("sideIcon").className = "glyphicon glyphicon-chevron-down mr5 openPanel";
+		$("span[id^='sideIcon-']").addClass("glyphicon glyphicon-play mr5 openPanel");
+		 document.getElementById("sideIcon-"+key).className = "glyphicon glyphicon-chevron-down mr5 openPanel";
 		 document.getElementById("showDiv-"+key).style.display='block';
 		 
 	}
@@ -577,9 +578,9 @@ $('.checkbox input:checkbox').click(function() {
 			if(string)
 			{
 				string= string.replace("_","");
-				//string=string.toLowerCase();	
+				string=string.toLowerCase();	
 				string=Utils.dotUndersRevert(string);		
-				//search=search.toLowerCase();
+				search=search.toLowerCase();
 				search= search.replace("_","");
 				search=Utils.dotUndersRevert(search);	
 				if( ((string.indexOf(search)) !=-1) && (string.length!= search.length)) 
@@ -618,12 +619,16 @@ $('.checkbox input:checkbox').click(function() {
 					else
 					{
 						var string=item.doc.term;
-						string= string.replace("_","");
-						string=Utils.dotUndersRevert(string);
-						if( ((string.indexOf(key)) !=-1) && (string.length== key.length)) 
-						{    
-								filtered.push(item); 
-								return false;
+						if(string)
+						{
+							string= string.replace("_","");
+							string=Utils.dotUndersRevert(string);
+							string=string.toLowerCase();	
+							if( ((string.indexOf(key)) !=-1) && (string.length== key.length)) 
+							{    
+									filtered.push(item); 
+									return false;
+							}
 						}
 					}
 				});
@@ -713,9 +718,9 @@ $('.checkbox input:checkbox').click(function() {
 			if(string)
 			{
 				string= string.replace("_","");
-				//string=string.toLowerCase();	
+				string=string.toLowerCase();	
 				string=Utils.dotUndersRevert(string);		
-				//search=search.toLowerCase();
+				search=search.toLowerCase();
 				search= search.replace("_","");
 				search=Utils.dotUndersRevert(search);	
 				if( ((string.indexOf(search)) !=-1) && (string.length!= search.length)) 
@@ -753,9 +758,9 @@ $('.checkbox input:checkbox').click(function() {
 			if(string)
 			{
 				string= string.replace("_","");
-				//string=string.toLowerCase();	
+				string=string.toLowerCase();	
 				string=Utils.dotUndersRevert(string);		
-				//search=search.toLowerCase();
+				search=search.toLowerCase();
 				search= search.replace("_","");
 				search=Utils.dotUndersRevert(search);	
 				if( ((string.indexOf(search)) !=-1) && (string.length!= search.length)) 

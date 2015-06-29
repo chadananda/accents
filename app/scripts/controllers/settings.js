@@ -86,7 +86,20 @@ angular.module('accentsApp')
 			console.log(docs.id+"no original");
 		  }
     });
-    $scope.setAmbiguous(alldocs);
+     $http.get('http://'+domainRemoteDb+'/'+remoteDb+'/_all_docs?include_docs=true')
+		.success(function(data) 
+		{
+			if(data.rows)
+			{		
+				$scope.docs=data.rows;
+				$scope.count=data.total_rows;
+			}	
+		})
+		.error(function(error) 
+		{
+			console.log(error);
+		});
+    $scope.setAmbiguous($scope.docs);
  };
  
  
@@ -177,12 +190,12 @@ angular.module('accentsApp')
 		});
 	}
 	//==================SET EACH RECORD IN A WORD FAMILY GROUP TO AMBIGUOUS IF MORE THAN ONE VERIFIED OR IF NONE===============//
-	$scope.setAmbiguous=function(docs)
+	$scope.setAmbiguous=function(alldocs)
 	{
 		var groupFamily={};
 		var count=1;
 		console.log('calledhere');
-		angular.forEach(docs,function(doc)
+		angular.forEach(alldocs,function(doc)
 		{
 			var family=doc.doc.wordfamily; 
 			if(family in groupFamily)
@@ -203,15 +216,19 @@ angular.module('accentsApp')
 			//~ if( i==200)
 				//~ return false;
 			var mainArray=[];
-			angular.forEach(docs,function(doc)
+			angular.forEach(alldocs,function(doc)
 			{
+				console.log(doc);
 				var searchString=doc.doc.term;
-				searchString= searchString.replace("_","");
-				searchString=Utils.dotUndersRevert(searchString);	
-				if(key==searchString)
+				if(searchString)
 				{
-					mainArray.push(doc);
-				}
+					searchString= searchString.replace("_","");
+					searchString=Utils.dotUndersRevert(searchString);	
+					if(key==searchString)
+					{
+						mainArray.push(doc);
+					}
+				}				
 			});
 			var countVerified=0;
 			var countAmbiguous=0;

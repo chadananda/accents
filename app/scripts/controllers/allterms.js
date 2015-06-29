@@ -445,6 +445,30 @@ $scope.message='Error adding record';
 		return filtered;
 	}
 }])
+.filter("checkfilter",function(){
+	return function(items)
+	{
+		var filtered = [];
+		var checked=document.getElementById("verifiedCheckbox");
+		if(checked.checked)
+		{
+			angular.forEach(items, function(item) 
+			{
+				if(item.doc.verify==1)
+					filtered.push(item);
+			});
+		}
+		else
+		{
+			angular.forEach(items, function(item) 
+			{
+					filtered.push(item);
+			});
+		}
+		
+		return filtered;
+	}
+})
 
 
 
