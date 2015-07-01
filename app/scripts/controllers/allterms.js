@@ -454,7 +454,7 @@ $scope.message='Error adding record';
 		{
 			angular.forEach(items, function(item) 
 			{
-				if(item.doc.verify==1)
+				if(!item.doc.verify)
 					filtered.push(item);
 			});
 		}

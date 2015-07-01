@@ -19,9 +19,9 @@ angular
   ])
   //======DEFINE ALL CONSTANTS HERE=========/
    .constant("myConfig", {
-        "url": "http://127.0.0.1:5986/accentsnew/",
+        "url": "http://127.0.0.1:5986/accents/",
         "remoteDbDomain":"127.0.0.1:5986",
-        "database":"accentsnew"
+        "database":"accents"
     })
     //======ALL ROUTES AND CORRESSPONDING CONTROLLERS ARE DEFINED HERE=======/
   .config(function ($routeProvider) {

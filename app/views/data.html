@@ -27,6 +27,7 @@
                           </div>
                           <div class="media-body">
                               <h3 class="dispinblk m0 valignmiddle">Interminable<br /> Accents</h3>
+                              <br/>
                               <p  class="dispinblk m0 valignmiddle">A proof of concept suggestion builder for Baha’i terms</p>
                           </div>
                        </div>
@@ -79,7 +80,7 @@
 				 <div class="col-md-12 mb10">
                   <div class="form-group col-sm-6 ">
 					 
-                    <input type="text" class="form-control chkval" name="term" id="term" style="font-size:20px !important;" ng-model-options="{ debounce: 250 }" ng-model="search.doc.term" />
+                    <input type="text" class="form-control chkval" name="term" id="term" style="font-size:20px !important;" ng-model-options="{ debounce: 1000 }" ng-model="search.doc.term" />
                     <input type="hidden" id="keyid"  />
                     <input type="hidden" id="keyrev"  />  
                      <span class="inputexm">Term</span>
@@ -130,10 +131,10 @@
                 <div class="col-lg-12 clearfix  mt10   "> 
                   <div class="col-sm-5 col-md-5 clearfix ">
                          <div class="checkbox mt20 dispinblk">
-                            <label style="padding-left:13px;"><input type="checkbox" ng-model="verified" /> Verified</label>
+                            <label style="padding-left:13px;"><input type="checkbox" ng-model="verified" ng-checked="editdata.verify==1"/> Verified</label>
                           </div>
                           <div class="checkbox mt20 dispinblk">
-                            <label style="padding-left:10px;"><input type="checkbox" ng-model="ambiguous" /> Ambiguous</label>
+                            <label style="padding-left:10px;"><input type="checkbox" ng-model="ambiguous"  ng-checked="editdata.verify==0" />Ambiguous</label>
                           </div>
                           <div class="dispinblk playmic">
                              <a href="javascript:void();" class="disabled">  <img src="images/play.png" alt="mic" /></a>
@@ -173,29 +174,29 @@
 						<div class="col-lg-12 clearfix mt0 autosearch-container" ng-if="search.doc.term">
 							<h5 class="mb10 "><span class="mr5 ">{{(docs|groupfiltercount:customi2html(search.doc.term))}}</span>Partial Matches</h5>  
 							<div ng-repeat="(key, value)  in docs |groupfilter:customi2html(search.doc.term)" class="searchGroup" ng-click="getAllRecords('{{key}}',docs)"  ng-show="value!=1" >
-								<span   class="glyphicon glyphicon-play mr5 openPanel" id="sideIcon-{{key}}"></span>	<u>{{key}}</u>-({{value}})
+								<span   class="glyphicon glyphicon-play mr5 openPanel" id="sideIcon-{{key}}"></span>	<u>{{key}}</u> ({{value}})
 								<div id="showDiv-{{key}}" class="col-md-11 col-md-offset-1" ng-show="viewkey==key && value!=1">
 									<div ng-repeat="t in filterresult" >
 										<span ng-bind-html="i2html(customi2html(t.term))">{{t.term}}</span>
 										<span class="glyphicon glyphicon-ok-circle ml10" ng-if="t.verify==1"></span>
-										<button  ng-click="editdoc(t._id,t._rev);" class="btn btn-primary btn-xs editbtn mb10" type="button">
+										<button  ng-click="editdoc(t._id,t._rev);" class="btn btn-primary btn-xs editbtn mb10" type="button" style="margin-left: 10px;">
 											<span class="glyphicon glyphicon-edit"></span>
 										</button>
-										<button ng-click="deletedoc(t._id,t._rev);" class="btn btn-danger btn-xs remove mb10" type="button" style="float:none;">
+										<button ng-click="deletedoc(t._id,t._rev);" class="btn btn-danger btn-xs remove mb10" type="button" style="float:none;margin-left: 10px;">
 											<span class="glyphicon glyphicon-remove"></span>
 										</button>
 											<!--<span class="glyphicon glyphicon-remove ml10" ng-click="deletedoc(t._id,t._rev);" ></span>-->
 									</div>
 								</div>
 							</div>
-							<div ng-repeat="doc  in docs |singlegroupFilter:customi2html(search.doc.term)" class="searchGroup"   >
-								<span class="glyphicon glyphicon-play mr5 openPanel"></span>
+							<div ng-repeat="doc  in docs |singlegroupFilter:customi2html(search.doc.term)" class="searchSingle"   >
+								<span class="glyphicon glyphicon-record mr5 openPanel"></span>
 								<span ng-bind-html="i2html(customi2html(doc.doc.term))">{{doc.doc.term}}</span>
 								<span class="glyphicon glyphicon-ok-circle ml10" ng-if="doc.doc.verify==1"></span>
-								<button  ng-click="editdoc(doc.doc._id,doc.doc._rev);" class="btn btn-primary btn-xs editbtn mb10" type="button">
+								<button  ng-click="editdoc(doc.doc._id,doc.doc._rev);" class="btn btn-primary btn-xs editbtn mb10" type="button"  style="margin-left: 10px;">
 									<span class="glyphicon glyphicon-edit"></span>
 								</button>
-								<button ng-click="deletedoc(doc.doc._id,doc.doc._rev);" class="btn btn-danger btn-xs remove mb10" type="button" style="float:none;">
+								<button ng-click="deletedoc(doc.doc._id,doc.doc._rev);" class="btn btn-danger btn-xs remove mb10" type="button" style="float:none;margin-left: 10px;">
 									<span class="glyphicon glyphicon-remove"></span>
 								</button>
 							</div>
