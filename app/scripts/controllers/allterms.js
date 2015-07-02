@@ -8,7 +8,7 @@
  * Controller of the accentsApp
  */
 angular.module('accentsApp')
-  .controller('AlltermsCtrl', function ($scope,$http,getRecords,$window,$filter,myConfig,Utils,$sce,docData) {
+  .controller('AlltermsCtrl', function ($rootScope,$scope,$http,getRecords,$window,$filter,myConfig,Utils,$sce,docData) {
     $scope.docs={};
     $scope.awesomeThings = [
       'HTML5 Boilerplate',
@@ -18,6 +18,15 @@ angular.module('accentsApp')
   
 var domainRemoteDb=myConfig.remoteDbDomain;
 var remoteDb=myConfig.database;
+//===================Reload Page on route change===========================//
+$rootScope.$on('$locationChangeStart', function($event, changeTo, changeFrom) {
+      if (changeTo == changeFrom) {
+        return;
+      }
+ 
+      window.location.assign(changeTo);
+      window.location.reload(true);
+    });
 //===========Calling Utility Functions============//
  $scope.i2html = function(text)
  {

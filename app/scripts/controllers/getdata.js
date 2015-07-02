@@ -20,6 +20,15 @@ angular.module('accentsApp')
     
 var domainRemoteDb=myConfig.remoteDbDomain;
 var remoteDb=myConfig.database;
+//===================Reload Page on route change===========================//
+$rootScope.$on('$locationChangeStart', function($event, changeTo, changeFrom) {
+      if (changeTo == changeFrom) {
+        return;
+      }
+ 
+      window.location.assign(changeTo);
+      window.location.reload(true);
+    });
 //===========Calling Utility Functions============//
  $scope.i2html = function(text)
  {
@@ -35,12 +44,16 @@ var remoteDb=myConfig.database;
  }
  //============On key up of the term textbox change the term=========//
  $( "#term" ).keyup(function() {
-	 var term = $('#term').val();	 
+	 var term = $('#term').val();	
 	 if(term!="")
 		{
 			var changedTerm=$scope.customi2html(term);
 			$("#term").val(changedTerm);
 			$("#heading-term").html(Utils.ilm2HTML(changedTerm));
+		}
+		else
+		{
+			$("#heading-term").html("");
 		}
 });
 //Every checkboxes in the page
@@ -48,7 +61,19 @@ $('.checkbox input:checkbox').click(function() {
     $('.checkbox input:checkbox').not(this).prop('checked', false);
 });  
 
-
+$scope.checkVerifiedCheckBox=function()
+{
+	var field=document.getElementById('original');
+	if (field.value == '') 
+	{
+        document.getElementById('verifiedCheckbox').checked=false;
+    }
+    else
+    {
+		document.getElementById('verifiedCheckbox').checked=true;
+	}
+	
+}
 	 //////////////////////////Fetch  data/////////////////////////////////////
 	// $scope.getAllData = function() {
 	$("#spinner").show();
@@ -231,8 +256,9 @@ $('.checkbox input:checkbox').click(function() {
 				if(sessionStorage.length!=0)
 				{
 					sessionStorage.clear();						
-					$scope.testFunction();
+					
 				}	
+				$scope.testFunction();
 			}).
 			error(function(data, status, headers, config) {
 			});   
@@ -295,7 +321,8 @@ $('.checkbox input:checkbox').click(function() {
 						{
 							console.log(status);
 						});
-					});					
+					});	
+									
 				}).
 				error(function(data, status, headers, config) 
 				{
@@ -410,114 +437,163 @@ $('.checkbox input:checkbox').click(function() {
     var definition=$scope.editdata.definition;
     var verified=$scope.verified;
     var ambiguous=$scope.ambiguous;
-    var additemverify="0";
-	var otheritemverify="0";
-    if(verified)
-    {
-		var additemverify="1";
-		var otheritemverify="0";
-	}
-	if(ambiguous)
-    {
-		var additemverify="1";
-		var otheritemverify="1";
-	}
+    //FILTER FOR WHOLE WORD MATCHES
+	$scope.wholeWordMatches = $filter('wholeWordFilter')(items,term);
 	var sessionArray= JSON.parse( localStorage.getItem("session-user"));
-	var userName=sessionArray.username;
-    var data= JSON.stringify(
-								{
-									"source": userName,   
-									"original":original , 
-									"definition":definition, 
-									"type": "term", 
-									"user": userName,
-									"term": term,
-									"ref":refrence,
-									"verify":additemverify
-								}
-							);   
-	//FILTER FOR PARTIAL RECORDS
-    $scope.partialitems = $filter('myfilterData')(items,searchTerm);
-    //FILTER FOR EXACT RECORDS
-    $scope.exactitems = $filter('filter',true)(items,{doc: {term: searchTerm}});
-    $scope.filteredItems =  $scope.partialitems.concat($scope.exactitems);
-    var uniqueid=[];
-    $scope.finalItems=[];
-    for(var i = 0; i< $scope.filteredItems.length; i++)
-    {  
-		if($scope.filteredItems[i].id!=id)
+	var userName=sessionArray.username;		
+	if(verified)
+	{
+		var additemverify="1";
+		var allRef=[];
+		var matchTerms=[];
+		allRef.push(refrence);
+		angular.forEach($scope.wholeWordMatches ,function(match)
 		{
-			if((uniqueid.indexOf($scope.filteredItems[i].id) === -1))
+			if(match.doc._id!=id)
 			{
-				uniqueid.push($scope.filteredItems[i].id); 
-				$scope.finalItems.push($scope.filteredItems[i]);       
-			}        
-		}
-	}
-    //console.log(JSON.stringify($scope.finalItems));  
-     if(confirm("Please Confirm the following updation:"+data))
-     {
-		$http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev, data).
-		success(function(data, status, headers, config) 
-		{
-			 for(var i = 0; i< $scope.finalItems.length; i++)
+				var z = ({"id":match.doc._id,"rev":match.doc._rev});
+				allRef.push(match.doc.ref);
+				matchTerms.push(z);
+			}
+		});	
+		var allReferences=allRef.join();
+		var data= JSON.stringify
+		({
+			"source": userName,   
+			"original":original , 
+			"definition":definition, 
+			"type": "term", 
+			"user": userName,
+			"term": searchTerm,
+			"ref":allReferences,
+			"verify":additemverify
+		});
+		if(confirm("Please Confirm the following Updation:"+data))
+		{	
+			$http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev, data).
+			success(function(data, status, headers, config) 
 			{
-			  var id=$scope.finalItems[i].id;
-			  var rev=$scope.finalItems[i].doc._rev;
-			  var data= JSON.stringify
-			   ({
-						   "source": userName,   
-						   "original":$scope.finalItems[i].doc.original , 
-						   "definition":$scope.finalItems[i].doc.definition, 
-						   "type": "term", 
-						   "user": userName,
-						   "term": $scope.finalItems[i].doc.term,
-						   "ref":  $scope.finalItems[i].doc.ref,
-						   "verify":otheritemverify
-						});
-						
-						$http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev, data).
+				console.log(status);
+				$scope.message='Record Updated Successfully';
+				angular.forEach(matchTerms ,function(match)
+				{
+					if(match.id!=id)
+					{
+						$http.delete('http://'+domainRemoteDb+'/'+remoteDb+'/'+match.id+'?rev='+match.rev).
 						success(function(data, status, headers, config) 
 						{
-							$scope.message='Record Updated Successfully';
-							//document.getElementById("addform").reset();
-				//$scope.addState();
-				//$scope.docs=[];
-				$http.get('http://'+domainRemoteDb+'/'+remoteDb+'/_all_docs?include_docs=true')
-					.success(function(data) 
-					{		
-						console.log('called');	
-						if(data.rows)
-						{
-							$scope.docs=data.rows;
-							$scope.count=data.total_rows;
-						}	
-												
-					})
-					.error(function(error) 
-					{
-						console.log(error);
-					});							
+							console.log(status);
 						}).
 						error(function(data, status, headers, config) 
 						{
 							console.log(status);
-							$scope.message='Error updating record';
 						});
-				
+					}
+				});	
+				$scope.allDocsFunc();
+			}).
+			error(function(data, status, headers, config) 
+			{
+				console.log(status);
+			});
+			
+		}
+		
+	}
+	else if(ambiguous)
+	{
+		var data= JSON.stringify
+		({
+			"source": userName,   
+			"original":original , 
+			"definition":definition, 
+			"type": "term", 
+			"user": userName,
+			"term": searchTerm,
+			"ref":refrence,
+			"verify":"0"
+		});
+		if(confirm("Please Confirm the following Updation:"+data))
+		{	
+			$http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev, data).
+		success(function(data, status, headers, config) 
+		{
+			console.log(status);
+			$scope.message='Record Updated Successfully';
+			//update all other items 
+			for(var i = 0; i< $scope.wholeWordMatches.length; i++)
+			{	
+				if($scope.wholeWordMatches[i].id!=id)
+				{
+					var id=$scope.wholeWordMatches[i].id;
+				var rev=$scope.wholeWordMatches[i].doc._rev;
+				var data= JSON.stringify
+				({
+				   "source": userName,   
+				   "original":$scope.wholeWordMatches[i].doc.original , 
+				   "definition":$scope.wholeWordMatches[i].doc.definition, 
+				   "type": "term", 
+				   "user": userName,
+				   "term": $scope.wholeWordMatches[i].doc.term,
+				   "ref":  $scope.wholeWordMatches[i].doc.ref,
+				   "verify":"0"
+				});
+				$http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev, data).
+				success(function(data, status, headers, config) 
+				{
+					console.log(status);
+					$scope.message='Record Updated Successfully';
+				}).
+				error(function(data, status, headers, config) 
+				{
+					console.log(status);
+					$scope.message='Error Updating record';
+				});
 				}
-
 				
+				
+			}		
 		}).
 		error(function(data, status, headers, config) 
 		{
 			console.log(status);
+			$scope.message='Error Updating record';
 		});
+		}
+		
 	}
 	else
 	{
-		return false;
+		var additemverify="0";
+			var otheritemverify="0";
+			var data= JSON.stringify
+			({
+				"source": userName,   
+				"original":original , 
+				"definition":definition, 
+				"type": "term", 
+				"user": userName,
+				"term": term,
+				"ref":refrence,
+				"verify":additemverify
+			});
+			
+			if(confirm("Please Confirm the following Addition:"+data))
+			{	
+				$http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev, data).
+				success(function(data, status, headers, config) 
+				{
+					console.log(status);
+					$scope.message='Record Added Successfully';							
+				}).
+				error(function(data, status, headers, config) 
+				{
+					console.log(status);
+					$scope.message='Error Adding record';
+				});
+			}
 	}
+    
 };    
     
      //////////////////////////Search data/////////////////////////////////////
@@ -609,7 +685,7 @@ $('.checkbox input:checkbox').click(function() {
 					var string=item.doc.wordfamily;
 					if(string)
 					{
-							
+						string=string.toLowerCase();		
 						if( ((string.indexOf(key)) !=-1) && (string.length== key.length)) 
 						{   
 								filtered.push(item); 

@@ -77,7 +77,7 @@
 
                 <div class="col-lg-12 clearfix">
                 <form class="form-inline clearfix" id="addform">
-				 <div class="col-md-12 mb10">
+				 <div class="col-md-12">
                   <div class="form-group col-sm-6 ">
 
                     <input type="text" class="form-control chkval" name="term" id="term" style="font-size:20px !important;" ng-model-options="{ debounce: 1000 }" ng-model="search.doc.term" />
@@ -95,7 +95,7 @@
                   </div>
                    <div class="col-md-12">
                   <div class="form-group posrleative col-sm-6 ">
-                     <input type="text" name="original" class="form-control chkval openautochoose" ng-model="editdata.original" style="font-size:20px !important;" />
+                     <input type="text" name="original" class="form-control chkval openautochoose"  id="original" ng-model="editdata.original" style="font-size:20px !important;" ng-change="checkVerifiedCheckBox()"/>
 
                        <div class=" col-lg-12">
                                 <div class=" autochoose">
@@ -131,10 +131,10 @@
                 <div class="col-lg-12 clearfix  mt10   ">
                   <div class="col-sm-5 col-md-5 clearfix ">
                          <div class="checkbox mt20 dispinblk">
-                            <label style="padding-left:13px;"><input type="checkbox" ng-model="verified" ng-checked="editdata.verify==1"/> Verified</label>
+                            <label style="padding-left:13px;"><input type="checkbox" ng-model="verified" id="verifiedCheckbox" ng-checked="editdata.verify==1"/> Verified</label>
                           </div>
                           <div class="checkbox mt20 dispinblk">
-                            <label style="padding-left:10px;"><input type="checkbox" ng-model="ambiguous"  ng-checked="editdata.verify==0" />Ambiguous</label>
+                            <label style="padding-left:10px;"><input type="checkbox" ng-model="ambiguous"  />Ambiguous</label>
                           </div>
                           <div class="dispinblk playmic">
                              <a href="javascript:void();" class="disabled">  <img src="images/play.png" alt="mic" /></a>
