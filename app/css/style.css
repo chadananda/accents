@@ -227,7 +227,7 @@ body{background:url('../images/bodybg.png') repeat; }
 	.divSecond
 	{
 		float: left;
-		width: 58%;
+		width: 54%;
 	}
 	.divThird
 	{
@@ -561,7 +561,7 @@ body{background:url('../images/bodybg.png') repeat; }
 
  	.divThird
 	{
-		font-size: 20px;
+		font-size: 24px;
 	}
 	.divThird input[type=checkbox] {
 	  /* Double-sized Checkboxes */
