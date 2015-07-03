@@ -20,14 +20,15 @@
             <div class="col-lg-12 clearfix  mb10 p0 pt10 pb10">
                 <div class="col-sm-6 logo p0 valignmiddle mt10">
                       <div class="media">
-                          <div class="media-left pull-left mainlogo">
+                          <div class="media-left pull-left">
                             <a href="index.html">
                                 <img src="images/ocean-logo.svg" alt="logo" class="img-responsive dispinblk valignmiddle"/>
                             </a>
                           </div>
                           <div class="media-body">
                               <h3 class="dispinblk m0 valignmiddle">Interminable<br /> Accents</h3>
-                              <p  class=" m0 valignmiddle">A dictionary builder for Bahá’í terms</p>
+                              <br/>
+                              <p  class="dispinblk m0 valignmiddle">A dictionary builder for Bahá’í terms</p>
                           </div>
                        </div>
                 </div>
@@ -70,14 +71,8 @@
 
             <div class="col-lg-12 clearfix mb10 p0 pt10 pb30 addtext mt30">
 				<div class="col-lg-12 mobile-margin">
-					<div class="row">
-						<div class="col-md-4 col-xs-5">
-							 <h2 class="pl15 pr15" id="toptext" style="font-weight:bold;">Add:</h2>
-						</div>
-						<div class="col-md-7  col-xs-7 term-top">
-							<h2 id="heading-term" style="color:white;font-weight:bold;"></h2>
-						</div>
-					</div>
+					 <h2 class="pl15 pr15" id="toptext" style="font-weight:bold;">Term Add</h2>
+					<h2 class="col-lg-12 clearfix text-center" id="heading-term" style="color:white;font-weight:bold;margin:10px;margin-top:-42px;"></h2>
 				</div>
 
                 <div class="col-lg-12 clearfix">
@@ -85,7 +80,7 @@
 				 <div class="col-md-12">
                   <div class="form-group col-sm-6 ">
 
-                    <input type="text" class="form-control chkval" name="term" id="term" style="font-size:20px !important;" ng-model-options="{ debounce: 1000 }" ng-minlength="3" ng-model="search.doc.term" />
+                    <input type="text" class="form-control chkval" name="term" id="term" style="font-size:20px !important;" ng-model-options="{ debounce: 1000 }" ng-model="search.doc.term" />
                     <input type="hidden" id="keyid"  />
                     <input type="hidden" id="keyrev"  />
                      <span class="inputexm">Term</span>
@@ -171,7 +166,7 @@
 									<span class="glyphicon glyphicon-edit"></span>
 								</button>
 								<!--<span class="glyphicon glyphicon-remove ml10" ng-click="deletedoc(docobj.doc._id,docobj.doc._rev);" ></span>-->
-								<button ng-click="deletedoc(docobj.doc._id,docobj.doc._rev,docs);" class="btn btn-danger btn-xs remove mb10" type="button" style="float:none;">
+								<button ng-click="deletedoc(docobj.doc._id,docobj.doc._rev);" class="btn btn-danger btn-xs remove mb10" type="button" style="float:none;">
 									<span class="glyphicon glyphicon-remove"></span>
 								</button>
 							</div>
@@ -187,7 +182,7 @@
 										<button  ng-click="editdoc(t._id,t._rev);" class="btn btn-primary btn-xs editbtn mb10" type="button" style="margin-left: 10px;">
 											<span class="glyphicon glyphicon-edit"></span>
 										</button>
-										<button ng-click="deletedoc(t._id,t._rev,docs);" class="btn btn-danger btn-xs remove mb10" type="button" style="float:none;margin-left: 10px;">
+										<button ng-click="deletedoc(t._id,t._rev);" class="btn btn-danger btn-xs remove mb10" type="button" style="float:none;margin-left: 10px;">
 											<span class="glyphicon glyphicon-remove"></span>
 										</button>
 											<!--<span class="glyphicon glyphicon-remove ml10" ng-click="deletedoc(t._id,t._rev);" ></span>-->
@@ -201,7 +196,7 @@
 								<button  ng-click="editdoc(doc.doc._id,doc.doc._rev);" class="btn btn-primary btn-xs editbtn mb10" type="button"  style="margin-left: 10px;">
 									<span class="glyphicon glyphicon-edit"></span>
 								</button>
-								<button ng-click="deletedoc(doc.doc._id,doc.doc._rev,docs);" class="btn btn-danger btn-xs remove mb10" type="button" style="float:none;margin-left: 10px;">
+								<button ng-click="deletedoc(doc.doc._id,doc.doc._rev);" class="btn btn-danger btn-xs remove mb10" type="button" style="float:none;margin-left: 10px;">
 									<span class="glyphicon glyphicon-remove"></span>
 								</button>
 							</div>

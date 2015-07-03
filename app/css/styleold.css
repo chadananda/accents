@@ -22,14 +22,9 @@ body{background:url('../images/bodybg.png') repeat; }
 .topbutton button{margin-top:15px; -webkit-transition: all 0.5s ease-in-out;-moz-transition: all 0.5s ease-in-out;  -o-transition: all 0.5s ease-in-out;transition: all 0.5s ease-in-out;}
 
 .logo img{max-width:86px;}
-.logo h3{
-	  color: #1D4583;
-    text-shadow: 2px 2px 3px rgba(12, 12, 12, 0.18);
-    padding-top: 5px;
-    padding-left: 2px;
-}
-.logo p{font-size:12px; color:#1D4583;  }
- #main-container{ border:1px solid #f0f0f0; width:100% !important; padding-left: 10px !important;padding-right: 10px !important;}
+.logo h3{color:#999999;}
+.logo p{font-size:12px; color:#999999;}
+ #main-container{ border:1px solid #f0f0f0; width:100% !important; background:#ffffff; padding-left: 10px !important;padding-right: 10px !important;}
 .inputexm{/*position:absolute;*/  left:20px; bottom:-16px; font-size:10px; color:#999999; font-style:italic;}
 .addtext{background:#333333; color:#fefefe;}
 .addtext h3{border-bottom:1px solid #3d3d3d; padding-bottom:10px; margin-top:5px; margin-bottom:20px;}
@@ -82,10 +77,6 @@ body{background:url('../images/bodybg.png') repeat; }
 /*=====================================ALL MOBILE VIEW===================================================*/
 @media only screen and (min-width : 0px) and (max-width:767px)
 {
-	.term-top 
-	{
-		margin-top: 20px;
-	}
 	.btn-circle
 	{
 		width: 26px !important;
@@ -213,7 +204,7 @@ body{background:url('../images/bodybg.png') repeat; }
 	}
 	.mobile-margin
 	{
-		margin-bottom:20px;
+		margin-bottom:60px;
 	}
 	.panel-box
 	{
@@ -599,20 +590,6 @@ body{background:url('../images/bodybg.png') repeat; }
   	padding-top:0 !important;
   	margin-bottom: 0 !important;
   }
-  .col-lg-12.mt30 {
-  	margin-top: 0px !important;
-  }
 
-  .mainlogo {
-    margin-right: 0px !important;
-  }
-
-  .table-responsive.tablecontainer.mt10 {
-  	background-color: white !important;
-  }
-
-  .col-lg-12.mb10.p0.mt10 {
-  	margin-top:0 !important;
-  }
 
 }
