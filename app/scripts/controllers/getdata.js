@@ -161,13 +161,123 @@ $scope.checkVerifiedCheckBox=function()
 								}
 							}
 						});
-						if(countVerify>0)
+						if(countVerify==1)
 						{
-							//===========if this is not alone verified record============//
+							//===========if this is not alone verified record and more verified left============//
+							$http.delete('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev).
+							success(function(data, status, headers, config) 
+							{
+								$("#spinner").show();
+								$scope.message='Record Deleted Successfully';
+								//================Unmark the family ambiguous======================//
+								angular.forEach($scope.wholeWordMatches,function(match)
+								{
+									var updateid= match.doc._id;
+									var revid= match.doc._rev;
+									var updatedWordfamilyField=$scope.search.doc.term;
+									updatedWordfamilyField= updatedWordfamilyField.replace("_","");	
+									updatedWordfamilyField=Utils.dotUndersRevert(updatedWordfamilyField);
+									if(match.doc.verify==1)
+									{
+										var verify=1;									
+									}
+									else
+									{
+										var verify=0;
+									}
+									var newdata= JSON.stringify
+									({
+										"source": match.doc.source,   
+										"original": match.doc.original , 
+										"definition": match.doc.definition, 
+										"type": "term", 
+										"user":  match.doc.user,
+										"term":  match.doc.term,
+										"ref": match.doc.ref,
+										"wordfamily":updatedWordfamilyField,
+										"verify":verify,
+										"ambiguous":0
+									});
+									$http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+updateid+'?rev='+revid, newdata).
+									success(function(newdata, status, headers, config) 
+									{
+										console.log(status);
+									}).
+									error(function(data, status, headers, config) 
+									{
+										console.log(status);
+									});
+								});
+							}).
+							error(function(data, status, headers, config) 
+							{
+							}); 
+						}
+						else if(countVerify>=1)
+						{
+							//===========if this is not alone verified record and more verified left============//
+							$http.delete('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev).
+							success(function(data, status, headers, config) 
+							{
+								$("#spinner").show();
+								$scope.message='Record Deleted Successfully';
+								//================mark the family ambiguous======================//
+								angular.forEach($scope.wholeWordMatches,function(match)
+								{
+									var updateid= match.doc._id;
+									var revid= match.doc._rev;
+									var updatedWordfamilyField=$scope.search.doc.term;
+									updatedWordfamilyField= updatedWordfamilyField.replace("_","");	
+									updatedWordfamilyField=Utils.dotUndersRevert(updatedWordfamilyField);
+									if(match.doc.verify==1)
+									{
+										var verify=1;									
+									}
+									else
+									{
+										var verify=0;
+									}
+									var newdata= JSON.stringify
+									({
+										"source": match.doc.source,   
+										"original": match.doc.original , 
+										"definition": match.doc.definition, 
+										"type": "term", 
+										"user":  match.doc.user,
+										"term":  match.doc.term,
+										"ref": match.doc.ref,
+										"wordfamily":updatedWordfamilyField,
+										"verify":verify,
+										"ambiguous":1
+									});
+									$http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+updateid+'?rev='+revid, newdata).
+									success(function(newdata, status, headers, config) 
+									{
+										console.log(status);
+									}).
+									error(function(data, status, headers, config) 
+									{
+										console.log(status);
+									});
+								});
+							}).
+							error(function(data, status, headers, config) 
+							{
+							}); 							
 						}
 						else
 						{
 							//===============if this alone is verified=================//
+							//===========if this is not alone verified record and more verified left============//
+							$http.delete('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev).
+							success(function(data, status, headers, config) 
+							{
+								$("#spinner").show();
+								$scope.message='Record Deleted Successfully';
+							}).
+							error(function(data, status, headers, config) 
+							{
+							}); 
 						}
 					}
 					else
@@ -204,38 +314,186 @@ $scope.checkVerifiedCheckBox=function()
 			}
 		}  
     
-		//////////////////////////Delete data in the form/////////////////////////////////////        
+		//============================Delete data in the form=====================================//        
         $scope.deletedata = function() 
         {
 			var id=document.getElementById("keyid").value;
 			var rev=document.getElementById("keyrev").value; 
 			if($window.confirm('Are you SURE you want to delete?'))
-			{	
-				$http.delete('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev).
-				success(function(data, status, headers, config)
+			{
+				$http.get('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev+'&include_docs=true').
+				success(function(data, status, headers, config) 
 				{
-					document.getElementById("addform").reset();
-					$scope.message='Record Deleted Successfully';
-					$http.get('http://'+domainRemoteDb+'/'+remoteDb+'/_all_docs?include_docs=true')
-					.success(function(data) 
+					$scope.editdata=data;
+					document.getElementById("term").value=data.term;
+					//==============First check the record being deleted is verified or not===============//
+					if(data.verify==1)
 					{
-						if(data.rows)
+						//=============if verified record====================//
+						//=============Get record's word family================//
+						$scope.wholeWordMatches = $filter('wholeWordFilter')(items,data.term);
+						var countVerify=0;
+						angular.forEach($scope.wholeWordMatches,function(match)
 						{
-							$scope.docs=data.rows;
-							$scope.count=data.total_rows;
-							$('div[id^="showDiv-"]').hide();
-						}	
-					})
-					.error(function(error) 
+							if(match.doc._id!=id)
+							{
+								if(match.doc.verify==1)
+								{
+									countVerify++;
+								}
+							}
+						});
+						if(countVerify==1)
+						{
+							//===========if this is not alone verified record and more verified left============//
+							$http.delete('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev).
+							success(function(data, status, headers, config) 
+							{
+								$("#spinner").show();
+								$scope.message='Record Deleted Successfully';
+								//================Unmark the family ambiguous======================//
+								angular.forEach($scope.wholeWordMatches,function(match)
+								{
+									var updateid= match.doc._id;
+									var revid= match.doc._rev;
+									var updatedWordfamilyField=$scope.search.doc.term;
+									updatedWordfamilyField= updatedWordfamilyField.replace("_","");	
+									updatedWordfamilyField=Utils.dotUndersRevert(updatedWordfamilyField);
+									if(match.doc.verify==1)
+									{
+										var verify=1;									
+									}
+									else
+									{
+										var verify=0;
+									}
+									var newdata= JSON.stringify
+									({
+										"source": match.doc.source,   
+										"original": match.doc.original , 
+										"definition": match.doc.definition, 
+										"type": "term", 
+										"user":  match.doc.user,
+										"term":  match.doc.term,
+										"ref": match.doc.ref,
+										"wordfamily":updatedWordfamilyField,
+										"verify":verify,
+										"ambiguous":0
+									});
+									$http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+updateid+'?rev='+revid, newdata).
+									success(function(newdata, status, headers, config) 
+									{
+										console.log(status);
+									}).
+									error(function(data, status, headers, config) 
+									{
+										console.log(status);
+									});
+								});
+							}).
+							error(function(data, status, headers, config) 
+							{
+							}); 
+						}
+						else if(countVerify>=1)
+						{
+							//===========if this is not alone verified record and more verified left============//
+							$http.delete('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev).
+							success(function(data, status, headers, config) 
+							{
+								$("#spinner").show();
+								$scope.message='Record Deleted Successfully';
+								//================mark the family ambiguous======================//
+								angular.forEach($scope.wholeWordMatches,function(match)
+								{
+									var updateid= match.doc._id;
+									var revid= match.doc._rev;
+									var updatedWordfamilyField=$scope.search.doc.term;
+									updatedWordfamilyField= updatedWordfamilyField.replace("_","");	
+									updatedWordfamilyField=Utils.dotUndersRevert(updatedWordfamilyField);
+									if(match.doc.verify==1)
+									{
+										var verify=1;									
+									}
+									else
+									{
+										var verify=0;
+									}
+									var newdata= JSON.stringify
+									({
+										"source": match.doc.source,   
+										"original": match.doc.original , 
+										"definition": match.doc.definition, 
+										"type": "term", 
+										"user":  match.doc.user,
+										"term":  match.doc.term,
+										"ref": match.doc.ref,
+										"wordfamily":updatedWordfamilyField,
+										"verify":verify,
+										"ambiguous":1
+									});
+									$http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+updateid+'?rev='+revid, newdata).
+									success(function(newdata, status, headers, config) 
+									{
+										console.log(status);
+									}).
+									error(function(data, status, headers, config) 
+									{
+										console.log(status);
+									});
+								});
+							}).
+							error(function(data, status, headers, config) 
+							{
+							}); 							
+						}
+						else
+						{
+							//===============if this alone is verified=================//
+							//===========if this is not alone verified record and more verified left============//
+							$http.delete('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev).
+							success(function(data, status, headers, config) 
+							{
+								$("#spinner").show();
+								$scope.message='Record Deleted Successfully';
+							}).
+							error(function(data, status, headers, config) 
+							{
+							}); 
+						}
+					}
+					else
 					{
-						console.log(error);
-					});
+						//=============if not a verified record====================//
+						$http.delete('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev).
+						success(function(data, status, headers, config) 
+						{
+							$("#spinner").show();
+							$scope.message='Record Deleted Successfully';
+							$http.get('http://'+domainRemoteDb+'/'+remoteDb+'/_all_docs?include_docs=true')
+							.success(function(data) 
+							{
+								if(data.rows)
+								{		
+									$scope.docs=data.rows;
+									$scope.count=data.total_rows;
+									$('div[id^="showDiv-"]').hide();
+								}	
+							})
+							.error(function(error) 
+							{
+								console.log(error);
+							});
+						}).
+						error(function(data, status, headers, config) 
+						{
+							$scope.message='Error Deleting Record';
+						}); 
+					}					
 				}).
-				error(function(data, status, headers, config) 
-				{			
-					alert(status);
-				});   
-			}        
+				error(function(data, status, headers, config) {
+				}); 			
+			}      
 		};
     
      //////////////////////////Cancel update data in the form/////////////////////////////////////
@@ -291,6 +549,7 @@ $scope.checkVerifiedCheckBox=function()
 				$('#Button3').css({ "display":"block" });
 				$('#updateword').css({ "display":"block" });
 				document.getElementById("toptext").innerHTML="Edit:";	
+				var refrenceArray=data.ref;
 				if(sessionStorage.length!=0)
 				{
 					sessionStorage.clear();						
@@ -310,6 +569,7 @@ $scope.checkVerifiedCheckBox=function()
 		var term=$scope.search.doc.term;
 		var original=$scope.editdata.original;
 		var refrence=$scope.editdata.ref;
+		refrence=$scope.getUnique(refrence);
 		var definition=$scope.editdata.definition;
 		//var verified=$scope.verified;
 		var verified=document.getElementById("verifiedCheckbox").checked;
@@ -357,8 +617,9 @@ $scope.checkVerifiedCheckBox=function()
 				});
 				if(termsMatch>0)
 				{
-					//============if any other verified term in the family===============//
+					//============if any other verified term that matches the current term in the family===============//
 					var allReferences=allRef.join();
+					allReferences=$scope.getUnique(allReferences);
 					var data= JSON.stringify
 					({
 						"source": userName,   
@@ -369,7 +630,8 @@ $scope.checkVerifiedCheckBox=function()
 						"term": term,
 						"ref":allReferences,
 						"wordfamily":wordfamilyField,
-						"verify":1
+						"verify":1,
+						"ambiguous":0
 					});
 					//================adding data record======================//
 					if(confirm("Please Confirm the following Addition:"+data))
@@ -403,7 +665,7 @@ $scope.checkVerifiedCheckBox=function()
 				}
 				else
 				{
-					//============if no other verified term in the family===============//
+					//============if no other verified term that matches with the current term in the family===============//
 					var data= JSON.stringify
 					({
 						"source": userName,   
@@ -414,7 +676,8 @@ $scope.checkVerifiedCheckBox=function()
 						"term": term,
 						"ref":refrence,
 						"wordfamily":wordfamilyField,
-						"verify":0
+						"verify":1,
+						"ambiguous":1
 					});
 					//================adding data record======================//
 					if(confirm("Please Confirm the following Addition:"+data))
@@ -432,6 +695,14 @@ $scope.checkVerifiedCheckBox=function()
 								var updatedWordfamilyField=$scope.search.doc.term;
 								updatedWordfamilyField= updatedWordfamilyField.replace("_","");	
 								updatedWordfamilyField=Utils.dotUndersRevert(updatedWordfamilyField);
+								if(match.doc.verify==1)
+								{
+									var verify=1;									
+								}
+								else
+								{
+									var verify=0;
+								}
 								var newdata= JSON.stringify
 								({
 									"source": match.doc.source,   
@@ -442,7 +713,8 @@ $scope.checkVerifiedCheckBox=function()
 									"term":  match.doc.term,
 									"ref": match.doc.ref,
 									"wordfamily":updatedWordfamilyField,
-									"verify":0
+									"verify":verify,
+									"ambiguous":1
 								});
 								$http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+updateid+'?rev='+revid, newdata).
 								success(function(newdata, status, headers, config) 
@@ -478,6 +750,7 @@ $scope.checkVerifiedCheckBox=function()
 					}
 				});
 				var allReferences=allRef.join();
+				allReferences=$scope.getUnique(allReferences);
 				var data= JSON.stringify
 				({
 					"source": userName,   
@@ -488,7 +761,8 @@ $scope.checkVerifiedCheckBox=function()
 					"term": term,
 					"ref":allReferences,
 					"wordfamily":wordfamilyField,
-					"verify":1
+					"verify":1,
+					"ambiguous":0
 				});
 				//================adding data record======================//
 				if(confirm("Please Confirm the following Addition:"+data))
@@ -560,6 +834,7 @@ $scope.checkVerifiedCheckBox=function()
 					//====================if any term matches====================//
 					//============if any other verified term in the family===============//
 					var allReferences=allRef.join();
+					allReferences=$scope.getUnique(allReferences);
 					var data= JSON.stringify
 					({
 						"source": userName,   
@@ -570,7 +845,8 @@ $scope.checkVerifiedCheckBox=function()
 						"term": term,
 						"ref":allReferences,
 						"wordfamily":wordfamilyField,
-						"verify":1
+						"verify":1,
+						"ambiguous":0
 					});	
 					//================adding data record======================//
 					if(confirm("Please Confirm the following Addition:"+data))
@@ -615,6 +891,34 @@ $scope.checkVerifiedCheckBox=function()
 			else
 			{
 				//==========if no other record is verified================//
+				var data= JSON.stringify
+					({
+						"source": userName,   
+						"original":original , 
+						"definition":definition, 
+						"type": "term", 
+						"user": userName,
+						"term": term,
+						"ref":refrence,
+						"wordfamily":wordfamilyField,
+						"verify":0,
+						"ambiguous":0
+					});	
+				//================adding data record======================//
+				if(confirm("Please Confirm the following Addition:"+data))
+				{	
+					$http.post('http://'+domainRemoteDb+'/'+remoteDb+'/', data).
+					success(function(data, status, headers, config) 
+					{
+						console.log(status);
+						$scope.message='Record Added Successfully';
+					}).
+					error(function(data, status, headers, config) 
+					{
+						console.log(status);
+						$scope.message='Error Adding record';
+					});
+				}
 			}
 						
 		}		
@@ -629,6 +933,7 @@ $scope.checkVerifiedCheckBox=function()
 		var term=document.getElementById("term").value;
 		var original=$scope.editdata.original;
 		var refrence=$scope.editdata.ref;
+		refrence=$scope.getUnique(refrence);
 		var definition=$scope.editdata.definition;
 		//var verified=$scope.verified;
 		var verified=document.getElementById("verifiedCheckbox").checked;
@@ -684,6 +989,7 @@ $scope.checkVerifiedCheckBox=function()
 				{
 					//============if any other verified term in the family===============//
 					var allReferences=allRef.join();
+					allReferences=$scope.getUnique(allReferences);
 					var data= JSON.stringify
 					({
 						"source": userName,   
@@ -694,7 +1000,8 @@ $scope.checkVerifiedCheckBox=function()
 						"term": term,
 						"ref":allReferences,
 						"wordfamily":wordfamilyField,
-						"verify":1
+						"verify":1,
+						"ambiguous":0
 					});
 					//================Updating data record======================//
 					if(confirm("Please Confirm the following Updation:"+data))
@@ -742,7 +1049,8 @@ $scope.checkVerifiedCheckBox=function()
 						"term": term,
 						"ref":refrence,
 						"wordfamily":wordfamilyField,
-						"verify":0
+						"verify":1,
+						"ambiguous":1
 					});
 					//================adding data record======================//
 					if(confirm("Please Confirm the following Addition:"+data))
@@ -760,6 +1068,14 @@ $scope.checkVerifiedCheckBox=function()
 								var updatedWordfamilyField=$scope.search.doc.term;
 								updatedWordfamilyField= updatedWordfamilyField.replace("_","");	
 								updatedWordfamilyField=Utils.dotUndersRevert(updatedWordfamilyField);
+								if(match.doc.verify==1)
+								{
+									var verify=1;									
+								}
+								else
+								{
+									var verify=0;
+								}
 								var newdata= JSON.stringify
 								({
 									"source": match.doc.source,   
@@ -770,7 +1086,8 @@ $scope.checkVerifiedCheckBox=function()
 									"term":  match.doc.term,
 									"ref": match.doc.ref,
 									"wordfamily":updatedWordfamilyField,
-									"verify":0
+									"verify":verify,
+									"ambiguous":1
 								});
 								$http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+updateid+'?rev='+revid, newdata).
 								success(function(newdata, status, headers, config) 
@@ -810,6 +1127,7 @@ $scope.checkVerifiedCheckBox=function()
 					}
 				});
 				var allReferences=allRef.join();
+				allReferences=$scope.getUnique(allReferences);
 				var data= JSON.stringify
 				({
 					"source": userName,   
@@ -820,7 +1138,8 @@ $scope.checkVerifiedCheckBox=function()
 					"term": term,
 					"ref":allReferences,
 					"wordfamily":wordfamilyField,
-					"verify":1
+					"verify":1,
+					"ambiguous":0
 				});
 				//================adding data record======================//
 				if(confirm("Please Confirm the following Addition:"+data))
@@ -901,6 +1220,7 @@ $scope.checkVerifiedCheckBox=function()
 					//====================if any term matches====================//
 					//============if any other verified term in the family===============//
 					var allReferences=allRef.join();
+					allReferences=$scope.getUnique(allReferences);
 					var data= JSON.stringify
 					({
 						"source": userName,   
@@ -911,7 +1231,8 @@ $scope.checkVerifiedCheckBox=function()
 						"term": term,
 						"ref":allReferences,
 						"wordfamily":wordfamilyField,
-						"verify":1
+						"verify":1,
+						"ambiguous":0
 					});	
 					//================adding data record======================//
 					if(confirm("Please Confirm the following Addition:"+data))
@@ -959,6 +1280,34 @@ $scope.checkVerifiedCheckBox=function()
 			else
 			{
 				//==========if no other record is verified================//
+				var data= JSON.stringify
+					({
+						"source": userName,   
+						"original":original , 
+						"definition":definition, 
+						"type": "term", 
+						"user": userName,
+						"term": term,
+						"ref":refrence,
+						"wordfamily":wordfamilyField,
+						"verify":0,
+						"ambiguous":0
+					});	
+				//================adding data record======================//
+				if(confirm("Please Confirm the following Addition:"+data))
+				{	
+					$http.post('http://'+domainRemoteDb+'/'+remoteDb+'/', data).
+					success(function(data, status, headers, config) 
+					{
+						console.log(status);
+						$scope.message='Record Added Successfully';
+					}).
+					error(function(data, status, headers, config) 
+					{
+						console.log(status);
+						$scope.message='Error Adding record';
+					});
+				}
 			}
 		}
 		$scope.allDocsFunc();
@@ -1006,6 +1355,20 @@ $scope.checkVerifiedCheckBox=function()
 		 document.getElementById("showDiv-"+key).style.display='block';
 		 
 	}
+	$scope.getUnique = function(arrayNew)
+	{
+		var u = {}, a = [];   
+		var refArr=arrayNew.split(",");
+			for(var i = 0, l = refArr.length; i < l; ++i){
+      if(u.hasOwnProperty(refArr[i])) {
+         continue;
+      }
+      a.push(refArr[i]);
+      u[refArr[i]] = 1;
+   }
+   var aString=a.join()
+   return aString;
+}
   })
 .filter('singlegroupFilter',['Utils',function(Utils){
 	return function(items,search)
