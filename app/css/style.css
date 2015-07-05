@@ -615,4 +615,17 @@ body{background:url('../images/bodybg.png') repeat; }
   	margin-top:0 !important;
   }
 
+  form input[type="text"] {
+    border-radius: 2px !important;
+    margin-top: 5px !important;
+    margin-bottom: -2px !important;
+  }
+
+  #addform .inputexm {
+  	padding-top:0; margin-top:0; line-height: 1em;
+  	margin-left: 5px !important;
+  }
+
+
+
 }
