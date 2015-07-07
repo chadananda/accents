@@ -73,7 +73,8 @@ $rootScope.$on('$locationChangeStart', function($event, changeTo, changeFrom) {
 				   "user": "Swarandeep",
 				   "term": docs.doc.term,
 				   "ref":  docs.doc.ref,
-				   "verify":"1"
+				   "verify":"1",
+				   "ambiguous":0,
 				});
 				
 				$http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev, data).
@@ -172,6 +173,15 @@ $rootScope.$on('$locationChangeStart', function($event, changeTo, changeFrom) {
 				var additemverify=item.doc.verify;
 				var sessionArray= JSON.parse( localStorage.getItem("session-user"));
 				var userName=sessionArray.username;
+				if(item.doc.ambiguous)
+				{
+					var ambiguous=item.doc.ambiguous;
+				}
+				else
+				{
+					var ambiguous=0;
+				}
+				
 				var data= JSON.stringify(
 											{
 												"source": userName,   
@@ -181,8 +191,9 @@ $rootScope.$on('$locationChangeStart', function($event, changeTo, changeFrom) {
 												"user": userName,
 												"term": term,
 												"ref":refrence,
+												"wordfamily":string,
 												"verify":additemverify,
-												"wordfamily":string
+												"ambiguous":ambiguous,
 											}
 										); 
 				$http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev, data).
@@ -203,9 +214,27 @@ $rootScope.$on('$locationChangeStart', function($event, changeTo, changeFrom) {
 		var groupFamily={};
 		var count=1;
 		console.log('calledhere');
+		//=================Making a group array for all family groups==================//
 		angular.forEach(alldocs,function(doc)
 		{
-			var family=doc.doc.wordfamily; 
+			if(doc.doc.wordfamily)
+			{
+				var family=doc.doc.wordfamily; 
+			}
+			else
+			{
+				var string=doc.doc.term;
+				if(string)
+				{
+					string= string.replace("_","");	
+					string=Utils.dotUndersRevert(string);
+					var family=string;				
+				}
+				else
+				{
+					return false;
+				}
+			}			
 			if(family in groupFamily)
 			{
 				var countnew=groupFamily[family];	
@@ -219,14 +248,15 @@ $rootScope.$on('$locationChangeStart', function($event, changeTo, changeFrom) {
 			}
 		});
 		var i=1;
+		//===============Traversing through the group=================//
 		angular.forEach(groupFamily,function(item,key)
 		{
 			//~ if( i==200)
 				//~ return false;
 			var mainArray=[];
+			//===========Traversing through the main docs array to form a sub array of family for each word family group========//
 			angular.forEach(alldocs,function(doc)
 			{
-				console.log(doc);
 				var searchString=doc.doc.term;
 				if(searchString)
 				{
@@ -238,6 +268,7 @@ $rootScope.$on('$locationChangeStart', function($event, changeTo, changeFrom) {
 					}
 				}				
 			});
+			//==================Check count of ambiguous and verified records===========================//
 			var countVerified=0;
 			var countAmbiguous=0;
 			var arrlength=mainArray.length;
@@ -250,92 +281,78 @@ $rootScope.$on('$locationChangeStart', function($event, changeTo, changeFrom) {
 					{
 						countVerified++;
 					}
-					if(verifyVal==0)
-					{
-						countAmbiguous++;
-					}
 				}
 			}
-			
-			var refArr=[];
-			
-			for(var j=0;j<arrlength;j++)
+			if(countVerified==1)
 			{
-				if(countVerified==1)
+				//=====only one verified term=====//
+				if(arrlength>1)
 				{
-					//console.log("just one verified record");
-					if(mainArray[j].doc.verify && mainArray[j].doc.verify==1)
+					var allRef=[];
+					//====Compressing the references====//
+					for(var j=0;j<arrlength;j++)
 					{
-						var id=mainArray[j].doc._id;
-						var rev=mainArray[j].doc._rev;
-						var source=mainArray[j].doc.source;
-						var term=mainArray[j].doc.term;
-						var type=mainArray[j].doc.type;
-						var user=mainArray[j].doc.user;
-						var wordfamily=mainArray[j].doc.wordfamily;
-						if(mainArray[j].doc.original)
+						if(mainArray[j].doc.ref)
+							allRef.push(mainArray[j].doc.ref);
+					}
+					//========compress into one record======//
+					for(var j=0;j<arrlength;j++)
+					{	
+						var verifyVal=mainArray[j].doc.verify;
+						if(verifyVal && verifyVal==1)
 						{
-							var original=mainArray[j].doc.original;
-						}
-						else
-						{
-							var original="";
-						}
-						if(mainArray[j].doc.definition)
-						{
+							//==verified record==//
+							var updateid=mainArray[j].doc._id;
+							var revid=mainArray[j].doc._rev;
+							var term=mainArray[j].doc.term;
+							var original=mainArray[j].doc.original;						
+							var refrence=mainArray[j].doc.ref;	
+							var source=mainArray[j].doc.source;	
+							var user=mainArray[j].doc.user;
+							if(refrence)					
+								allRef.push(refrence);
+							var allReferences=allRef.join();
+							allReferences=$scope.getUnique(allReferences);						
 							var definition=mainArray[j].doc.definition;
+							if(mainArray[j].doc.wordfamily)
+							{
+								var wordfamilyField=mainArray[j].doc.wordfamily;
+							}
+							else
+							{
+								var wordfamilyField=mainArray[j].doc.term;
+								wordfamilyField= wordfamilyField.replace("_","");	
+								wordfamilyField=Utils.dotUndersRevert(wordfamilyField);
+							}
+							var data= JSON.stringify
+							({
+								"source": source,   
+								"original":original , 
+								"definition":definition, 
+								"type": "term", 
+								"user": user,
+								"term": term,
+								"ref":allReferences,
+								"wordfamily":wordfamilyField,
+								"verify":1,
+								"ambiguous":0
+							});
+							$http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+updateid+'?rev='+revid, data).
+							success(function(data, status, headers, config) 
+							{
+								console.log(status);												
+							}).
+							error(function(data, status, headers, config) 
+							{
+								console.log(status);
+							});
 						}
 						else
 						{
-							var definition="";
-						}
-						if(mainArray[j].doc.ref)
-						{
-							var ref=mainArray[j].doc.ref;
-							if(refArr.indexOf(ref)==-1)
-								refArr.push(ref);
-						}
-						
-						var verify=mainArray[j].doc.verify;					
-						
-					}
-					else
-					{
-						if(mainArray[j].doc.ref)
-						{
-							var ref=mainArray[j].doc.ref;
-							if(refArr.indexOf(ref)==-1)
-								refArr.push(ref);
-						}
-						var delid=mainArray[j].doc._id;
-						var delrev=mainArray[j].doc._rev;
-						$http.delete('http://'+domainRemoteDb+'/'+remoteDb+'/'+delid+'?rev='+delrev).
-						success(function(data,status, headers, config) 
-						{
-							console.log(status);
-						}).
-						error(function(data, status, headers, config) 
-						{
-							console.log(status);
-						}); 
-					}
-					if(j==(arrlength-1))
-						{
-							 var allReferences=refArr.join();
-							 var data= JSON.stringify(
-								{
-									"source": source,   
-									"original":original , 
-									"definition":definition, 
-									"type": type, 
-									"user": user,
-									"term": term,
-									"ref":allReferences,
-									"verify":verify,
-									"wordfamily":wordfamily
-								}
-							);
-							$http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev, data).
+							//==unverified record to be deleted==//
+							var delid=mainArray[j].doc._id;
+							var delrev=mainArray[j].doc._rev;
+							$http.delete('http://'+domainRemoteDb+'/'+remoteDb+'/'+delid+'?rev='+delrev).
 							success(function(data, status, headers, config) 
 							{
 								console.log(status);
@@ -344,87 +361,116 @@ $rootScope.$on('$locationChangeStart', function($event, changeTo, changeFrom) {
 							{
 								console.log(status);
 							});
-							console.log(data);
 						}
-				}
-				else
+					}
+				}				
+			}
+			else if(countVerified>1)
+			{
+				//=====more than one verified term=====//
+				var verifiedArray=[];
+				for(var j=0;j<arrlength;j++)
 				{
-					//console.log("set all ambiguous");
-					var id=mainArray[j].doc._id;
-					var rev=mainArray[j].doc._rev;
-					var source=mainArray[j].doc.source;
-					var term=mainArray[j].doc.term;
-					var type=mainArray[j].doc.type;
-					var user=mainArray[j].doc.user;
-					var wordfamily=mainArray[j].doc.wordfamily;
-					if(mainArray[j].doc.original)
+					var verifyVal=mainArray[j].doc.verify;
+					if(verifyVal && verifyVal==1)
 					{
-						var original=mainArray[j].doc.original;
+						verifiedArray.push(mainArray[j].doc.term);
 					}
-					else
+				}
+				angular.forEach(verifiedArray,function(ver)
+				{
+					var allRef=[];
+					for(var j=0;j<arrlength;j++)
 					{
-						var original="";
-					}
-					if(mainArray[j].doc.definition)
-					{
-						var definition=mainArray[j].doc.definition;
-					}
-					else
-					{
-						var definition="";
-					}
-					if(mainArray[j].doc.ref)
-					{
-						var ref=mainArray[j].doc.ref;
-					}
-					else
-					{
-						var ref="";
-					}
-					var verify="0";
-					var data= JSON.stringify(
+						if(mainArray[j].doc.verify && mainArray[j].doc.verify==0)
+						{
+							if((ver.indexOf(mainArray[j].doc.term))!=-1)
+							{
+								//if the ambiguous record term matches the verified term
+								// get its reference 
+								allRef.push(mainArray[j].doc.ref);
+								//and delete the term
+								var delid=mainArray[j].doc._id;
+								var delrev=mainArray[j].doc._rev;
+								$http.delete('http://'+domainRemoteDb+'/'+remoteDb+'/'+delid+'?rev='+delrev).
+								success(function(data, status, headers, config) 
 								{
-									"source": source,   
-									"original":original , 
-									"definition":definition, 
-									"type": type, 
-									"user": user,
-									"term": term,
-									"ref":ref,
-									"verify":verify,
-									"wordfamily":wordfamily
-								}
-							);
-				$http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev, data).
-				success(function(data, status, headers, config) 
-				{
-					console.log(status);
-				}).
-				error(function(data, status, headers, config) 
-				{
-					console.log(status);
+									console.log(status);
+								}).
+								error(function(data, status, headers, config) 
+								{
+									console.log(status);
+								});
+							}
+							
+						}
+						else if(mainArray[j].doc.verify && mainArray[j].doc.verify==1)
+						{
+							allRef.push(mainArray[j].doc.ref);
+							var updateid=mainArray[j].doc._id;
+							var revid=mainArray[j].doc._rev;
+							var term=mainArray[j].doc.term;
+							var original=mainArray[j].doc.original;						
+							var refrence=mainArray[j].doc.ref;	
+							var source=mainArray[j].doc.source;	
+							var user=mainArray[j].doc.user;					
+							var definition=mainArray[j].doc.definition;
+							if(mainArray[j].doc.wordfamily)
+							{
+								var wordfamilyField=mainArray[j].doc.wordfamily;
+							}
+							else
+							{
+								var wordfamilyField=mainArray[j].doc.term;
+								wordfamilyField= wordfamilyField.replace("_","");	
+								wordfamilyField=Utils.dotUndersRevert(wordfamilyField);
+							}
+						}
+						else
+						{
+						}
+						if(j==(arrlength-1))
+						{
+							var allReferences=allRef.join();
+							allReferences=$scope.getUnique(allReferences);
+							//save the verified record
+							var data= JSON.stringify
+							({
+								"source": source,   
+								"original":original , 
+								"definition":definition, 
+								"type": "term", 
+								"user": user,
+								"term": term,
+								"ref":allReferences,
+								"wordfamily":wordfamilyField,
+								"verify":1,
+								"ambiguous":1
+							});
+							$http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+updateid+'?rev='+revid, data).
+							success(function(data, status, headers, config) 
+							{
+								console.log(status);												
+							}).
+							error(function(data, status, headers, config) 
+							{
+								console.log(status);
+							});	
+						}
+					}
 				});
-				//	console.log(id);
-				}
 				
-				//~ else if(countVerified>1)
-				//~ {
-					//~ console.log("2-"+mainArray[j].doc.term);
-					//~ console.log("again set all as ambiguous");
-				//~ }
-				//~ else if(countAmbiguous>=1)
-				//~ {
-					//~ console.log("3-"+mainArray[j].doc.term);
-					//~ console.log("set all ambiguous");
-				//~ }
 				
 			}
-		
-	
+			else
+			{
+				//=====no verified term=====//
+				console.log("no one verified term");
+			}
+			
 			i++;
-			//console.log(mainArray);
 		});
-		
+		 $scope.allDocsFunc();
 	}
 	
 	//==========================COMPRESS RECORDS TO PACK ALL REFERENCES IN ONE SINGLE VERIFIED RECORD===============================//
@@ -469,6 +515,14 @@ $rootScope.$on('$locationChangeStart', function($event, changeTo, changeFrom) {
 			var type=item.doc.type;
 			var user=item.doc.user;
 			var wordfamily=item.doc.wordfamily;
+			if(item.doc.ambiguous)
+			{
+				var ambiguous=item.doc.ambiguous;
+			}
+			else
+			{
+				var ambiguous=0;
+			}
 			if(item.doc.ref)
 			{
 				var ref=item.doc.ref;
@@ -495,8 +549,9 @@ $rootScope.$on('$locationChangeStart', function($event, changeTo, changeFrom) {
 									"user": user,
 									"term": term,
 									"ref":ref,
+									"wordfamily":wordfamily,
 									"verify":verify,
-									"wordfamily":wordfamily
+									"ambiguous":ambiguous									
 								}
 							);
 			$http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev, data).
@@ -510,28 +565,35 @@ $rootScope.$on('$locationChangeStart', function($event, changeTo, changeFrom) {
 			});
 		});
 	}
-	
-	$scope.unique = function(origArr) 
+		$scope.getUnique = function(arrayNew)
 	{
-		var newArr = [],
-		origLen = origArr.length,
-		found, x, y;
-		for (x = 0; x < origLen; x++) 
+		var u = {}, a = [];   
+		var refArr=arrayNew.split(",");
+			for(var i = 0, l = refArr.length; i < l; ++i){
+      if(u.hasOwnProperty(refArr[i])) {
+         continue;
+      }
+      a.push(refArr[i]);
+      u[refArr[i]] = 1;
+   }
+   var aString=a.join()
+   return aString;
+}
+ //===============All docs function======================//
+	 $scope.allDocsFunc=function()
+	 {
+		 $http.get('http://'+domainRemoteDb+'/'+remoteDb+'/_all_docs?include_docs=true')
+		.success(function(data) 
 		{
-			found = undefined;
-			for (y = 0; y < newArr.length; y++) 
-			{
-				if (origArr[x] === newArr[y]) 
-				{
-					found = true;
-					break;
-				}
-			}
-			if (!found) 
-			{
-				newArr.push(origArr[x]);
-			}
-		}
-		return newArr;
-	}
+			if(data.rows)
+			{		
+				$scope.docs=data.rows;
+				$scope.count=data.total_rows;
+			}	
+		})
+		.error(function(error) 
+		{
+			console.log(error);
+		});
+	 };
  });
