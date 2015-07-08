@@ -445,6 +445,10 @@ body{background:url('../images/bodybg.png') repeat; }
 @media all /*and (max-width : 1200px)*/
 {
 
+.verifyy {
+    float: left;
+    margin-left: 5px;
+}
 
 	.form-control.chkval 	{
 		font-size: 20px;
