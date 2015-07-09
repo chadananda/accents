@@ -72,10 +72,8 @@
 				<div class="col-lg-12 mobile-margin">
 					<div class="row">
 						<div class="col-md-4 col-xs-5">
-							 <h2 class="pl15 pr15" id="toptext" style="font-weight:bold;">Add:</h2>
-						</div>
-						<div class="col-md-7  col-xs-7 term-top">
-							<h2 id="heading-term" style="color:white;font-weight:bold;"></h2>
+							 <h2 class="pl15 pr15" style="font-weight:bold;"><div  id="toptext" style="display:inline;">Add: </div>
+							 <div id="heading-term" style="display:inline;"></div></h2>
 						</div>
 					</div>
 				</div>
@@ -138,9 +136,11 @@
                          <div class="checkbox mt20 dispinblk">
                             <label style="padding-left:13px;"><input type="checkbox" ng-model="verified" id="verifiedCheckbox" ng-checked="editdata.verify==1"/> Verified</label>
                           </div>
+                          <!--
                           <div class="checkbox mt20 dispinblk">
                             <label style="padding-left:10px;"><input type="checkbox" ng-model="ambiguous"  />Ambiguous</label>
                           </div>
+                          --->
                           <div class="dispinblk playmic">
                              <a href="javascript:void();" class="disabled">  <img src="images/play.png" alt="mic" /></a>
                           </div>
@@ -175,6 +175,12 @@
 								<button ng-click="deletedoc(docobj.doc._id,docobj.doc._rev,docs);" class="btn btn-danger btn-xs remove mb10" type="button" style="float:none;">
 									<span class="glyphicon glyphicon-remove"></span>
 								</button>
+								&nbsp;
+								<div class="otherData">
+									<div class="notesClass">Original: {{docobj.doc.original}},</div>
+									<div class="notesClass">Ref: {{docobj.doc.ref}},</div>
+									<div class="notesClass">Notes: {{docobj.doc.definition}}</div>
+								</div>
 							</div>
 						</div>
 						<div class="col-lg-12 clearfix mt0 autosearch-container" ng-if="search.doc.term">

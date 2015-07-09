@@ -96,13 +96,16 @@ $scope.checkVerifiedCheckBox=function()
         });
        // alert(sessionStorage.list);
    if(sessionStorage.length!=0)
-     {
-		 var arrayDoc=JSON.parse(docData.getFormData());
-		 var id=JSON.stringify(arrayDoc[0]['id']);
-		 id=id.replace(/"/g,'');
-		 var rev=JSON.stringify(arrayDoc[1]['rev']);
-		 rev=rev.replace(/"/g,'');
-		 setTimeout(function(){$scope.editdoc(id,rev)},1000);   
+     {	
+		 if(sessionStorage.data)
+		 {
+			 var arrayDoc=JSON.parse(docData.getFormData());
+			 var id=JSON.stringify(arrayDoc[0]['id']);
+			 id=id.replace(/"/g,'');
+			 var rev=JSON.stringify(arrayDoc[1]['rev']);
+			 rev=rev.replace(/"/g,'');
+			 setTimeout(function(){$scope.editdoc(id,rev)},1000);   
+		 }
 	 } 
 	 $scope.testFunction=function()
 	 {
@@ -552,8 +555,9 @@ $scope.checkVerifiedCheckBox=function()
 				var refrenceArray=data.ref;
 				if(sessionStorage.length!=0)
 				{
-					sessionStorage.clear();						
-					
+					var sessionTerm=sessionStorage.term;
+					sessionStorage.clear();	
+					sessionStorage.term=sessionTerm;
 				}	
 				$scope.testFunction();
 			}).
@@ -1137,7 +1141,7 @@ $scope.checkVerifiedCheckBox=function()
 					"ambiguous":0
 				});
 				//================adding data record======================//
-				if(confirm("Please Confirm the following Addition:"+data))
+				if(confirm("Please Confirm the following Updation:"+data))
 				{	
 					$http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev, data).
 					success(function(data, status, headers, config) 
@@ -1160,7 +1164,8 @@ $scope.checkVerifiedCheckBox=function()
 									console.log(status);
 								});
 							}							
-						});										
+						});	
+						$scope.allDocsFunc();									
 					}).
 					error(function(data, status, headers, config) 
 					{
@@ -1276,9 +1281,9 @@ $scope.checkVerifiedCheckBox=function()
 						"ambiguous":0
 					});	
 				//================adding data record======================//
-				if(confirm("Please Confirm the following Addition:"+data))
+				if(confirm("Please Confirm the following Updation:"+data))
 				{	
-					$http.post('http://'+domainRemoteDb+'/'+remoteDb+'/', data).
+					$http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev, data).
 					success(function(data, status, headers, config) 
 					{
 						console.log(status);

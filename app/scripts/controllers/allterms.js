@@ -18,6 +18,7 @@ angular.module('accentsApp')
   
 var domainRemoteDb=myConfig.remoteDbDomain;
 var remoteDb=myConfig.database;
+ 
 //===================Reload Page on route change===========================//
 $rootScope.$on('$locationChangeStart', function($event, changeTo, changeFrom) {
       if (changeTo == changeFrom) {
@@ -45,6 +46,11 @@ $rootScope.$on('$locationChangeStart', function($event, changeTo, changeFrom) {
 			var changedTerm=$scope.customi2html(term);
 			$("#term").val(changedTerm);
 			$("#heading-term").html(changedTerm);
+			  sessionStorage.setItem('term',term);
+		}
+		else
+		{
+			sessionStorage.setItem('term',"");
 		}
 });
  //=========Pass document data to edit page=================//
@@ -85,6 +91,13 @@ $rootScope.$on('$locationChangeStart', function($event, changeTo, changeFrom) {
 	$scope.count=data.total_rows;
 	$("#spinner").hide();
 	$(".pagination").css("display","block");
+	if(sessionStorage.term)
+	{
+		document.getElementById('term').value=sessionStorage.getItem('term') ;
+		setTimeout(function(){
+			$("#term").trigger("change");
+		},100);
+	}
 		}	
           
         })
