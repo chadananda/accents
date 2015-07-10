@@ -71,26 +71,26 @@
             <div class="col-lg-12 clearfix mb10 p0 pt10 pb30 addtext mt30">
 				<div class="col-lg-12 mobile-margin">
 					<div class="row">
-						<div class="col-md-4 col-xs-5">
+						<div class="col-md-12 col-xs-12">
 							 <h2 class="pl15 pr15" style="font-weight:bold;"><div  id="toptext" style="display:inline;">Add: </div>
-							 <div id="heading-term" style="display:inline;"></div></h2>
+							 <div id="heading-term" style="display:inline;margin-left: 10px;"></div></h2>
 						</div>
 					</div>
 				</div>
 
                 <div class="col-lg-12 clearfix">
-                <form class="form-inline clearfix" id="addform">
+                <form class="form-inline clearfix" id="addform" name="addform" >
 				 <div class="col-md-12">
                   <div class="form-group col-sm-6 ">
 
-                    <input type="text" class="form-control chkval" name="term" id="term" style="font-size:20px !important;" ng-model-options="{ debounce: 1000 }" ng-minlength="3" ng-model="search.doc.term" />
+                    <input type="text" class="form-control chkval" ng-enter="adddata(docs)" name="term" id="term" style="font-size:20px !important;" ng-model-options="{ debounce: 1000 }" ng-minlength="3" ng-model="search.doc.term" />
                     <input type="hidden" id="keyid"  />
                     <input type="hidden" id="keyrev"  />
                      <span class="inputexm">Term</span>
 
                   </div>
                   <div class="form-group posrleative col-sm-6 ">
-					  <input type="text" name="reference"  class="form-control chkval" id="reference" ng-model="editdata.ref" value="" />
+					  <input type="text" name="reference"  class="form-control chkval" id="reference" ng-model="editdata.ref" value=""  ng-enter="adddata(docs)"/>
                      <span class="inputexm">Reference e.g. Iqan pg 72</span>
 
 
@@ -98,7 +98,7 @@
                   </div>
                    <div class="col-md-12">
                   <div class="form-group posrleative col-sm-6 ">
-                     <input type="text" name="original" class="form-control chkval openautochoose"  id="original" ng-model="editdata.original" style="font-size:20px !important;" ng-change="checkVerifiedCheckBox()"/>
+                     <input type="text" name="original" class="form-control chkval openautochoose"  id="original" ng-enter="adddata(docs)" ng-model="editdata.original" style="font-size:20px !important;" ng-change="checkVerifiedCheckBox()"/>
 
                        <div class=" col-lg-12">
                                 <div class=" autochoose">
@@ -124,7 +124,7 @@
 
                   </div>
 				  <div class="form-group col-sm-6 ">
-                    <input type="text" class="form-control chkval" name="definition" ng-model="editdata.definition" />
+                    <input type="text" class="form-control chkval" name="definition" ng-model="editdata.definition" ng-enter="adddata(docs)"/>
                     <span class="inputexm">Notes</span>
                   </div>
 				</div>
@@ -165,21 +165,21 @@
 							<h5 class="mb10 "><span class="mr5">{{(docs|wholeWordFilterMatch: customi2html(search.doc.term)).length}}</span>Whole Word Matches</h5>
 							<div ng-repeat="docobj in docs |wholeWordFilterMatch: customi2html(search.doc.term)"  class="col-md-11 col-md-offset-1" >
 								<span ng-bind-html="i2html(customi2html(docobj.doc.term))">{{docobj.doc.term}}</span>
-								<span class="glyphicon glyphicon-ok-circle ml10" ng-if="docobj.doc.verify==1"></span>
-								<span class="glyphicon glyphicon-question-sign" ng-if="docobj.doc.ambiguous==1"></span>
+								<span class="glyphicon glyphicon-ok-circle ml10" ng-if="docobj.doc.verify==1"  style="margin-left: 5px;"></span>
+								<span class="glyphicon glyphicon-question-sign" ng-if="docobj.doc.ambiguous==1"  style="margin-left: 5px;"></span>
 								<!--<span class="glyphicon glyphicon-edit ml10" ng-click="editdoc(docobj.doc._id,docobj.doc._rev);"></span>-->
-								<button  ng-click="editdoc(docobj.doc._id,docobj.doc._rev);" class="btn btn-primary btn-xs editbtn mb10" type="button">
+								<button  ng-click="editdoc(docobj.doc._id,docobj.doc._rev);" class="btn btn-primary btn-xs editbtn mb10" type="button" style="margin-left: 10px;">
 									<span class="glyphicon glyphicon-edit"></span>
 								</button>
 								<!--<span class="glyphicon glyphicon-remove ml10" ng-click="deletedoc(docobj.doc._id,docobj.doc._rev);" ></span>-->
-								<button ng-click="deletedoc(docobj.doc._id,docobj.doc._rev,docs);" class="btn btn-danger btn-xs remove mb10" type="button" style="float:none;">
+								<button ng-click="deletedoc(docobj.doc._id,docobj.doc._rev,docs);" class="btn btn-danger btn-xs remove mb10" type="button" style="float:none;margin-left: 10px;">
 									<span class="glyphicon glyphicon-remove"></span>
 								</button>
 								&nbsp;
 								<div class="otherData">
-									<div class="notesClass">Original: {{docobj.doc.original}},</div>
-									<div class="notesClass">Ref: {{docobj.doc.ref}},</div>
-									<div class="notesClass">Notes: {{docobj.doc.definition}}</div>
+									<div class="notesClass" ng-show="docobj.doc.original!=''">Original: {{docobj.doc.original}}&nbsp;</div>
+									<div class="notesClass" ng-show="docobj.doc.ref!=''">Ref: {{docobj.doc.ref}}&nbsp;</div>
+									<div class="notesClass" ng-show="docobj.doc.definition!=''">Notes: {{docobj.doc.definition}}&nbsp;</div>
 								</div>
 							</div>
 						</div>
@@ -190,8 +190,8 @@
 								<div id="showDiv-{{key}}" class="col-md-11 col-md-offset-1" ng-show="viewkey==key && value!=1">
 									<div ng-repeat="t in filterresult" >
 										<span ng-bind-html="i2html(customi2html(t.term))">{{t.term}}</span>
-										<span class="glyphicon glyphicon-ok-circle ml10" ng-if="t.verify==1"></span>
-										<span class="glyphicon glyphicon-question-sign" ng-if="t.ambiguous==1"></span>
+										<span class="glyphicon glyphicon-ok-circle ml10" ng-if="t.verify==1"  style="margin-left: 5px;"></span>
+										<span class="glyphicon glyphicon-question-sign" ng-if="t.ambiguous==1"  style="margin-left: 5px;"></span>
 										<button  ng-click="editdoc(t._id,t._rev);" class="btn btn-primary btn-xs editbtn mb10" type="button" style="margin-left: 10px;">
 											<span class="glyphicon glyphicon-edit"></span>
 										</button>
@@ -205,8 +205,8 @@
 							<div ng-repeat="doc  in docs |singlegroupFilter:customi2html(search.doc.term)" class="searchSingle"   >
 								<span class="glyphicon glyphicon-record mr5 openPanel"></span>
 								<span ng-bind-html="i2html(customi2html(doc.doc.term))">{{doc.doc.term}}</span>
-								<span class="glyphicon glyphicon-ok-circle ml10" ng-if="doc.doc.verify==1"></span>
-								<span class="glyphicon glyphicon-question-sign" ng-if="doc.doc.ambiguous==1"></span>
+								<span class="glyphicon glyphicon-ok-circle ml10" ng-if="doc.doc.verify==1"  style="margin-left: 5px;"></span>
+								<span class="glyphicon glyphicon-question-sign" ng-if="doc.doc.ambiguous==1"  style="margin-left: 5px;"></span>
 								<button  ng-click="editdoc(doc.doc._id,doc.doc._rev);" class="btn btn-primary btn-xs editbtn mb10" type="button"  style="margin-left: 10px;">
 									<span class="glyphicon glyphicon-edit"></span>
 								</button>

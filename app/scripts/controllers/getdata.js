@@ -56,6 +56,15 @@ $rootScope.$on('$locationChangeStart', function($event, changeTo, changeFrom) {
 			$("#heading-term").html("");
 		}
 });
+
+document.getElementById('term').onkeydown = function(e){
+   if(e.keyCode == 13){
+     // submit.
+    // $scope.allDocsFunc();
+     
+     $scope.adddata($scope.docs);
+   }
+};
 //Every checkboxes in the page
 $('.checkbox input:checkbox').click(function() {
     $('.checkbox input:checkbox').not(this).prop('checked', false);
@@ -180,36 +189,39 @@ $scope.checkVerifiedCheckBox=function()
 									var updatedWordfamilyField=$scope.search.doc.term;
 									updatedWordfamilyField= updatedWordfamilyField.replace("_","");	
 									updatedWordfamilyField=Utils.dotUndersRevert(updatedWordfamilyField);
-									if(match.doc.verify==1)
+									if(match.doc._id!=data.id)
 									{
-										var verify=1;									
+										if(match.doc.verify==1)
+										{
+											var verify=1;									
+										}
+										else
+										{
+											var verify=0;
+										}
+										var newdata= JSON.stringify
+										({
+											"source": match.doc.source,   
+											"original": match.doc.original , 
+											"definition": match.doc.definition, 
+											"type": "term", 
+											"user":  match.doc.user,
+											"term":  match.doc.term,
+											"ref": match.doc.ref,
+											"wordfamily":updatedWordfamilyField,
+											"verify":verify,
+											"ambiguous":0
+										});
+										$http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+updateid+'?rev='+revid, newdata).
+										success(function(newdata, status, headers, config) 
+										{
+											console.log(status);
+										}).
+										error(function(data, status, headers, config) 
+										{
+											console.log(status);
+										});
 									}
-									else
-									{
-										var verify=0;
-									}
-									var newdata= JSON.stringify
-									({
-										"source": match.doc.source,   
-										"original": match.doc.original , 
-										"definition": match.doc.definition, 
-										"type": "term", 
-										"user":  match.doc.user,
-										"term":  match.doc.term,
-										"ref": match.doc.ref,
-										"wordfamily":updatedWordfamilyField,
-										"verify":verify,
-										"ambiguous":0
-									});
-									$http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+updateid+'?rev='+revid, newdata).
-									success(function(newdata, status, headers, config) 
-									{
-										console.log(status);
-									}).
-									error(function(data, status, headers, config) 
-									{
-										console.log(status);
-									});
 								});
 							}).
 							error(function(data, status, headers, config) 
@@ -232,36 +244,39 @@ $scope.checkVerifiedCheckBox=function()
 									var updatedWordfamilyField=$scope.search.doc.term;
 									updatedWordfamilyField= updatedWordfamilyField.replace("_","");	
 									updatedWordfamilyField=Utils.dotUndersRevert(updatedWordfamilyField);
-									if(match.doc.verify==1)
+									if(match.doc._id!=data.id)
 									{
-										var verify=1;									
+										if(match.doc.verify==1)
+										{
+											var verify=1;									
+										}
+										else
+										{
+											var verify=0;
+										}
+										var newdata= JSON.stringify
+										({
+											"source": match.doc.source,   
+											"original": match.doc.original , 
+											"definition": match.doc.definition, 
+											"type": "term", 
+											"user":  match.doc.user,
+											"term":  match.doc.term,
+											"ref": match.doc.ref,
+											"wordfamily":updatedWordfamilyField,
+											"verify":verify,
+											"ambiguous":1
+										});
+										$http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+updateid+'?rev='+revid, newdata).
+										success(function(newdata, status, headers, config) 
+										{
+											console.log(status);
+										}).
+										error(function(data, status, headers, config) 
+										{
+											console.log(status);
+										});
 									}
-									else
-									{
-										var verify=0;
-									}
-									var newdata= JSON.stringify
-									({
-										"source": match.doc.source,   
-										"original": match.doc.original , 
-										"definition": match.doc.definition, 
-										"type": "term", 
-										"user":  match.doc.user,
-										"term":  match.doc.term,
-										"ref": match.doc.ref,
-										"wordfamily":updatedWordfamilyField,
-										"verify":verify,
-										"ambiguous":1
-									});
-									$http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+updateid+'?rev='+revid, newdata).
-									success(function(newdata, status, headers, config) 
-									{
-										console.log(status);
-									}).
-									error(function(data, status, headers, config) 
-									{
-										console.log(status);
-									});
 								});
 							}).
 							error(function(data, status, headers, config) 
@@ -315,6 +330,13 @@ $scope.checkVerifiedCheckBox=function()
 				error(function(data, status, headers, config) {
 				}); 			
 			}
+			setTimeout(function(){
+			$scope.editdata.ref="";
+			$scope.editdata.original="";
+			$scope.editdata.definition="";
+			document.getElementById("verifiedCheckbox").checked = false;
+			$scope.allDocsFunc();
+			},1000);
 		}  
     
 		//============================Delete data in the form=====================================//        
@@ -362,36 +384,39 @@ $scope.checkVerifiedCheckBox=function()
 									var updatedWordfamilyField=$scope.search.doc.term;
 									updatedWordfamilyField= updatedWordfamilyField.replace("_","");	
 									updatedWordfamilyField=Utils.dotUndersRevert(updatedWordfamilyField);
-									if(match.doc.verify==1)
+									if(match.doc._id!=data.id)
 									{
-										var verify=1;									
+										if(match.doc.verify==1)
+										{
+											var verify=1;									
+										}
+										else
+										{
+											var verify=0;
+										}
+										var newdata= JSON.stringify
+										({
+											"source": match.doc.source,   
+											"original": match.doc.original , 
+											"definition": match.doc.definition, 
+											"type": "term", 
+											"user":  match.doc.user,
+											"term":  match.doc.term,
+											"ref": match.doc.ref,
+											"wordfamily":updatedWordfamilyField,
+											"verify":verify,
+											"ambiguous":0
+										});
+										$http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+updateid+'?rev='+revid, newdata).
+										success(function(newdata, status, headers, config) 
+										{
+											console.log(status);
+										}).
+										error(function(data, status, headers, config) 
+										{
+											console.log(status);
+										});
 									}
-									else
-									{
-										var verify=0;
-									}
-									var newdata= JSON.stringify
-									({
-										"source": match.doc.source,   
-										"original": match.doc.original , 
-										"definition": match.doc.definition, 
-										"type": "term", 
-										"user":  match.doc.user,
-										"term":  match.doc.term,
-										"ref": match.doc.ref,
-										"wordfamily":updatedWordfamilyField,
-										"verify":verify,
-										"ambiguous":0
-									});
-									$http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+updateid+'?rev='+revid, newdata).
-									success(function(newdata, status, headers, config) 
-									{
-										console.log(status);
-									}).
-									error(function(data, status, headers, config) 
-									{
-										console.log(status);
-									});
 								});
 							}).
 							error(function(data, status, headers, config) 
@@ -414,36 +439,39 @@ $scope.checkVerifiedCheckBox=function()
 									var updatedWordfamilyField=$scope.search.doc.term;
 									updatedWordfamilyField= updatedWordfamilyField.replace("_","");	
 									updatedWordfamilyField=Utils.dotUndersRevert(updatedWordfamilyField);
-									if(match.doc.verify==1)
+									if(match.doc._id!=data.id)
 									{
-										var verify=1;									
+										if(match.doc.verify==1)
+										{
+											var verify=1;									
+										}
+										else
+										{
+											var verify=0;
+										}
+										var newdata= JSON.stringify
+										({
+											"source": match.doc.source,   
+											"original": match.doc.original , 
+											"definition": match.doc.definition, 
+											"type": "term", 
+											"user":  match.doc.user,
+											"term":  match.doc.term,
+											"ref": match.doc.ref,
+											"wordfamily":updatedWordfamilyField,
+											"verify":verify,
+											"ambiguous":1
+										});
+										$http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+updateid+'?rev='+revid, newdata).
+										success(function(newdata, status, headers, config) 
+										{
+											console.log(status);
+										}).
+										error(function(data, status, headers, config) 
+										{
+											console.log(status);
+										});
 									}
-									else
-									{
-										var verify=0;
-									}
-									var newdata= JSON.stringify
-									({
-										"source": match.doc.source,   
-										"original": match.doc.original , 
-										"definition": match.doc.definition, 
-										"type": "term", 
-										"user":  match.doc.user,
-										"term":  match.doc.term,
-										"ref": match.doc.ref,
-										"wordfamily":updatedWordfamilyField,
-										"verify":verify,
-										"ambiguous":1
-									});
-									$http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+updateid+'?rev='+revid, newdata).
-									success(function(newdata, status, headers, config) 
-									{
-										console.log(status);
-									}).
-									error(function(data, status, headers, config) 
-									{
-										console.log(status);
-									});
 								});
 							}).
 							error(function(data, status, headers, config) 
@@ -496,44 +524,53 @@ $scope.checkVerifiedCheckBox=function()
 				}).
 				error(function(data, status, headers, config) {
 				}); 			
-			}      
+			} 
+			setTimeout(function(){
+			$scope.editdata.ref="";
+			$scope.editdata.original="";
+			$scope.editdata.definition="";
+			document.getElementById("verifiedCheckbox").checked = false;
+			$scope.allDocsFunc();
+			},1000);     
 		};
     
-     //////////////////////////Cancel update data in the form/////////////////////////////////////
-        
-        $scope.cancelUpdate = function() {
-			$scope.search.doc.term="";
+		//=============Cancel function to reset to add state======================//
+        $scope.cancelUpdate = function() 
+        {
 			document.getElementById("keyid").value="";
 			document.getElementById("keyrev").value="";
-			document.getElementById("addform").reset();
-		$scope.addState();
-		$scope.docs=[];
-		$http.get('http://'+domainRemoteDb+'/'+remoteDb+'/_all_docs?include_docs=true')
-				.success(function(data) 
-				{			
-					if(data.rows)
-					{
-						console.log(data.rows.doc);
-						$scope.docs=data.rows;
-						$scope.count=data.total_rows;
-					}	
-											
-				})
-				.error(function(error) 
-				{
-					console.log(error);
-				});
-        
+			$scope.addform.$setPristine();
+			$scope.search.doc.term="";
+			$scope.editdata.ref="";
+			$scope.editdata.original="";
+			$scope.editdata.definition="";
+			document.getElementById("verifiedCheckbox").checked = false;
+			$scope.addState();
+			$scope.allDocsFunc();     
     };
-    
-     $scope.addState = function() {
-		 document.getElementById("toptext").innerHTML="Add:";
-		  document.getElementById("heading-term").innerHTML="";
-		
-			$('#Button2').css({ "display":"none" });
-			$('#Button3').css({ "display":"none" });	
-			$('#updateword').css({ "display":"none" });
-			$('#addword').css({ "display":"block" });
+    //=============Cancel function to reset to add state after add and update======================//
+        $scope.cancelUpdateAdd = function() 
+        {
+			document.getElementById("keyid").value="";
+			document.getElementById("keyrev").value="";
+			$scope.addform.$setPristine();
+		//	$scope.search.doc.term="";
+			$scope.editdata.ref="";
+			$scope.editdata.original="";
+			$scope.editdata.definition="";
+			document.getElementById("verifiedCheckbox").checked = false;
+			$scope.addState();
+			$scope.allDocsFunc();      
+    };
+    //==============Add state of the form========================//
+     $scope.addState = function() 
+     {
+		document.getElementById("toptext").innerHTML="Add:";
+		document.getElementById("heading-term").innerHTML="";		
+		$('#Button2').css({ "display":"none" });
+		$('#Button3').css({ "display":"none" });	
+		$('#updateword').css({ "display":"none" });
+		$('#addword').css({ "display":"block" });
 	 };
       //////////////////////////single record data/////////////////////////////////////
         
@@ -652,7 +689,6 @@ $scope.checkVerifiedCheckBox=function()
 								success(function(data, status, headers, config) 
 								{
 									console.log(status);
-									$scope.allDocsFunc();
 								}).
 								error(function(data, status, headers, config) 
 								{
@@ -725,14 +761,12 @@ $scope.checkVerifiedCheckBox=function()
 								success(function(newdata, status, headers, config) 
 								{
 									console.log(status);
-									$scope.allDocsFunc();
 								}).
 								error(function(data, status, headers, config) 
 								{
 									console.log(status);
 								});
 							});	
-											
 						}).
 						error(function(data, status, headers, config) 
 						{
@@ -785,14 +819,12 @@ $scope.checkVerifiedCheckBox=function()
 							success(function(data, status, headers, config) 
 							{
 								console.log(status);
-								$scope.allDocsFunc();
 							}).
 							error(function(data, status, headers, config) 
 							{
 								console.log(status);
 							});
-						});	
-										
+						});			
 					}).
 					error(function(data, status, headers, config) 
 					{
@@ -902,7 +934,6 @@ $scope.checkVerifiedCheckBox=function()
 					{
 						console.log(status);
 						$scope.message='Record Added Successfully';
-						$scope.allDocsFunc();
 					}).
 					error(function(data, status, headers, config) 
 					{
@@ -914,10 +945,7 @@ $scope.checkVerifiedCheckBox=function()
 						
 		}
 		setTimeout(function(){
-		document.getElementById("addform").reset();
-		$scope.addState();
-		$scope.docs=[];
-		$scope.message="";
+		$scope.cancelUpdateAdd();
 		},2000);
    }
    //=============================Updating records======================================//
@@ -1017,7 +1045,6 @@ $scope.checkVerifiedCheckBox=function()
 									success(function(data, status, headers, config) 
 									{
 										console.log(status);
-										$scope.allDocsFunc();
 									}).
 									error(function(data, status, headers, config) 
 									{
@@ -1091,7 +1118,6 @@ $scope.checkVerifiedCheckBox=function()
 								success(function(newdata, status, headers, config) 
 								{
 									console.log(status);
-									$scope.allDocsFunc();
 								}).
 								error(function(data, status, headers, config) 
 								{
@@ -1156,8 +1182,7 @@ $scope.checkVerifiedCheckBox=function()
 								$http.delete('http://'+domainRemoteDb+'/'+remoteDb+'/'+match.doc._id+'?rev='+match.doc._rev).
 								success(function(data, status, headers, config) 
 								{
-									console.log(status);									
-									$scope.allDocsFunc();	
+									console.log(status);		
 								}).
 								error(function(data, status, headers, config) 
 								{
@@ -1236,8 +1261,7 @@ $scope.checkVerifiedCheckBox=function()
 									$http.delete('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev).
 									success(function(data, status, headers, config) 
 									{
-										console.log(status);									
-										$scope.allDocsFunc();	
+										console.log(status);	
 									}).
 									error(function(data, status, headers, config) 
 									{
@@ -1288,7 +1312,6 @@ $scope.checkVerifiedCheckBox=function()
 					{
 						console.log(status);
 						$scope.message='Record Updated Successfully';
-						$scope.allDocsFunc();
 					}).
 					error(function(data, status, headers, config) 
 					{
@@ -1298,6 +1321,9 @@ $scope.checkVerifiedCheckBox=function()
 				}
 			}
 		}
+		setTimeout(function(){
+		$scope.cancelUpdateAdd();
+		},2000);
 	}
     
      //////////////////////////Search data/////////////////////////////////////
@@ -1346,17 +1372,38 @@ $scope.checkVerifiedCheckBox=function()
 	{
 		var u = {}, a = [];   
 		var refArr=arrayNew.split(",");
-			for(var i = 0, l = refArr.length; i < l; ++i){
-      if(u.hasOwnProperty(refArr[i])) {
-         continue;
-      }
-      a.push(refArr[i]);
-      u[refArr[i]] = 1;
-   }
-   var aString=a.join()
-   return aString;
-}
+		for(var i = 0, l = refArr.length; i < l; ++i)
+		{
+			if(u.hasOwnProperty(refArr[i])) 
+			{
+				continue;
+			}
+			var pgPlace=refArr[i].toLowerCase().indexOf('pg');
+			refArr[i]=refArr[i].replace(refArr[i].substring(pgPlace,pgPlace+2),"pg");
+			a.push(refArr[i]);
+			u[refArr[i]] = 1;
+		}
+		var aString=a.join()
+		return aString;
+	}
   })
+  
+/*
+This directive allows us to pass a function in on an enter key to do what we want.
+ */
+.directive('ngEnter', function () {
+    return function (scope, element, attrs) {
+        element.bind("keydown keypress", function (event) {
+            if(event.which === 13) {
+                scope.$apply(function (){
+                    scope.$eval(attrs.ngEnter);
+                });
+ 
+                event.preventDefault();
+            }
+        });
+    };
+    })
 .filter('singlegroupFilter',['Utils',function(Utils){
 	return function(items,search)
 	{
