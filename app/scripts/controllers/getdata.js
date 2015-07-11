@@ -56,7 +56,8 @@ $rootScope.$on('$locationChangeStart', function($event, changeTo, changeFrom) {
 			$("#heading-term").html("");
 		}
 });
-
+if(document.getElementById('term'))
+{
 document.getElementById('term').onkeydown = function(e){
    if(e.keyCode == 13){
      // submit.
@@ -65,6 +66,7 @@ document.getElementById('term').onkeydown = function(e){
      $scope.adddata($scope.docs);
    }
 };
+}
 //Every checkboxes in the page
 $('.checkbox input:checkbox').click(function() {
     $('.checkbox input:checkbox').not(this).prop('checked', false);
@@ -340,7 +342,7 @@ $scope.checkVerifiedCheckBox=function()
 		}  
     
 		//============================Delete data in the form=====================================//        
-        $scope.deletedata = function() 
+        $scope.deletedata = function(items) 
         {
 			var id=document.getElementById("keyid").value;
 			var rev=document.getElementById("keyrev").value; 
@@ -526,11 +528,7 @@ $scope.checkVerifiedCheckBox=function()
 				}); 			
 			} 
 			setTimeout(function(){
-			$scope.editdata.ref="";
-			$scope.editdata.original="";
-			$scope.editdata.definition="";
-			document.getElementById("verifiedCheckbox").checked = false;
-			$scope.allDocsFunc();
+			$scope.cancelUpdate();
 			},1000);     
 		};
     
@@ -554,8 +552,8 @@ $scope.checkVerifiedCheckBox=function()
 			document.getElementById("keyid").value="";
 			document.getElementById("keyrev").value="";
 			$scope.addform.$setPristine();
-		//	$scope.search.doc.term="";
-			$scope.editdata.ref="";
+			$scope.search.doc.term="";
+			//$scope.editdata.ref="";
 			$scope.editdata.original="";
 			$scope.editdata.definition="";
 			document.getElementById("verifiedCheckbox").checked = false;
@@ -661,6 +659,22 @@ $scope.checkVerifiedCheckBox=function()
 					//============if any other verified term that matches the current term in the family===============//
 					var allReferences=allRef.join();
 					allReferences=$scope.getUnique(allReferences);
+					//==check if the term being added has definition and original==//
+					if(original=="" || definition=="")					
+					{
+						//=get both the values from other terms already present=//
+						angular.forEach($scope.wholeWordMatches ,function(match)
+						{
+							if(original=="")
+							{
+								original=match.doc.original;
+							}
+							if(definition=="")
+							{
+								definition=match.doc.definition;
+							}
+						});
+					}
 					var data= JSON.stringify
 					({
 						"source": userName,   
@@ -702,7 +716,11 @@ $scope.checkVerifiedCheckBox=function()
 							console.log(status);
 							$scope.message='Error Adding record';
 						});
-					}					
+					}	
+					else
+					{
+						return false;
+					}				
 				}
 				else
 				{
@@ -774,6 +792,10 @@ $scope.checkVerifiedCheckBox=function()
 							$scope.message='Error Adding record';
 						});
 					}
+					else
+					{
+						return false;
+					}
 				}
 			}
 			else
@@ -791,6 +813,22 @@ $scope.checkVerifiedCheckBox=function()
 				});
 				var allReferences=allRef.join();
 				allReferences=$scope.getUnique(allReferences);
+				//==check if the term being added has definition and original==//
+				if(original=="" || definition=="")					
+				{
+					//=get both the values from other terms already present=//
+					angular.forEach($scope.wholeWordMatches ,function(match)
+					{
+						if(original=="")
+						{
+							original=match.doc.original;
+						}
+						if(definition=="")
+						{
+							definition=match.doc.definition;
+						}
+					});
+				}
 				var data= JSON.stringify
 				({
 					"source": userName,   
@@ -832,6 +870,10 @@ $scope.checkVerifiedCheckBox=function()
 						$scope.message='Error Adding record';
 					});
 				}
+				else
+				{
+					return false;
+				}
 			}
 		}
 		else
@@ -866,11 +908,29 @@ $scope.checkVerifiedCheckBox=function()
 							allRef.push(item.doc.ref);
 							var allReferences=allRef.join();
 							allReferences=$scope.getUnique(allReferences);
+							//==check if the term being added has definition and original==//
+							if((item.doc.original=="" || typeof(item.doc.original)=="undefined")|| (item.doc.definition=="" || typeof(item.doc.definition)=="undefined"))					
+							{
+								//=get both the values from other terms already present=//
+								if(item.doc.original=="" || typeof(item.doc.original)=="undefined")
+								{
+									var neworiginal=original;
+								}
+								if(item.doc.definition=="" || typeof(item.doc.definition)=="undefined")
+								{
+									var newdefinition=definition;
+								}
+							}
+							else
+							{
+								var neworiginal=item.doc.original;
+								var newdefinition=item.doc.definition;
+							}
 							var data= JSON.stringify
 							({
 								"source": item.doc.source,   
-								"original":item.doc.original , 
-								"definition":item.doc.definition, 
+								"original":neworiginal , 
+								"definition":newdefinition, 
 								"type": "term", 
 								"user": item.doc.userName,
 								"term": item.doc.term,
@@ -895,6 +955,10 @@ $scope.checkVerifiedCheckBox=function()
 									console.log(status);
 									$scope.message='Error Adding record';
 								});
+							}
+							else
+							{
+								return false;
 							}
 							termsMatch++;
 						}				
@@ -940,6 +1004,10 @@ $scope.checkVerifiedCheckBox=function()
 						console.log(status);
 						$scope.message='Error Adding record';
 					});
+				}
+				else
+				{
+					return false;
 				}
 			}
 						
@@ -1015,6 +1083,22 @@ $scope.checkVerifiedCheckBox=function()
 					//============if any other verified term in the family===============//
 					var allReferences=allRef.join();
 					allReferences=$scope.getUnique(allReferences);
+					//==check if the term being added has definition and original==//
+					if(original=="" || definition=="")					
+					{
+						//=get both the values from other terms already present=//
+						angular.forEach($scope.wholeWordMatches ,function(match)
+						{
+							if(original=="")
+							{
+								original=match.doc.original;
+							}
+							if(definition=="")
+							{
+								definition=match.doc.definition;
+							}
+						});
+					}
 					var data= JSON.stringify
 					({
 						"source": userName,   
@@ -1059,6 +1143,10 @@ $scope.checkVerifiedCheckBox=function()
 							console.log(status);
 							$scope.message='Error Updating record';
 						});
+					}
+					else
+					{
+						return false;
 					}
 				}
 				else
@@ -1132,6 +1220,10 @@ $scope.checkVerifiedCheckBox=function()
 							$scope.message='Error Adding record';
 						});
 					}
+					else
+					{
+						return false;
+					}
 				}	
 			}
 			else
@@ -1153,6 +1245,22 @@ $scope.checkVerifiedCheckBox=function()
 				});
 				var allReferences=allRef.join();
 				allReferences=$scope.getUnique(allReferences);
+				//==check if the term being added has definition and original==//
+				if(original=="" || definition=="")					
+				{
+					//=get both the values from other terms already present=//
+					angular.forEach($scope.wholeWordMatches ,function(match)
+					{
+						if(original=="")
+						{
+							original=match.doc.original;
+						}
+						if(definition=="")
+						{
+							definition=match.doc.definition;
+						}
+					});
+				}
 				var data= JSON.stringify
 				({
 					"source": userName,   
@@ -1198,6 +1306,10 @@ $scope.checkVerifiedCheckBox=function()
 						$scope.message='Error Adding record';
 					});
 				}
+				else
+				{
+					return false;
+				}
 			}
 		}
 		else
@@ -1235,11 +1347,28 @@ $scope.checkVerifiedCheckBox=function()
 							allRef.push(item.doc.ref);
 							var allReferences=allRef.join();
 							allReferences=$scope.getUnique(allReferences);
+							if((item.doc.original=="" || typeof(item.doc.original)=="undefined")|| (item.doc.definition=="" || typeof(item.doc.definition)=="undefined"))					
+							{
+								//=get both the values from other terms already present=//
+								if(item.doc.original=="" || typeof(item.doc.original)=="undefined")
+								{
+									var neworiginal=original;
+								}
+								if(item.doc.definition=="" || typeof(item.doc.definition)=="undefined")
+								{
+									var newdefinition=definition;
+								}
+							}
+							else
+							{
+								var neworiginal=item.doc.original;
+								var newdefinition=item.doc.definition;
+							}	
 							var data= JSON.stringify
 							({
 								"source": item.doc.source,   
-								"original":item.doc.original , 
-								"definition":item.doc.definition, 
+								"original":neworiginal , 
+								"definition":newdefinition, 
 								"type": "term", 
 								"user": item.doc.userName,
 								"term": item.doc.term,
@@ -1273,6 +1402,10 @@ $scope.checkVerifiedCheckBox=function()
 									console.log(status);
 									$scope.message='Error Adding record';
 								});
+							}
+							else
+							{
+								return false;
 							}
 							termsMatch++;
 						}				
@@ -1318,6 +1451,10 @@ $scope.checkVerifiedCheckBox=function()
 						console.log(status);
 						$scope.message='Error Adding record';
 					});
+				}
+				else
+				{
+					return false;
 				}
 			}
 		}
@@ -1371,20 +1508,30 @@ $scope.checkVerifiedCheckBox=function()
 	$scope.getUnique = function(arrayNew)
 	{
 		var u = {}, a = [];   
-		var refArr=arrayNew.split(",");
-		for(var i = 0, l = refArr.length; i < l; ++i)
+		if(arrayNew!="" || typeof(arrayNew)!="undefined")
 		{
-			if(u.hasOwnProperty(refArr[i])) 
+			var refArr=arrayNew.split(",");
+			for(var i = 0, l = refArr.length; i < l; ++i)
 			{
-				continue;
+				if(u.hasOwnProperty(refArr[i])) 
+				{
+					continue;
+				}
+				if(refArr[i]!="")
+				{
+					var pgPlace=refArr[i].toLowerCase().indexOf('pg');
+					refArr[i]=refArr[i].replace(refArr[i].substring(pgPlace,pgPlace+2),"pg");
+					a.push(refArr[i]);
+					u[refArr[i]] = 1;
+				}
 			}
-			var pgPlace=refArr[i].toLowerCase().indexOf('pg');
-			refArr[i]=refArr[i].replace(refArr[i].substring(pgPlace,pgPlace+2),"pg");
-			a.push(refArr[i]);
-			u[refArr[i]] = 1;
+			var aString=a.join()
+			return aString;
 		}
-		var aString=a.join()
-		return aString;
+		else
+		{
+			return arrayNew;
+		}
 	}
   })
   

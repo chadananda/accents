@@ -114,39 +114,42 @@ $rootScope.$on('$locationChangeStart', function($event, changeTo, changeFrom) {
  
  //===================Delete Duplicate Records================//
  $scope.deleteDuplicate=function(alldocs){
-	 angular.forEach(alldocs, function(docs) {		
+	 var idArray=[];
+	  angular.forEach(alldocs, function(docs) {		
 		 angular.forEach(alldocs,function(doc)
 		 {
-		  if(doc.doc.term==docs.doc.term && doc.doc.original==docs.doc.original && doc.doc.definition==docs.doc.definition && doc.doc.source==docs.doc.source)
-		  {
-				if(doc.doc.verify && doc.doc.verify=="1")
-				{
-					var id=docs.id;
-					var rev=docs.doc._rev;
-				}
-				else
-				{
-					var id=doc.id; 
-					var rev=doc.doc._rev;
-				}
-				//console.log(id);
-				$http.delete('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev).
-				success(function(data, status, headers, config) 
-				{
-					//$("#spinner").show();
-					$scope.message='Records Deleted Successfully';					
-				}).
-				error(function(data, status, headers, config) 
-				{
-					$scope.message='Error Deleting Record';
-				});
-				
-		  }
-		});
-		
-	 });
-	 $scope.addFamilyField(alldocs);
-	 $scope.removeUnusedData(alldocs);
+			 if((docs.doc._id!=doc.doc._id )&& (docs.doc._rev!=doc.doc._rev))
+			 {
+				 if(doc.doc.term==docs.doc.term && doc.doc.original==docs.doc.original && doc.doc.definition==docs.doc.definition && doc.doc.source==docs.doc.source)
+				 {
+					if(doc.doc.verify && doc.doc.verify=="1")
+					{
+						var id=docs.id;
+						var rev=docs.doc._rev;
+					}
+					else
+					{
+						var id=doc.id; 
+						var rev=doc.doc._rev;
+					}
+					idArray.push(id);
+					
+					//~ $http.delete('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev).
+					//~ success(function(data, status, headers, config) 
+					//~ {
+						//~ //$("#spinner").show();
+						//~ $scope.message='Records Deleted Successfully';					
+					//~ }).
+					//~ error(function(data, status, headers, config) 
+					//~ {
+						//~ $scope.message='Error Deleting Record';
+					//~ });		
+				 }
+			 }
+		 });
+		 //$scope.allDocsFunc();
+	  });
+	  console.log(idArray);
  };
 	//==================For slide toggle of help divs====================//
 	$scope.slideShow=function(calledId)
