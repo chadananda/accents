@@ -124,7 +124,7 @@
 
                   </div>
 				  <div class="form-group col-sm-6 ">
-                    <input type="text" class="form-control chkval" name="definition" ng-model="editdata.definition" ng-enter="adddata(docs)"/>
+                    <input type="text" class="form-control chkval" name="definition" ng-model="editdata.definition" ng-enter="adddata(docs)" id="definition" />
                     <span class="inputexm">Notes</span>
                   </div>
 				</div>
@@ -177,9 +177,9 @@
 								</button>
 								&nbsp;
 								<div class="otherData">
-									<div class="notesClass" ng-show="docobj.doc.original!=''">Original: {{docobj.doc.original}}&nbsp;</div>
-									<div class="notesClass" ng-show="docobj.doc.ref!=''">Ref: {{docobj.doc.ref}}&nbsp;</div>
-									<div class="notesClass" ng-show="docobj.doc.definition!=''">Notes: {{docobj.doc.definition}}&nbsp;</div>
+									<div class="notesClass" ng-show="docobj.doc.original!=''">{{docobj.doc.original}}&nbsp;</div>
+									<div class="notesClass" ng-show="docobj.doc.ref!=''"> {{docobj.doc.ref}}&nbsp;</div>
+									<div class="notesClass" ng-show="docobj.doc.definition!=''"> {{docobj.doc.definition}}&nbsp;</div>
 								</div>
 							</div>
 						</div>
