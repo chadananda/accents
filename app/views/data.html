@@ -134,7 +134,7 @@
                 <div class="col-lg-12 clearfix  mt10   ">
                   <div class="col-sm-5 col-md-5 clearfix ">
                          <div class="checkbox mt20 dispinblk">
-                            <label style="padding-left:13px;"><input type="checkbox" ng-model="verified" id="verifiedCheckbox" ng-checked="editdata.verify==1"/> Verified</label>
+                            <label style="padding-left:13px;"><input type="checkbox" ng-model="verified" id="verifiedCheckbox" ng-checked="editdata.verify==1  || editdata.verify==true"/> Verified</label>
                           </div>
                           <!--
                           <div class="checkbox mt20 dispinblk">
@@ -165,7 +165,7 @@
 							<h5 class="mb10 "><span class="mr5">{{(docs|wholeWordFilterMatch: customi2html(search.doc.term)).length}}</span>Whole Word Matches</h5>
 							<div ng-repeat="docobj in docs |wholeWordFilterMatch: customi2html(search.doc.term)"  class="col-md-11 col-md-offset-1" >
 								<span ng-bind-html="i2html(customi2html(docobj.doc.term))">{{docobj.doc.term}}</span>
-								<span class="glyphicon glyphicon-ok-circle ml10" ng-if="docobj.doc.verify==1"  style="margin-left: 5px;"></span>
+								<span class="glyphicon glyphicon-ok-circle ml10" ng-if="docobj.doc.verify==1 || docobj.doc.verify==true"  style="margin-left: 5px;"></span>
 								<span class="glyphicon glyphicon-question-sign" ng-if="docobj.doc.ambiguous==1"  style="margin-left: 5px;"></span>
 								<!--<span class="glyphicon glyphicon-edit ml10" ng-click="editdoc(docobj.doc._id,docobj.doc._rev);"></span>-->
 								<button  ng-click="editdoc(docobj.doc._id,docobj.doc._rev);" class="btn btn-primary btn-xs editbtn mb10" type="button" style="margin-left: 10px;">
@@ -190,7 +190,7 @@
 								<div id="showDiv-{{key}}" class="col-md-11 col-md-offset-1" ng-show="viewkey==key && value!=1">
 									<div ng-repeat="t in filterresult" >
 										<span ng-bind-html="i2html(customi2html(t.term))">{{t.term}}</span>
-										<span class="glyphicon glyphicon-ok-circle ml10" ng-if="t.verify==1"  style="margin-left: 5px;"></span>
+										<span class="glyphicon glyphicon-ok-circle ml10" ng-if="t.verify==1  || t.verify==true"  style="margin-left: 5px;"></span>
 										<span class="glyphicon glyphicon-question-sign" ng-if="t.ambiguous==1"  style="margin-left: 5px;"></span>
 										<button  ng-click="editdoc(t._id,t._rev);" class="btn btn-primary btn-xs editbtn mb10" type="button" style="margin-left: 10px;">
 											<span class="glyphicon glyphicon-edit"></span>
@@ -205,7 +205,7 @@
 							<div ng-repeat="doc  in docs |singlegroupFilter:customi2html(search.doc.term)" class="searchSingle"   >
 								<span class="glyphicon glyphicon-record mr5 openPanel"></span>
 								<span ng-bind-html="i2html(customi2html(doc.doc.term))">{{doc.doc.term}}</span>
-								<span class="glyphicon glyphicon-ok-circle ml10" ng-if="doc.doc.verify==1"  style="margin-left: 5px;"></span>
+								<span class="glyphicon glyphicon-ok-circle ml10" ng-if="doc.doc.verify==1 || doc.doc.verify==true"  style="margin-left: 5px;"></span>
 								<span class="glyphicon glyphicon-question-sign" ng-if="doc.doc.ambiguous==1"  style="margin-left: 5px;"></span>
 								<button  ng-click="editdoc(doc.doc._id,doc.doc._rev);" class="btn btn-primary btn-xs editbtn mb10" type="button"  style="margin-left: 10px;">
 									<span class="glyphicon glyphicon-edit"></span>
