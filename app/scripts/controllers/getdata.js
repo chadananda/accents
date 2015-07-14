@@ -105,7 +105,7 @@ angular.module('accentsApp')
   // returns array of allowable term fields (so we can adjust this on one place)
   $scope.termAllowedFields = function() {
     return ['definition', 'original', 'source', 'term', 'user', 'wordfamily', 'ref',
-            'verify', 'ambiguous', 'audio', '_id', '_rev', 'type'];
+            'verified', 'ambiguous', 'audio', '_id', '_rev', 'type'];
   };
 
   // remove fields that are not allowed -- we use this on loading records and before saving
@@ -190,6 +190,7 @@ angular.module('accentsApp')
               termObj.original = termObj.original || ''; // default blank string
               termObj.definition = termObj.definition || ''; // default blank
               termObj.ref = $scope.scrubField(termObj.ref, true);
+              termObj.verified = termObj.verified || false;
               termObj = $scope.pruneUnallowedFields(termObj); // remove any extraneous fields
               $scope.idDocs[termObj['_id']] = termObj; // add to termObj cache
             }
@@ -246,6 +247,7 @@ angular.module('accentsApp')
     wordfamily = $scope.genWordFamily(wordfamily); // cleanup just in case
     var terms = $scope.getWordFamilyTerms(wordfamily);
     var family = {};
+
     // split into object of one termArray for each spelling
     // eg. { "_Shiráz" => [termObj, termObj, termObj],
     //       "_Shíráz" => [termObj, termObj, termObj] }
@@ -253,17 +255,22 @@ angular.module('accentsApp')
       if (!family[termObj.term]) family[termObj.term] = []; // initialize if neccesary
       family[termObj.term].push(termObj);
     });
+
+    console.log('cleanWordFamily: '+ wordfamily, family);
+
     // now compress each list down to just one record each
     var verified_count = 0;
     Object.keys(family).forEach(function(term) {
-      family[term] = $scope.compressTerms(family[term]); // takes array of termObjs, returns just one
-      if (family[term].verify) verified_count++;
+      family[term] = $scope.compressTerms(family[term]); // takes array of termObjs, returns merged termObj
+      if (family[term].verified) verified_count++;
     });
+
     // now set them all to ambiguous or not depending on verified count
     Object.keys(family).forEach(function(term) {
       family[term].ambiguous = (verified_count>1);
       $scope.termCRUD('update', family[term]);
     });
+
     // wait a second then refresh main cache list
     setTimeout(function() {
       $scope.refreshAllDocList();
@@ -273,11 +280,10 @@ angular.module('accentsApp')
   // compresses array of matching terms into one, returns termObj
   // this is not a whole word-family but just a sub-branch with exactly matching terms
   $scope.compressTerms = function(termsArray) {
+    if (termsArray.length===1) return termsArray[0]; // no need to merge if there's only one
 
     // for some reason, the first term is already compressed
     console.log('compressTerms', termsArray);
-
-    if (termsArray.length===1) return termsArray[0]; // no need to merge if there's only one
     var i, key, keys, term;
     var base = termsArray[0]; // first term we will merge everything into
     var allowedTerms = $scope.termAllowedFields(); // list of allowed fields, we'll ignore all others
@@ -450,7 +456,7 @@ angular.module('accentsApp')
     document.getElementById("reference").value = $scope.scrubField(termObj.ref, true);
     document.getElementById("original").value = termObj.original.trim();
     document.getElementById("definition").value = termObj.definition.trim();
-    document.getElementById("verifiedCheckbox").checked = termObj.verify;
+    document.getElementById("verifiedCheckbox").checked = termObj.verified;
 
     // why do we need this?
     $scope.editdata.original =termObj.original.trim();
@@ -1798,7 +1804,7 @@ This directive allows us to pass a function in on an enter key to do what we wan
         var string=item.doc.term;
         if(string)
         {
-          if( ((string.toLowerCase().indexOf(search.toLowerCase())) !=-1) && item.doc.verify==1)
+          if( ((string.toLowerCase().indexOf(search.toLowerCase())) !=-1) && item.doc.verified==1)
           {
             filtered.push(item);
           }
