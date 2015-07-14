@@ -131,11 +131,12 @@ angular.module('accentsApp')
 
     // delete action requires _id and _rev
     if (action == 'delete') {
-      $http.delete($scope.db_url() + termObj._id+'?rev='+termObj._rev)
+      $http.delete($scope.db_url() + termObj._id)
         .success(function(data, status, headers, config){
           console.log(status);
           delete $scope.idDocs[termObj._id]; // remove item from cache
           if (callback) callback();
+          
         })
         .error(function(data, status, headers, config) { console.log(status); });
 
@@ -247,33 +248,36 @@ angular.module('accentsApp')
     wordfamily = $scope.genWordFamily(wordfamily); // cleanup just in case
     var terms = $scope.getWordFamilyTerms(wordfamily);
     var family = {};
-
     // split into object of one termArray for each spelling
     // eg. { "_Shiráz" => [termObj, termObj, termObj],
     //       "_Shíráz" => [termObj, termObj, termObj] }
+   
     terms.forEach(function(termObj) {
       if (!family[termObj.term]) family[termObj.term] = []; // initialize if neccesary
       family[termObj.term].push(termObj);
     });
-
-    console.log('cleanWordFamily: '+ wordfamily, family);
-
+    //console.log('cleanWordFamily: '+ wordfamily, family);
     // now compress each list down to just one record each
     var verified_count = 0;
     Object.keys(family).forEach(function(term) {
       family[term] = $scope.compressTerms(family[term]); // takes array of termObjs, returns merged termObj
-      if (family[term].verified) verified_count++;
-    });
-
+      if (family[term].verified) verified_count++;      
+    }); 
+     setTimeout(function() {  
+    $scope.refreshAllDocList();
+     }, 2000);   
     // now set them all to ambiguous or not depending on verified count
     Object.keys(family).forEach(function(term) {
       family[term].ambiguous = (verified_count>1);
-      $scope.termCRUD('update', family[term]);
+     setTimeout(function() {   
+     $scope.termCRUD('update', family[term]);
+    }, 2000);      
+    
     });
 
     // wait a second then refresh main cache list
     setTimeout(function() {
-      $scope.refreshAllDocList();
+     // $scope.refreshAllDocList();
     }, 2000);
   };
 
@@ -283,7 +287,7 @@ angular.module('accentsApp')
     if (termsArray.length===1) return termsArray[0]; // no need to merge if there's only one
 
     // for some reason, the first term is already compressed
-    console.log('compressTerms', termsArray);
+  //  console.log('compressTerms', termsArray);
     var i, key, keys, term;
     var base = termsArray[0]; // first term we will merge everything into
     var allowedTerms = $scope.termAllowedFields(); // list of allowed fields, we'll ignore all others
@@ -316,11 +320,17 @@ angular.module('accentsApp')
           }
         }
       };
-      // discard merged record
-      $scope.termCRUD('delete', term);
+		// discard merged record  
+		$scope.termCRUD('delete', term);     
     }
+    $scope.refreshAllDocList();
+     setTimeout(function() {   
+		 console.log('update1');  
+      $scope.termCRUD('update', base);
+    }, 5000);
     // update base record
-    $scope.termCRUD('update', base);
+    
+   
     return base;
   };
 
@@ -451,7 +461,6 @@ angular.module('accentsApp')
 
     // if multi value reference, keep only the first one
     //$scope.editdata.term = t.term.trim();
-    console.log(termObj);
     document.getElementById("term").value = termObj.term.trim();
     document.getElementById("reference").value = $scope.scrubField(termObj.ref, true);
     document.getElementById("original").value = termObj.original.trim();
@@ -471,37 +480,14 @@ angular.module('accentsApp')
     $('#Button3').css({ "display":"block" });
     $('#updateword').css({ "display":"block" });
     document.getElementById("toptext").innerHTML="Edit:";
-
-
-    // ??? what does this do?
-    //$scope.testFunction();
-    /*
-    var term = $('#term').val();
-    if(term !== "") {
-      var changedTerm=$scope.customi2html(term);
-      $("#term").val(changedTerm);
-      $("#heading-term").html(Utils.ilm2HTML(changedTerm));
-    }
-    */
-
-
     $("#heading-term").html(Utils.ilm2HTML(termObj.term));
-
     setTimeout(function() {
       $("#term").trigger("change");
     }, 100);
 
-
     // TODO: add audio state
   };
-
   /********* end of CRUD DRY Utils *************/
-
-
-
-
-
-
   $("#spinner").show();
   $scope.refreshAllDocList(); // added by Chad to load cache
   getRecords.getAllData()
@@ -526,9 +512,6 @@ angular.module('accentsApp')
         setTimeout(function(){$scope.editdoc(id,rev)},5000);
       }
     }
-
-
-
   /* what is this? should it be part of the term Form load?
   $scope.testFunction=function() {
     var term = $('#term').val();
@@ -549,8 +532,6 @@ angular.module('accentsApp')
   $scope.allDocsFunc=function() {
     $scope.refreshAllDocList();
   };
-
-
   //==Delete Record from the partial or whole word searches========//
   $scope.deletedoc = function(id) {
     if($window.confirm('Are you SURE you want to delete this term?')) {
@@ -565,183 +546,10 @@ angular.module('accentsApp')
         }, 1000);
       });
     }
+  };   
+   $scope.refreshFilteredMatches=function(termObj){
+      $("#term").trigger("change");
   };
-    /*
-      if($window.confirm('Are you SURE you want to delete?')) {
-        $http.get('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev+'&include_docs=true').
-        success(function(data, status, headers, config) {
-          $scope.editdata=data;
-          document.getElementById("term").value=data.term;
-          //==============First check the record being deleted is verified or not===============//
-          if(data.verify==1) {
-            //=============if verified record====================//
-            //=============Get record's word family================//
-            $scope.wholeWordMatches = $filter('wholeWordFilter')(items,data.term);
-            var countVerify=0;
-            angular.forEach($scope.wholeWordMatches,function(match) {
-              if(match.doc._id!=id) {
-                if(match.doc.verify==1) {
-                  countVerify++;
-                }
-              }
-            });
-            if(countVerify==1)   {
-              //===========if this is not alone verified record and more verified left============//
-              $http.delete('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev).
-              success(function(data, status, headers, config) {
-                $("#spinner").show();
-                $scope.message='Record Deleted Successfully';
-                //================Unmark the family ambiguous======================//
-                angular.forEach($scope.wholeWordMatches,function(match) {
-                  var updateid= match.doc._id;
-                  var revid= match.doc._rev;
-                  var updatedWordfamilyField=$scope.search.doc.term;
-                  updatedWordfamilyField= updatedWordfamilyField.replace("_","");
-                  updatedWordfamilyField=Utils.dotUndersRevert(updatedWordfamilyField);
-                  if(match.doc._id!=data.id) {
-                    if(match.doc.verify==1) {
-                      var verify=1;
-                    }
-                    else {
-                      var verify=0;
-                    }
-                    var newdata= JSON.stringify
-                    ({
-                      "source": match.doc.source,
-                      "original": match.doc.original ,
-                      "definition": match.doc.definition,
-                      "type": "term",
-                      "user":  match.doc.user,
-                      "term":  match.doc.term,
-                      "ref": match.doc.ref,
-                      "wordfamily":updatedWordfamilyField,
-                      "verify":verify,
-                      "ambiguous":0
-                    });
-                    $http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+updateid+'?rev='+revid, newdata).
-                    success(function(newdata, status, headers, config) {
-                      console.log(status);
-                    }).
-                    error(function(data, status, headers, config) {
-                      console.log(status);
-                    });
-                  }
-                });
-              }).
-              error(function(data, status, headers, config)
-              {
-              });
-            }
-            else if(countVerify>=1) {
-              //===========if this is not alone verified record and more verified left============//
-              $http.delete('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev).
-              success(function(data, status, headers, config) {
-                $("#spinner").show();
-                $scope.message='Record Deleted Successfully';
-                //================mark the family ambiguous======================//
-                angular.forEach($scope.wholeWordMatches,function(match) {
-                  var updateid= match.doc._id;
-                  var revid= match.doc._rev;
-                  var updatedWordfamilyField=$scope.search.doc.term;
-                  updatedWordfamilyField= updatedWordfamilyField.replace("_","");
-                  updatedWordfamilyField=Utils.dotUndersRevert(updatedWordfamilyField);
-                  if(match.doc._id!=data.id) {
-                    if(match.doc.verify==1) {
-                      var verify=1;
-                    }
-                    else {
-                      var verify=0;
-                    }
-                    var newdata= JSON.stringify
-                    ({
-                      "source": match.doc.source,
-                      "original": match.doc.original ,
-                      "definition": match.doc.definition,
-                      "type": "term",
-                      "user":  match.doc.user,
-                      "term":  match.doc.term,
-                      "ref": match.doc.ref,
-                      "wordfamily":updatedWordfamilyField,
-                      "verify":verify,
-                      "ambiguous":1
-                    });
-                    $http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+updateid+'?rev='+revid, newdata).
-                    success(function(newdata, status, headers, config)
-                    {
-                      console.log(status);
-                    }).
-                    error(function(data, status, headers, config)
-                    {
-                      console.log(status);
-                    });
-                  }
-                });
-              }).
-              error(function(data, status, headers, config)
-              {
-              });
-            }
-            else
-            {
-              //===============if this alone is verified=================//
-              //===========if this is not alone verified record and more verified left============//
-              $http.delete('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev).
-              success(function(data, status, headers, config)
-              {
-                $("#spinner").show();
-                $scope.message='Record Deleted Successfully';
-              }).
-              error(function(data, status, headers, config)
-              {
-              });
-            }
-          }
-          else
-          {
-            //=============if not a verified record====================//
-            $http.delete('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev).
-            success(function(data, status, headers, config)
-            {
-              $("#spinner").show();
-              $scope.message='Record Deleted Successfully';
-              $http.get('http://'+domainRemoteDb+'/'+remoteDb+'/_all_docs?include_docs=true')
-              .success(function(data)
-              {
-                if(data.rows)
-                {
-                  $scope.docs=data.rows;
-                  $scope.count=data.total_rows;
-                  $('div[id^="showDiv-"]').hide();
-                }
-              })
-              .error(function(error)
-              {
-                console.log(error);
-              });
-            }).
-            error(function(data, status, headers, config)
-            {
-              $scope.message='Error Deleting Record';
-            });
-          }
-        }).
-        error(function(data, status, headers, config) {
-        });
-      }
-
-
-      setTimeout(function(){
-      $scope.editdata.ref="";
-      $scope.editdata.original="";
-      $scope.editdata.definition="";
-      document.getElementById("verifiedCheckbox").checked = false;
-      $scope.allDocsFunc();
-      },1000);
-
-
-    };
-
-    */
   //============================Delete data in the form=====================================//
   $scope.deletedata = function() {
     if($window.confirm('Are you SURE you want to delete this term?')) {
@@ -752,284 +560,28 @@ angular.module('accentsApp')
         // wait a second then refresh global list and filtered matches
         setTimeout(function() {
           // refresh filtered list with form term, this is not implemented yet
-          // $scope.refreshFilteredMatches(termObj);
+           $scope.refreshFilteredMatches(termObj);
         }, 1000);
       });
     }
   };
-
-   /*
-
-
-      var id=document.getElementById("keyid").value;
-      var rev=document.getElementById("keyrev").value;
-      if($window.confirm('Are you SURE you want to delete?')) {
-
-        $http.get('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev+'&include_docs=true').
-        success(function(data, status, headers, config)
-        {
-          $scope.editdata=data;
-          document.getElementById("term").value=data.term;
-          //==============First check the record being deleted is verified or not===============//
-          if(data.verify==1)
-          {
-            //=============if verified record====================//
-            //=============Get record's word family================//
-            $scope.wholeWordMatches = $filter('wholeWordFilter')(items,data.term);
-            var countVerify=0;
-            angular.forEach($scope.wholeWordMatches,function(match)
-            {
-              if(match.doc._id!=id)
-              {
-                if(match.doc.verify==1)
-                {
-                  countVerify++;
-                }
-              }
-            });
-            if(countVerify==1)
-            {
-              //===========if this is not alone verified record and more verified left============//
-              $http.delete('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev).
-              success(function(data, status, headers, config)
-              {
-                $("#spinner").show();
-                $scope.message='Record Deleted Successfully';
-                //================Unmark the family ambiguous======================//
-                angular.forEach($scope.wholeWordMatches,function(match)
-                {
-                  var updateid= match.doc._id;
-                  var revid= match.doc._rev;
-                  var updatedWordfamilyField=$scope.search.doc.term;
-                  updatedWordfamilyField= updatedWordfamilyField.replace("_","");
-                  updatedWordfamilyField=Utils.dotUndersRevert(updatedWordfamilyField);
-                  if(match.doc._id!=data.id)
-                  {
-                    if(match.doc.verify==1)
-                    {
-                      var verify=1;
-                    }
-                    else
-                    {
-                      var verify=0;
-                    }
-                    var newdata= JSON.stringify
-                    ({
-                      "source": match.doc.source,
-                      "original": match.doc.original ,
-                      "definition": match.doc.definition,
-                      "type": "term",
-                      "user":  match.doc.user,
-                      "term":  match.doc.term,
-                      "ref": match.doc.ref,
-                      "wordfamily":updatedWordfamilyField,
-                      "verify":verify,
-                      "ambiguous":0
-                    });
-                    $http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+updateid+'?rev='+revid, newdata).
-                    success(function(newdata, status, headers, config)
-                    {
-                      console.log(status);
-                    }).
-                    error(function(data, status, headers, config)
-                    {
-                      console.log(status);
-                    });
-                  }
-                });
-              }).
-              error(function(data, status, headers, config)
-              {
-              });
-            }
-            else if(countVerify>=1)
-            {
-              //===========if this is not alone verified record and more verified left============//
-              $http.delete('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev).
-              success(function(data, status, headers, config)
-              {
-                $("#spinner").show();
-                $scope.message='Record Deleted Successfully';
-                //================mark the family ambiguous======================//
-                angular.forEach($scope.wholeWordMatches,function(match)
-                {
-                  var updateid= match.doc._id;
-                  var revid= match.doc._rev;
-                  var updatedWordfamilyField=$scope.search.doc.term;
-                  updatedWordfamilyField= updatedWordfamilyField.replace("_","");
-                  updatedWordfamilyField=Utils.dotUndersRevert(updatedWordfamilyField);
-                  if(match.doc._id!=data.id)
-                  {
-                    if(match.doc.verify==1)
-                    {
-                      var verify=1;
-                    }
-                    else
-                    {
-                      var verify=0;
-                    }
-                    var newdata= JSON.stringify
-                    ({
-                      "source": match.doc.source,
-                      "original": match.doc.original ,
-                      "definition": match.doc.definition,
-                      "type": "term",
-                      "user":  match.doc.user,
-                      "term":  match.doc.term,
-                      "ref": match.doc.ref,
-                      "wordfamily":updatedWordfamilyField,
-                      "verify":verify,
-                      "ambiguous":1
-                    });
-                    $http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+updateid+'?rev='+revid, newdata).
-                    success(function(newdata, status, headers, config)
-                    {
-                      console.log(status);
-                    }).
-                    error(function(data, status, headers, config)
-                    {
-                      console.log(status);
-                    });
-                  }
-                });
-              }).
-              error(function(data, status, headers, config)
-              {
-              });
-            }
-            else
-            {
-              //===============if this alone is verified=================//
-              //===========if this is not alone verified record and more verified left============//
-              $http.delete('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev).
-              success(function(data, status, headers, config)
-              {
-                $("#spinner").show();
-                $scope.message='Record Deleted Successfully';
-              }).
-              error(function(data, status, headers, config)
-              {
-              });
-            }
-          }
-          else
-          {
-            //=============if not a verified record====================//
-            $http.delete('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev).
-            success(function(data, status, headers, config)
-            {
-              $("#spinner").show();
-              $scope.message='Record Deleted Successfully';
-              $http.get('http://'+domainRemoteDb+'/'+remoteDb+'/_all_docs?include_docs=true')
-              .success(function(data)
-              {
-                if(data.rows)
-                {
-                  $scope.docs=data.rows;
-                  $scope.count=data.total_rows;
-                  $('div[id^="showDiv-"]').hide();
-                }
-              })
-              .error(function(error)
-              {
-                console.log(error);
-              });
-            }).
-            error(function(data, status, headers, config)
-            {
-              $scope.message='Error Deleting Record';
-            });
-          }
-        }).
-        error(function(data, status, headers, config) {
-        });
-      }
-      setTimeout(function(){
-      $scope.cancelUpdate();
-      },1000);
-    };
-   */
-
   //=============Cancel function to reset to add state======================//
   $scope.cancelUpdate = function() {
     $scope.clearEditForm();
-    /*
-    document.getElementById("keyid").value="";
-    document.getElementById("keyrev").value="";
-    $scope.addform.$setPristine();
-    $scope.search.doc.term="";
-    $scope.editdata.ref="";
-    $scope.editdata.original="";
-    $scope.editdata.definition="";
-    document.getElementById("verifiedCheckbox").checked = false;
-    $scope.addState();
-    $scope.allDocsFunc();
-    */
   };
 
 
   //=============Cancel function to reset to add state after add and update======================//
   $scope.cancelUpdateAdd = function() {
     $scope.clearEditForm();
-    /*
-    document.getElementById("keyid").value="";
-    document.getElementById("keyrev").value="";
-    $scope.addform.$setPristine();
-    $scope.search.doc.term="";
-    //$scope.editdata.ref="";
-    $scope.editdata.original="";
-    $scope.editdata.definition="";
-    document.getElementById("verifiedCheckbox").checked = false;
-    $scope.addState();
-    $scope.allDocsFunc();
-    */
   };
-
-    //==============Add state of the form========================//
-    /*
-    $scope.addState = function() {
-      // note: I've added this to the clearForm function so clear form sets to add state.
-      // that will have to be overridden for edit mode
-      document.getElementById("toptext").innerHTML="Add:";
-      document.getElementById("heading-term").innerHTML="";
-      $('#Button2').css({ "display":"none" });
-      $('#Button3').css({ "display":"none" });
-      $('#updateword').css({ "display":"none" });
-      $('#addword').css({ "display":"block" });
-    };
-    */
 
   //////////////////////////single record data/////////////////////////////////////
   $scope.editdoc = function(id) {
     var termObj = $scope.getTermObj(id);
     if (termObj) $scope.setFormTerm(termObj);
       else $scope.clearEditForm();
-     /*
-    $http.get('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev+'&include_docs=true')
-      .success(function(data, status, headers, config) {
-        $scope.editdata=data;
-        document.getElementById("term").value=data.term;
-        document.getElementById("keyid").value=data._id;
-        document.getElementById("keyrev").value=data._rev;
-        $('#addword').css({ "display":"none" });
-        $('#Button2').css({ "display":"block" });
-        //$( "#Button2" ).attr( "ng-click", "deletedata('"+id+"','"+rev+"');" );
-        $('#Button3').css({ "display":"block" });
-        $('#updateword').css({ "display":"block" });
-        document.getElementById("toptext").innerHTML="Edit:";
-        var refrenceArray=data.ref;
-        if(sessionStorage.length!=0)   {
-          var sessionTerm=sessionStorage.term;
-          sessionStorage.clear();
-          sessionStorage.term=sessionTerm;
-        }
-        $scope.testFunction();
-      })
-      .error(function(data, status, headers, config) {
-      });
-     */
   };
-
   //=====================================Add a new term===================================//
   $scope.adddata=function() {
     var termObj = $scope.getFormTerm();
@@ -1041,418 +593,23 @@ angular.module('accentsApp')
         $scope.clearEditForm();
       });
   };
-
-      /*
-        //===========Get all data of the record==================//
-        var term=$scope.search.doc.term;
-        var original=$scope.editdata.original;
-        var refrence=$scope.editdata.ref;
-        refrence=$scope.getUnique(refrence);
-        var definition=$scope.editdata.definition;
-        //var verified=$scope.verified;
-        var verified=document.getElementById("verifiedCheckbox").checked;
-        var ambiguous=$scope.ambiguous;
-        var sessionArray= JSON.parse( localStorage.getItem("session-user"));
-        var userName=sessionArray.username;
-        var wordfamilyField=$scope.search.doc.term;
-        wordfamilyField= wordfamilyField.replace("_","");
-        wordfamilyField=Utils.dotUndersRevert(wordfamilyField);
-        //==============Get its word family=======================//
-        $scope.wholeWordMatches = $filter('wholeWordFilter')(items,term);
-        if(verified) {
-          //============If record being added is verified====================//
-          var countVerify=0;
-          //====Check if other records in the family are verified or not=====//
-          angular.forEach($scope.wholeWordMatches,function(item) {
-            if(item.doc.verify) {
-              if(item.doc.verify==1) {
-                countVerify++;
-              }
-            }
-          });
-          //===============if other records in family are verified=================//
-          if(countVerify>0) {
-            var allRef=[];
-            allRef.push(refrence);
-            var termsMatch=0;
-            //==============Check which other records have same term=================//
-            angular.forEach($scope.wholeWordMatches, function(item) {
-              var termCheck=item.doc.term;
-              if(termCheck) {
-                if((termCheck.indexOf(term))!=-1 && termCheck.length==term.length) {
-                  allRef.push(item.doc.ref);
-                  termsMatch++;
-                }
-              }
-            });
-            if(termsMatch>0) {
-              //=======if any other verified term that matches the current term in the family====//
-              var allReferences=allRef.join();
-              allReferences=$scope.getUnique(allReferences);
-              //==check if the term being added has definition and original==//
-              if(original=="" || definition=="") {
-                //=get both the values from other terms already present=//
-                angular.forEach($scope.wholeWordMatches, function(match) {
-                  if(original=="") {
-                    original=match.doc.original;
-                  }
-                  if(definition=="") {
-                    definition=match.doc.definition;
-                  }
-                });
-              }
-              var data= JSON.stringify
-              ({
-                "source": userName,
-                "original":original ,
-                "definition":definition,
-                "type": "term",
-                "user": userName,
-                "term": term,
-                "ref":allReferences,
-                "wordfamily":wordfamilyField,
-                "verify":1,
-                "ambiguous":0
-              });
-              //================adding data record======================//
-              if(confirm("Please Confirm the following Addition:"+data)) {
-                $http.post('http://'+domainRemoteDb+'/'+remoteDb+'/', data).
-                success(function(data, status, headers, config) {
-                  console.log(status);
-                  $scope.message='Record Added Successfully';
-                  angular.forEach($scope.wholeWordMatches, function(match) {
-                    //================deleting all other ambiguous records=================//
-                    $http.delete('http://'+domainRemoteDb+'/'+remoteDb+'/'+match.doc._id+'?rev='+match.doc._rev).
-                    success(function(data, status, headers, config) {
-                      console.log(status);
-                    }).
-                    error(function(data, status, headers, config) {
-                      console.log(status);
-                    });
-                  });
-
-                }).
-                error(function(data, status, headers, config) {
-                  console.log(status);
-                  $scope.message='Error Adding record';
-                });
-              }
-              else {
-                return false;
-              }
-            }
-            else {
-              //=====if no other verified term that matches with the current term in the family========//
-              var data= JSON.stringify
-              ({
-                "source": userName,
-                "original":original ,
-                "definition":definition,
-                "type": "term",
-                "user": userName,
-                "term": term,
-                "ref":refrence,
-                "wordfamily":wordfamilyField,
-                "verify":1,
-                "ambiguous":1
-              });
-              //================adding data record======================//
-              if(confirm("Please Confirm the following Addition:"+data))
-              {
-                $http.post('http://'+domainRemoteDb+'/'+remoteDb+'/', data).
-                success(function(data, status, headers, config)
-                {
-                  console.log(status);
-                  $scope.message='Record Added Successfully';
-                  //=============making all others ambiguous============//
-                  angular.forEach($scope.wholeWordMatches ,function(match)
-                  {
-                    var updateid= match.doc._id;
-                    var revid= match.doc._rev;
-                    var updatedWordfamilyField=$scope.search.doc.term;
-                    updatedWordfamilyField= updatedWordfamilyField.replace("_","");
-                    updatedWordfamilyField=Utils.dotUndersRevert(updatedWordfamilyField);
-                    if(match.doc.verify==1)
-                    {
-                      var verify=1;
-                    }
-                    else
-                    {
-                      var verify=0;
-                    }
-                    var newdata= JSON.stringify
-                    ({
-                      "source": match.doc.source,
-                      "original": match.doc.original ,
-                      "definition": match.doc.definition,
-                      "type": "term",
-                      "user":  match.doc.user,
-                      "term":  match.doc.term,
-                      "ref": match.doc.ref,
-                      "wordfamily":updatedWordfamilyField,
-                      "verify":verify,
-                      "ambiguous":1
-                    });
-                    $http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+updateid+'?rev='+revid, newdata).
-                    success(function(newdata, status, headers, config)
-                    {
-                      console.log(status);
-                    }).
-                    error(function(data, status, headers, config)
-                    {
-                      console.log(status);
-                    });
-                  });
-                }).
-                error(function(data, status, headers, config)
-                {
-                  console.log(status);
-                  $scope.message='Error Adding record';
-                });
-              }
-              else
-              {
-                return false;
-              }
-            }
-          }
-          else
-          {
-            //==============if other records in family are not verified===============//
-            var allRef=[];
-            allRef.push(refrence);
-            //=====So here we will compress the family into one=======//
-            angular.forEach($scope.wholeWordMatches,function(item)
-            {
-              if(item.doc.ref)
-              {
-                allRef.push(item.doc.ref);
-              }
-            });
-            var allReferences=allRef.join();
-            allReferences=$scope.getUnique(allReferences);
-            //==check if the term being added has definition and original==//
-            if(original=="" || definition=="")
-            {
-              //=get both the values from other terms already present=//
-              angular.forEach($scope.wholeWordMatches ,function(match)
-              {
-                if(original=="")
-                {
-                  original=match.doc.original;
-                }
-                if(definition=="")
-                {
-                  definition=match.doc.definition;
-                }
-              });
-            }
-            var data= JSON.stringify
-            ({
-              "source": userName,
-              "original":original ,
-              "definition":definition,
-              "type": "term",
-              "user": userName,
-              "term": term,
-              "ref":allReferences,
-              "wordfamily":wordfamilyField,
-              "verify":1,
-              "ambiguous":0
-            });
-            //================adding data record======================//
-            if(confirm("Please Confirm the following Addition:"+data))
-            {
-              $http.post('http://'+domainRemoteDb+'/'+remoteDb+'/', data).
-              success(function(data, status, headers, config)
-              {
-                console.log(status);
-                $scope.message='Record Added Successfully';
-                angular.forEach($scope.wholeWordMatches ,function(match)
-                {
-                  //================deleting all other ambiguous records=================//
-                  $http.delete('http://'+domainRemoteDb+'/'+remoteDb+'/'+match.doc._id+'?rev='+match.doc._rev).
-                  success(function(data, status, headers, config)
-                  {
-                    console.log(status);
-                  }).
-                  error(function(data, status, headers, config)
-                  {
-                    console.log(status);
-                  });
-                });
-              }).
-              error(function(data, status, headers, config)
-              {
-                console.log(status);
-                $scope.message='Error Adding record';
-              });
-            }
-            else
-            {
-              return false;
-            }
-          }
-        }
-        else
-        {
-          //============If record being added is not verified====================//
-          var countVerify=0;
-          //====Check if other records in the family are verified or not and how many verified=====//
-          angular.forEach($scope.wholeWordMatches,function(item)
-          {
-            if(item.doc.verify)
-            {
-              if(item.doc.verify==1)
-              {
-                countVerify++;
-              }
-            }
-          });
-          if(countVerify>=1)
-          {
-            //==========if exactly one record is verified================//
-            var termsMatch=0;
-            //==============Check which other records have same term=================//
-            angular.forEach($scope.wholeWordMatches,function(item)
-            {
-              var termCheck=item.doc.term;
-              if(item.doc.verify && item.doc.verify==1)
-              {
-                if((termCheck.indexOf(term))!=-1 && termCheck.length==term.length)
-                {
-                  var allRef=[];
-                  allRef.push(refrence);
-                  allRef.push(item.doc.ref);
-                  var allReferences=allRef.join();
-                  allReferences=$scope.getUnique(allReferences);
-                  //==check if the term being added has definition and original==//
-                  if((item.doc.original=="" || typeof(item.doc.original)=="undefined") ||
-                     (item.doc.definition=="" || typeof(item.doc.definition)=="undefined"))
-                  {
-                    //=get both the values from other terms already present=//
-                    if(item.doc.original=="" || typeof(item.doc.original)=="undefined")
-                    {
-                      var neworiginal=original;
-                    }
-                    if(item.doc.definition=="" || typeof(item.doc.definition)=="undefined")
-                    {
-                      var newdefinition=definition;
-                    }
-                  }
-                  else
-                  {
-                    var neworiginal=item.doc.original;
-                    var newdefinition=item.doc.definition;
-                  }
-                  var data= JSON.stringify
-                  ({
-                    "source": item.doc.source,
-                    "original":neworiginal ,
-                    "definition":newdefinition,
-                    "type": "term",
-                    "user": item.doc.userName,
-                    "term": item.doc.term,
-                    "ref":allReferences,
-                    "wordfamily":item.doc.wordfamily,
-                    "verify":1,
-                    "ambiguous":0
-                  });
-                  var upid=item.doc._id;
-                  var uprev=item.doc._rev;
-                  //================adding data record======================//
-                  if(confirm("Please Confirm the following Addition:"+data))
-                  {
-                    $http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+upid+'?rev='+uprev, data).
-                    success(function(data, status, headers, config)
-                    {
-                      console.log(status);
-                      $scope.message='Record Merged Successfully';
-                    }).
-                    error(function(data, status, headers, config)
-                    {
-                      console.log(status);
-                      $scope.message='Error Adding record';
-                    });
-                  }
-                  else
-                  {
-                    return false;
-                  }
-                  termsMatch++;
-                }
-              }
-            });
-            if(termsMatch==0)
-            {
-              //====================if no term matches====================//
-              alert("The term you are trying to add does not match with any of the existing verified spellings "+
-                "and will not be saved unless spelling is verified.");
-            }
-          }
-          //~ else if(countVerify>1)
-          //~ {
-            //~ //==========if more than one record is verified================//
-          //~ }
-          else
-          {
-            //==========if no other record is verified================//
-            var data= JSON.stringify
-              ({
-                "source": userName,
-                "original":original ,
-                "definition":definition,
-                "type": "term",
-                "user": userName,
-                "term": term,
-                "ref":refrence,
-                "wordfamily":wordfamilyField,
-                "verify":0,
-                "ambiguous":0
-              });
-            //================adding data record======================//
-            if(confirm("Please Confirm the following Addition:"+data))
-            {
-              $http.post('http://'+domainRemoteDb+'/'+remoteDb+'/', data).
-              success(function(data, status, headers, config)
-              {
-                console.log(status);
-                $scope.message='Record Added Successfully';
-              }).
-              error(function(data, status, headers, config)
-              {
-                console.log(status);
-                $scope.message='Error Adding record';
-              });
-            }
-            else
-            {
-              return false;
-            }
-          }
-
-        }
-        setTimeout(function(){
-          $scope.cancelUpdateAdd();
-        },2000);
-
-        */
-
-
-
   //=======Form Update record======================================//
   $scope.updatedata=function(items) {
     var termObj = $scope.getFormTerm();
-    //alert(JSON.stringify(termObj));
-    $scope.termCRUD("update",termObj, function() {
-      // clean & compact the word family
-      $scope.cleanWordFamily(termObj);
-      // wait a second then refresh global list and filtered matches
-      setTimeout(function(){
-          // refresh filtered list with whatever matches the form term, this is not implemented yet
-          // $scope.refreshFilteredMatches(termObj);
-      }, 1000);
-    });
+    if(confirm("Please Confirm the following Updation:"+JSON.stringify(termObj))){
+		$scope.termCRUD("update",termObj, function() {
+		// clean & compact the word family
+		$scope.cleanWordFamily(termObj);
+		// wait a second then refresh global list and filtered matches
+		setTimeout(function(){
+			// refresh filtered list with whatever matches the form term, this is not implemented yet
+			$scope.refreshFilteredMatches(termObj);
+			}, 1000);
+		});
+	}
+	else{
+		return false;
+	}	
   };
 
   //////////////////////////Search data/////////////////////////////////////
