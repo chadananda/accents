@@ -88,6 +88,19 @@ body{background:url('../images/bodybg.png') repeat; }
     white-space: nowrap;
     max-width: 390px;
 }
+.recordButton {
+    background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
+    border: 1px solid white !important;
+    padding: 3px 5px;
+}
+.playButton{
+background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
+    border: 1px solid white !important;
+    padding:4px 7px;
+}
+.modal-body > ul {
+    list-style-type: none;
+}
 /*=====================================ALL MOBILE VIEW===================================================*/
 @media only screen and (min-width : 0px) and (max-width:767px)
 {

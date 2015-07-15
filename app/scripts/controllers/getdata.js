@@ -8,7 +8,7 @@
  * Controller of the accentsApp
  */
 angular.module('accentsApp')
-  .controller('getdataCtrl', function($rootScope,$scope,$http,getRecords,$window,$filter,myConfig,Utils,$sce,docData) {
+  .controller('getdataCtrl', function($rootScope,$scope,$http,getRecords,$window,$filter,myConfig,Utils,$sce,docData,$modal,$log) {
   $scope.docs={};
   $scope.filterresult={};
   $scope.awesomeThings = [
@@ -21,13 +21,13 @@ angular.module('accentsApp')
   var remoteDb=myConfig.database;
 
   //===================Reload Page on route change===========================//
-  $rootScope.$on('$locationChangeStart', function($event, changeTo, changeFrom) {
-    if (changeTo == changeFrom) {
-      return;
-    }
-    window.location.assign(changeTo);
-    window.location.reload(true);
-  });
+  //~ $rootScope.$on('$locationChangeStart', function($event, changeTo, changeFrom) {
+    //~ if (changeTo == changeFrom) {
+      //~ return;
+    //~ }
+    //~ window.location.assign(changeTo);
+    //~ window.location.reload(true);
+  //~ });
 
   //===========Calling Utility Functions============//
   $scope.i2html = function(text) {
@@ -41,31 +41,46 @@ angular.module('accentsApp')
   }
 
   //============On key up of the term textbox change the term=========//
-  $( "#term" ).keyup(function() {
-    var term = $('#term').val();
-    if(term!="") {
-      // TODO: get cursor position
-      // split the word at the cursor position - part1 & part2
-      // run customi2html on part1
-      // then set val to part1+part2 and set the cursor position to part1.length
-      var changedTerm = $scope.customi2html(term);
-      $("#term").val(changedTerm);
-      $("#heading-term").html(Utils.ilm2HTML(changedTerm));
-    }
-    else $("#heading-term").html("");
-  });
-
-  if(document.getElementById('term')) {
-    document.getElementById('term').onkeydown = function(e){
-      if (e.keyCode == 13) {
-        // submit.
-        // $scope.allDocsFunc();
-
-        // what is this?
-        $scope.adddata($scope.docs);
-      }
-    };
-  }
+  //~ $( "#term" ).keyup(function() {
+	  //~ console.log('keytouched');
+    //~ var term = $('#term').val();
+    //~ if(term!="") {
+      //~ // TODO: get cursor position
+      //~ // split the word at the cursor position - part1 & part2
+      //~ // run customi2html on part1
+      //~ // then set val to part1+part2 and set the cursor position to part1.length
+      //~ var changedTerm = $scope.customi2html(term);
+      //~ $("#term").val(changedTerm);
+      //~ $("#heading-term").html(Utils.ilm2HTML(changedTerm));
+    //~ }
+    //~ else $("#heading-term").html("");
+  //~ });
+  //=======Called on ng-keyup of term======//
+	$scope.changeTerm=function(){
+		var term = $('#term').val();
+		if(term!="") {
+			// TODO: get cursor position
+			// split the word at the cursor position - part1 & part2
+			// run customi2html on part1
+			// then set val to part1+part2 and set the cursor position to part1.length
+			var changedTerm = $scope.customi2html(term);
+			$("#term").val(changedTerm);
+			$("#heading-term").html(Utils.ilm2HTML(changedTerm));
+		}
+		else $("#heading-term").html("");
+	};
+	
+  //~ if(document.getElementById('term')) {
+    //~ document.getElementById('term').onkeydown = function(e){
+      //~ if (e.keyCode == 13) {
+        //~ // submit.
+        //~ // $scope.allDocsFunc();
+//~ 
+        //~ // what is this?
+        //~ $scope.adddata($scope.docs);
+      //~ }
+    //~ };
+  //~ }
 
   //Every checkboxes in the page
   $('.checkbox input:checkbox').click(function() {
@@ -292,7 +307,8 @@ angular.module('accentsApp')
       keys = Object.keys(term); // iterate through each field of termObj to be discarded
       for (var j = 1; j < keys.length; j++) {
         key = keys[j];
-        if (allowedTerms.indexOf(key)) { // ignore properties not on our allowed list
+        if (allowedTerms.indexOf(key)!=-1) { // ignore properties not on our allowed list
+			
           if (key == 'verified') {
             base[key] = (base[key] || term[key]);
           } else if (key == 'ref') {
@@ -313,7 +329,6 @@ angular.module('accentsApp')
     }
     $scope.refreshAllDocList();
      setTimeout(function() {
-     console.log('update1');
       $scope.termCRUD('update', base);
     }, 5000);
     // update base record
@@ -368,17 +383,13 @@ angular.module('accentsApp')
     // clear all fields except for reference field
     document.getElementById("keyid").value="";
     document.getElementById("keyrev").value="";
-    $scope.addform.$setPristine();
+    if(typeof($scope.addform)!="undefined")	$scope.addform.$setPristine();
     //$scope.search.doc.term='';
-    document.getElementById("term").value="";
+   // document.getElementById("term").value="";
     // if multi value reference, keep only the first one
     var ref = document.getElementById("reference").value.split(',').shift().trim();
     $scope.editdata = {ref: ref};
     document.getElementById("verifiedCheckbox").checked = false;
-
-    // $scope.addState();
-    // $scope.allDocsFunc();
-
     // switch form to add state
     document.getElementById("toptext").innerHTML="Add:";
     document.getElementById("heading-term").innerHTML="";
@@ -511,25 +522,34 @@ angular.module('accentsApp')
 
   //==Delete Record from the partial or whole word searches========//
   $scope.deletedoc = function(id) {
-    if($window.confirm('Are you SURE you want to delete this term?')) {
+    if(confirm('Are you SURE you want to delete this term?')) {
       var termObj = $scope.getTermObj(id);
       $scope.termCRUD('delete', termObj, function() {
-        // clear form
-        $scope.clearEditForm();
+		if(typeof($scope.editdata)!="undefined")
+		{
+			// clear form
+			$scope.clearEditForm();
+		}
         // clean & compact the word family
         $scope.cleanWordFamily(termObj);
         // wait a second then refresh global list and filtered matches
-        $scope.refreshFilteredMatches(termObj);
-      });
+		setTimeout(function(){
+					$scope.refreshFilteredMatches(termObj);
+			},5000);
+		});
     }
   };
 
   // Refresh the search with supplied term object
   $scope.refreshFilteredMatches = function(term){
-    // in case this is a termObj, just grab the term part
-    if (term.hasOwnProperty('term')) term = term.term;
-    // how do we change this to filter on the term instead of on #term.val ?
-    $("#term").trigger("change");
+	  $scope.refreshAllDocList(function(){
+		    // in case this is a termObj, just grab the term part
+			if (term.hasOwnProperty('term')) term = term.term;
+			// how do we change this to filter on the term instead of on #term.val ?
+			$scope.changeTerm();
+			$("#term").trigger("change");
+	});
+  
   };
 
 
@@ -543,8 +563,10 @@ angular.module('accentsApp')
         // clean & compact the word family
         $scope.cleanWordFamily(termObj);
         // wait a second then refresh global list and filtered matches
-        $scope.refreshFilteredMatches(termObj);
-      });
+		 setTimeout(function(){
+					$scope.refreshFilteredMatches(termObj);
+			},5000);
+		});
     }
   };
 
@@ -564,7 +586,7 @@ angular.module('accentsApp')
   $scope.editdoc = function(id) {
     var termObj = $scope.getTermObj(id);
     if (termObj) $scope.setFormTerm(termObj);
-      else $scope.clearEditForm();
+	else $scope.clearEditForm();
   };
 
   // Form Add
@@ -577,7 +599,9 @@ angular.module('accentsApp')
         // clear form
         $scope.clearEditForm();
         // wait a second then refresh global list and filtered matches
-        $scope.refreshFilteredMatches(termObj);
+         setTimeout(function(){
+			$scope.refreshFilteredMatches(termObj);
+			},5000);
       });
   };
 
@@ -590,7 +614,9 @@ angular.module('accentsApp')
       // clear form
       $scope.clearEditForm();
       // wait a second then refresh global list and filtered matches
-      $scope.refreshFilteredMatches(termObj);
+      setTimeout(function(){
+		$scope.refreshFilteredMatches(termObj);
+		},5000);
     });
   };
 
@@ -645,8 +671,11 @@ angular.module('accentsApp')
     document.getElementById("sideIcon-"+key).className = "glyphicon glyphicon-chevron-down mr5 openPanel";
     document.getElementById("showDiv-"+key).style.display='block';
   };
-
-
+ //~ $scope.openModal = function () {
+//~ 
+     //~ $('#myModal').modal('show')                // initializes and invokes show immediately
+  //~ };
+//~ 
 
 })
 

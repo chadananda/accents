@@ -20,14 +20,14 @@ var domainRemoteDb=myConfig.remoteDbDomain;
 var remoteDb=myConfig.database;
  
 //===================Reload Page on route change===========================//
-$rootScope.$on('$locationChangeStart', function($event, changeTo, changeFrom) {
-      if (changeTo == changeFrom) {
-        return;
-      }
- 
-      window.location.assign(changeTo);
-      window.location.reload(true);
-    });
+//~ $rootScope.$on('$locationChangeStart', function($event, changeTo, changeFrom) {
+      //~ if (changeTo == changeFrom) {
+        //~ return;
+      //~ }
+ //~ 
+      //~ window.location.assign(changeTo);
+      //~ window.location.reload(true);
+    //~ });
 //===========Calling Utility Functions============//
  $scope.i2html = function(text)
  {
@@ -91,7 +91,7 @@ $rootScope.$on('$locationChangeStart', function($event, changeTo, changeFrom) {
 	$scope.count=data.total_rows;
 	$("#spinner").hide();
 	$(".pagination").css("display","block");
-	if(sessionStorage.term)
+	if(sessionStorage.getItem('term')!=null)
 	{
 		document.getElementById('term').value=sessionStorage.getItem('term') ;
 		setTimeout(function(){
@@ -476,7 +476,7 @@ $scope.message='Error adding record';
 		{
 			angular.forEach(items, function(item) 
 			{
-				if(!item.doc.verify)
+				if(!item.doc.verified)
 					filtered.push(item);
 			});
 		}

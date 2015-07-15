@@ -17,14 +17,14 @@ angular.module('accentsApp')
 	var domainRemoteDb=myConfig.remoteDbDomain;
 	var remoteDb=myConfig.database;
 	//===================Reload Page on route change===========================//
-$rootScope.$on('$locationChangeStart', function($event, changeTo, changeFrom) {
-      if (changeTo == changeFrom) {
-        return;
-      }
- 
-      window.location.assign(changeTo);
-      window.location.reload(true);
-    });
+//~ $rootScope.$on('$locationChangeStart', function($event, changeTo, changeFrom) {
+      //~ if (changeTo == changeFrom) {
+        //~ return;
+      //~ }
+ //~ 
+      //~ window.location.assign(changeTo);
+      //~ window.location.reload(true);
+    //~ });
 	//===========Calling Utility Functions============//
  $scope.i2html = function(text)
  {
