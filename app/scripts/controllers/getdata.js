@@ -124,21 +124,24 @@ angular.module('accentsApp')
       console.log('No db action: '+action);
       return false;
     }
-    //console.log('termCRUD', action, termObj);
+    console.log('termCRUD', action, termObj);
 
     // prune unallowed fields
     termObj = $scope.pruneUnallowedFields(termObj);
 
     // delete action requires _id and _rev
     if (action == 'delete') {
-      $http.delete($scope.db_url() + termObj._id)
-        .success(function(data, status, headers, config){
-          console.log(status);
-          delete $scope.idDocs[termObj._id]; // remove item from cache
-          if (callback) callback();
-          
-        })
-        .error(function(data, status, headers, config) { console.log(status); });
+     // $http.get($scope.db_url() + termObj._id).success(function(data){
+        $http.delete($scope.db_url() + termObj._id +'?rev='+ termObj._rev)
+          .success(function(data, status, headers, config){
+            console.log(status);
+            delete $scope.idDocs[termObj._id]; // remove item from cache
+            if (callback) callback();
+          })
+          .error(function(data, status, headers, config) { console.log(status); });
+
+     // });
+
 
 
     // update (put) requires object with _id and _rev, term, wordfamily
@@ -150,10 +153,12 @@ angular.module('accentsApp')
       termObj.type = 'term';
       $http.put($scope.db_url() +termObj._id+'?rev='+termObj._rev,JSON.stringify(termObj))
         .success(function(newdata, status, headers, config) {
-          console.log(status);
+          console.log(newdata);
+          termObj._rev = newdata.rev;
           $scope.idDocs[termObj._id] = termObj; // update cache
           if (callback) callback();})
         .error(function(data, status, headers, config) { console.log(status); });
+
 
     // add (post) requires object with term, wordfamily
     } else if (!termObj['_rev']) {
@@ -165,13 +170,11 @@ angular.module('accentsApp')
       termObj.type = 'term';
       $http.post($scope.db_url(), JSON.stringify(termObj))
         .success(function(newdata, status, headers, config) {
-          $http.get($scope.db_url() +newdata.id)
-            .success(function(termObj) {
-              console.log('newly added termObj', termObj);
-              $scope.idDocs[termObj._id] = termObj; // add to cache
-              if (callback) callback(termObj);
-            });
-
+          termObj._rev = newdata.rev;
+          termObj._id = newdata.id;
+          console.log('newly added termObj', termObj);
+          $scope.idDocs[termObj._id] = termObj; // add to cache
+          if (callback) callback(termObj);
         })
         .error(function(data, status, headers, config) { console.log(status); });
     }
@@ -251,7 +254,7 @@ angular.module('accentsApp')
     // split into object of one termArray for each spelling
     // eg. { "_Shiráz" => [termObj, termObj, termObj],
     //       "_Shíráz" => [termObj, termObj, termObj] }
-   
+
     terms.forEach(function(termObj) {
       if (!family[termObj.term]) family[termObj.term] = []; // initialize if neccesary
       family[termObj.term].push(termObj);
@@ -261,18 +264,18 @@ angular.module('accentsApp')
     var verified_count = 0;
     Object.keys(family).forEach(function(term) {
       family[term] = $scope.compressTerms(family[term]); // takes array of termObjs, returns merged termObj
-      if (family[term].verified) verified_count++;      
-    }); 
-     setTimeout(function() {  
+      if (family[term].verified) verified_count++;
+    });
+     setTimeout(function() {
     $scope.refreshAllDocList();
-     }, 2000);   
+     }, 2000);
     // now set them all to ambiguous or not depending on verified count
     Object.keys(family).forEach(function(term) {
       family[term].ambiguous = (verified_count>1);
-     setTimeout(function() {   
+     setTimeout(function() {
      $scope.termCRUD('update', family[term]);
-    }, 2000);      
-    
+    }, 2000);
+
     });
 
     // wait a second then refresh main cache list
@@ -320,17 +323,17 @@ angular.module('accentsApp')
           }
         }
       };
-		// discard merged record  
-		$scope.termCRUD('delete', term);     
+    // discard merged record
+    $scope.termCRUD('delete', term);
     }
     $scope.refreshAllDocList();
-     setTimeout(function() {   
-		 console.log('update1');  
+     setTimeout(function() {
+     console.log('update1');
       $scope.termCRUD('update', base);
     }, 5000);
     // update base record
-    
-   
+
+
     return base;
   };
 
@@ -481,9 +484,10 @@ angular.module('accentsApp')
     $('#updateword').css({ "display":"block" });
     document.getElementById("toptext").innerHTML="Edit:";
     $("#heading-term").html(Utils.ilm2HTML(termObj.term));
-    setTimeout(function() {
-      $("#term").trigger("change");
-    }, 100);
+
+    //setTimeout(function() {
+      $scope.refreshFilteredMatches(termObj);
+    //}, 100);
 
     // TODO: add audio state
   };
@@ -512,19 +516,6 @@ angular.module('accentsApp')
         setTimeout(function(){$scope.editdoc(id,rev)},5000);
       }
     }
-  /* what is this? should it be part of the term Form load?
-  $scope.testFunction=function() {
-    var term = $('#term').val();
-    if(term !== "") {
-      var changedTerm=$scope.customi2html(term);
-      $("#term").val(changedTerm);
-      $("#heading-term").html(Utils.ilm2HTML(changedTerm));
-    }
-    setTimeout(function() {
-      $("#term").trigger("change");
-    }, 100);
-  };
-  */
 
 
 
@@ -537,52 +528,60 @@ angular.module('accentsApp')
     if($window.confirm('Are you SURE you want to delete this term?')) {
       var termObj = $scope.getTermObj(id);
       $scope.termCRUD('delete', termObj, function() {
+        // clear form
+        $scope.clearEditForm();
         // clean & compact the word family
         $scope.cleanWordFamily(termObj);
         // wait a second then refresh global list and filtered matches
-        setTimeout(function(){
-          // refresh filtered list with form term, this is not implemented yet
-          // $scope.refreshFilteredMatches(termObj);
-        }, 1000);
+        $scope.refreshFilteredMatches(termObj);
       });
     }
-  };   
-   $scope.refreshFilteredMatches=function(termObj){
-      $("#term").trigger("change");
   };
-  //============================Delete data in the form=====================================//
+
+  // Refresh the search with supplied term object
+  $scope.refreshFilteredMatches = function(term){
+    // in case this is a termObj, just grab the term part
+    if (term.hasOwnProperty('term')) term = term.term;
+    // how do we change this to filter on the term instead of on #term.val ?
+    $("#term").trigger("change");
+  };
+
+
+  // Form Delete
   $scope.deletedata = function() {
     if($window.confirm('Are you SURE you want to delete this term?')) {
       var termObj = $scope.getFormTerm();
       $scope.termCRUD('delete', termObj, function() {
+        // clear form
+        $scope.clearEditForm();
         // clean & compact the word family
         $scope.cleanWordFamily(termObj);
         // wait a second then refresh global list and filtered matches
-        setTimeout(function() {
-          // refresh filtered list with form term, this is not implemented yet
-           $scope.refreshFilteredMatches(termObj);
-        }, 1000);
+        $scope.refreshFilteredMatches(termObj);
       });
     }
   };
-  //=============Cancel function to reset to add state======================//
+
+
+  // Cancel Add or Update Event
   $scope.cancelUpdate = function() {
     $scope.clearEditForm();
   };
 
 
-  //=============Cancel function to reset to add state after add and update======================//
+  // Cancel Add or Update Event
   $scope.cancelUpdateAdd = function() {
     $scope.clearEditForm();
   };
 
-  //////////////////////////single record data/////////////////////////////////////
+  // Edit item
   $scope.editdoc = function(id) {
     var termObj = $scope.getTermObj(id);
     if (termObj) $scope.setFormTerm(termObj);
       else $scope.clearEditForm();
   };
-  //=====================================Add a new term===================================//
+
+  // Form Add
   $scope.adddata=function() {
     var termObj = $scope.getFormTerm();
     if (!termObj.term.trim()) alert('Warning: term field required.');
@@ -591,28 +590,25 @@ angular.module('accentsApp')
         $scope.cleanWordFamily(termObj.wordfamily);
         // clear form
         $scope.clearEditForm();
+        // wait a second then refresh global list and filtered matches
+        $scope.refreshFilteredMatches(termObj);
       });
   };
-  //=======Form Update record======================================//
-  $scope.updatedata=function(items) {
+
+  // Form Update
+  $scope.updatedata=function() {
     var termObj = $scope.getFormTerm();
-    if(confirm("Please Confirm the following Updation:"+JSON.stringify(termObj))){
-		$scope.termCRUD("update",termObj, function() {
-		// clean & compact the word family
-		$scope.cleanWordFamily(termObj);
-		// wait a second then refresh global list and filtered matches
-		setTimeout(function(){
-			// refresh filtered list with whatever matches the form term, this is not implemented yet
-			$scope.refreshFilteredMatches(termObj);
-			}, 1000);
-		});
-	}
-	else{
-		return false;
-	}	
+    $scope.termCRUD("update", termObj, function() {
+      // clean & compact the word family
+      $scope.cleanWordFamily(termObj);
+      // clear form
+      $scope.clearEditForm();
+      // wait a second then refresh global list and filtered matches
+      $scope.refreshFilteredMatches(termObj);
+    });
   };
 
-  //////////////////////////Search data/////////////////////////////////////
+  // Search data
   $scope.getnames=function(searchval){
     $http.get('http://'+domainRemoteDb+'/'+remoteDb+'/_design/lists/_view/full_term?startkey="'+searchval+
         '"&endkey="'+searchval+'\\ufff0"&include_docs=true')
@@ -640,45 +636,13 @@ angular.module('accentsApp')
       var match = termObj.wordfamily.toLowerCase();
       if(((match.indexOf(key)) !=-1) && (match.length == key.length)) filtered.push(termObj);
     });
-        /*var filtered = new Array();
-        angular.forEach(docs, function(item) {
-          var string=item.doc.term;
-          if(string) {
-            string = string.replace("_","");
-            string = string.toLowerCase();
-            string = Utils.dotUndersRevert(string);
-            if( ((string.indexOf(key)) !=-1) && (string.length == key.length) ) {
-              filtered.push(item.doc);
-            }
-          }
-        });*/
+
     $scope.filterresult = filtered;
     $scope.viewkey=key;
     $("span[id^='sideIcon-']").addClass("glyphicon glyphicon-play mr5 openPanel");
     document.getElementById("sideIcon-"+key).className = "glyphicon glyphicon-chevron-down mr5 openPanel";
     document.getElementById("showDiv-"+key).style.display='block';
   };
-
-
-      /*
-      $scope.getUnique = function(arrayNew) {
-        // (modified by Chad July 10 2015)
-        // clean up references replacing variants of PG. with pg, PAR. with par, are removing excess spaces
-        if(arrayNew=="undefined") arrayNew = '';
-        return arrayNew.split(",").map(function(ref) {
-          return ref.replace(/(pg[\.]?|page|p\.)/ig, 'pg ') // cleanup PG
-                    .replace(/(par[\.]?|pp[\.]?)/ig,'par ') // cleanup PAR
-                    .replace(/\s+/ig, ' ') // remove any excess spaces
-                    .trim(); // remove surrounding spaces
-        })
-        // remove duplicates
-        .filter(function(ref, index, self) {
-          return index == self.indexOf(ref);
-        })
-        // re-join with a comma and a space
-        .join(', ');
-      };
-      */
 
 
 
@@ -689,48 +653,43 @@ angular.module('accentsApp')
 This directive allows us to pass a function in on an enter key to do what we want.
  */
 .directive('ngEnter', function () {
-    return function (scope, element, attrs) {
-        element.bind("keydown keypress", function (event) {
-            if(event.which === 13) {
-                scope.$apply(function (){
-                    scope.$eval(attrs.ngEnter);
-                });
-
-                event.preventDefault();
-            }
+  return function (scope, element, attrs) {
+    element.bind("keydown keypress", function (event) {
+      if(event.which === 13) {
+        scope.$apply(function (){
+            scope.$eval(attrs.ngEnter);
         });
-    };
-    })
+
+        event.preventDefault();
+      }
+    });
+  };
+})
+
 .filter('singlegroupFilter',['Utils',function(Utils){
-  return function(items,search)
-  {
+  return function(items,search) {
     var subArray=[];
     var filtered = [];
     var mainArray={};
     var count=1;
     var wordFamily=[];
 
-    angular.forEach(items, function(item)
-    {
+    angular.forEach(items, function(item) {
       var string=item.doc.term;
-      if(string)
-      {
+      if(string) {
         string= string.replace("_","");
         string=string.toLowerCase();
         string=Utils.dotUndersRevert(string);
         search=search.toLowerCase();
         search= search.replace("_","");
         search=Utils.dotUndersRevert(search);
-        if( ((string.indexOf(search)) !=-1) && (string.length!= search.length))
-        {
-          if(string in mainArray)
-          {
+        if( ((string.indexOf(search)) !=-1) && (string.length!= search.length)) {
+          if(string in mainArray) {
             var countnew=mainArray[string];
             countnew++;
             mainArray[string]=countnew;
           }
-          else
-          {
+          else {
             count=1;
             mainArray[string]=count;
 
@@ -738,34 +697,26 @@ This directive allows us to pass a function in on an enter key to do what we wan
         }
       }
     });
-    angular.forEach(mainArray,function(value,key)
-    {
-      if(value==1)
-      {
-        angular.forEach(items, function(item)
-        {
+    angular.forEach(mainArray,function(value,key) {
+      if(value==1) {
+        angular.forEach(items, function(item) {
           var string=item.doc.wordfamily;
-          if(string)
-          {
+          if(string) {
             string=string.toLowerCase();
-            if( ((string.indexOf(key)) !=-1) && (string.length== key.length))
-            {
-                filtered.push(item);
-                return false;
+            if( ((string.indexOf(key)) !=-1) && (string.length== key.length)) {
+              filtered.push(item);
+              return false;
             }
           }
-          else
-          {
+          else {
             var string=item.doc.term;
-            if(string)
-            {
+            if(string) {
               string= string.replace("_","");
               string=Utils.dotUndersRevert(string);
               string=string.toLowerCase();
-              if( ((string.indexOf(key)) !=-1) && (string.length== key.length))
-              {
-                  filtered.push(item);
-                  return false;
+              if( ((string.indexOf(key)) !=-1) && (string.length== key.length)) {
+                filtered.push(item);
+                return false;
               }
             }
           }
@@ -775,66 +726,57 @@ This directive allows us to pass a function in on an enter key to do what we wan
     });
     return filtered;
   };
-  }])
+}])
+
 .filter('offset', function() {
   return function(input, start) {
-   if (!input || !input.length) { return; }
-        start = +start; //parse to int
-        return input.slice(start);
+    if (!input || !input.length) return;
+    start = +start; //parse to int
+    return input.slice(start);
   };
 })
 
 .filter('myfilterData',['Utils',function(Utils){
-  return function(items,search)
-  {
+  return function(items,search) {
     var subArray={};
     var filtered = [];
     var mainArray={};
     var count=1;
 
-    angular.forEach(items, function(item)
-    {
+    angular.forEach(items, function(item) {
       var string=item.doc.term;
-      if(string)
-      {
+      if(string) {
         string= string.replace("_","");
         //string=string.toLowerCase();
         string=Utils.dotUndersRevert(string);
-        if(search)
-        {
+        if(search) {
         //  search=search.toLowerCase();
           search= search.replace("_","");
           search=Utils.dotUndersRevert(search);
-          if( ((string.indexOf(search)) !=-1) && (string.length!= search.length))
-          {
+          if( ((string.indexOf(search)) !=-1) && (string.length!= search.length)) {
             filtered.push(item);
           }
         }
 
       }
     });
-
     return filtered;
   };
-
 }])
+
 .filter('wholeWordFilter',['Utils',function(Utils){
-  return function(items,search)
-  {
+  return function(items,search) {
     var filtered = [];
-    angular.forEach(items, function(item)
-    {
+    angular.forEach(items, function(item) {
       var string=item.doc.term;
-      if(string)
-      {
+      if(string) {
         string= string.replace("_","");
         //string=string.toLowerCase();
         string=Utils.dotUndersRevert(string);
         //search=search.toLowerCase();
         search= search.replace("_","");
         search=Utils.dotUndersRevert(search);
-        if( ((string.indexOf(search)) !=-1) && (string.length== search.length))
-        {
+        if( ((string.indexOf(search)) !=-1) && (string.length== search.length)) {
           filtered.push(item);
         }
       }
@@ -842,23 +784,20 @@ This directive allows us to pass a function in on an enter key to do what we wan
     return filtered;
   }
 }])
+
 .filter('wholeWordFilterMatch',['Utils',function(Utils){
-  return function(items,search)
-  {
+  return function(items,search) {
     var filtered = [];
-    angular.forEach(items, function(item)
-    {
+    angular.forEach(items, function(item) {
       var string=item.doc.term;
-      if(string)
-      {
+      if(string) {
         string= string.replace("_","");
         string=string.toLowerCase();
         string=Utils.dotUndersRevert(string);
         search=search.toLowerCase();
         search= search.replace("_","");
         search=Utils.dotUndersRevert(search);
-        if( ((string.indexOf(search)) !=-1) && (string.length== search.length))
-        {
+        if( ((string.indexOf(search)) !=-1) && (string.length== search.length)) {
           filtered.push(item);
         }
       }
@@ -866,35 +805,30 @@ This directive allows us to pass a function in on an enter key to do what we wan
     return filtered;
   }
 }])
+
 .filter('groupfilter',['Utils',function(Utils){
-  return function(items,search)
-  {
+  return function(items,search) {
     var subArray={};
     var filtered = [];
     var mainArray={};
     var count=1;
 
-    angular.forEach(items, function(item)
-    {
+    angular.forEach(items, function(item) {
       var string=item.doc.term;
-      if(string)
-      {
+      if(string) {
         string= string.replace("_","");
         string=string.toLowerCase();
         string=Utils.dotUndersRevert(string);
         search=search.toLowerCase();
         search= search.replace("_","");
         search=Utils.dotUndersRevert(search);
-        if( ((string.indexOf(search)) !=-1) && (string.length!= search.length))
-        {
-          if(string in mainArray)
-          {
+        if( ((string.indexOf(search)) !=-1) && (string.length!= search.length)) {
+          if(string in mainArray) {
             var countnew=mainArray[string];
             countnew++;
             mainArray[string]=countnew;
           }
-          else
-          {
+          else {
             count=1;
             mainArray[string]=count;
           }
@@ -904,37 +838,31 @@ This directive allows us to pass a function in on an enter key to do what we wan
     //console.log(mainArray);
     return mainArray;
   };
-
 }])
+
 .filter('groupfiltercount',['Utils',function(Utils){
-  return function(items,search)
-  {
+  return function(items,search) {
     var subArray={};
     var filtered = [];
     var mainArray={};
     var count=1;
 
-    angular.forEach(items, function(item)
-    {
+    angular.forEach(items, function(item) {
       var string=item.doc.term;
-      if(string)
-      {
+      if(string) {
         string= string.replace("_","");
         string=string.toLowerCase();
         string=Utils.dotUndersRevert(string);
         search=search.toLowerCase();
         search= search.replace("_","");
         search=Utils.dotUndersRevert(search);
-        if( ((string.indexOf(search)) !=-1) && (string.length!= search.length))
-        {
-          if(string in mainArray)
-          {
+        if( ((string.indexOf(search)) !=-1) && (string.length!= search.length)) {
+          if(string in mainArray) {
             var countnew=mainArray[string];
             countnew++;
             mainArray[string]=countnew;
           }
-          else
-          {
+          else {
             count=1;
             mainArray[string]=count;
           }
@@ -942,48 +870,38 @@ This directive allows us to pass a function in on an enter key to do what we wan
       }
     });
     var sum=0;
-    angular.forEach(mainArray,function(it)
-    {
+    angular.forEach(mainArray,function(it) {
       sum=sum+it;
     });
     return sum;
   };
-
 }])
+
 .filter('newfilter',function(){
-  return function(items,search)
-  {
+  return function(items,search) {
     var filtered = [];
-    if(search)
-    {
-      angular.forEach(items, function(item)
-      {
+    if(search) {
+      angular.forEach(items, function(item) {
         var string=item.doc.term;
-        if(string)
-        {
-          if( ((string.toLowerCase().indexOf(search.toLowerCase())) !=-1) && item.doc.verified==1)
-          {
+        if(string) {
+          if( ((string.toLowerCase().indexOf(search.toLowerCase())) !=-1) && item.doc.verified==1) {
             filtered.push(item);
           }
         }
       });
       return filtered;
     }
-    else
-    {
-      return items;
-    }
+    else return items;
   }
 })
-.controller("PaginationCtrl", function($scope) {
 
+.controller("PaginationCtrl", function($scope) {
   $scope.itemsPerPage = 10;
   $scope.currentPage = 0;
   $scope.items = [];
-  $scope.totalRows=5334;
+  $scope.totalRows=5334; // ????
 
   for (var i=0; i<$scope.totalRows; i++) {
-
     $scope.items.push({ id: i, name: "name "+ i, description: "description " + i });
   }
 
@@ -991,12 +909,10 @@ This directive allows us to pass a function in on an enter key to do what we wan
     var rangeSize = 5;
     var ret = [];
     var start;
-
     start = $scope.currentPage;
     if ( start > $scope.pageCount()-rangeSize ) {
       start = $scope.pageCount()-rangeSize+1;
     }
-
     for (var i=start; i<start+rangeSize; i++) {
       ret.push(i);
     }
@@ -1004,9 +920,7 @@ This directive allows us to pass a function in on an enter key to do what we wan
   };
 
   $scope.prevPage = function() {
-    if ($scope.currentPage > 0) {
-      $scope.currentPage--;
-    }
+    if ($scope.currentPage > 0) $scope.currentPage--;
   };
 
   $scope.prevPageDisabled = function() {
@@ -1031,8 +945,6 @@ This directive allows us to pass a function in on an enter key to do what we wan
     $scope.currentPage = n;
   };
 
-  /******************************************************/
-  // some helper functions to clean up CRUD operations
 
 
 
