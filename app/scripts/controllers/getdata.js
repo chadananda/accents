@@ -275,7 +275,7 @@ angular.module('accentsApp')
     if (termsArray.length===1) return termsArray[0]; // no need to merge if there's only one
 
     // for some reason, the first term is already compressed
-  //  console.log('compressTerms', termsArray);
+    //  console.log('compressTerms', termsArray);
     var i, key, keys, term;
     var base = termsArray[0]; // first term we will merge everything into
     var allowedTerms = $scope.termAllowedFields(); // list of allowed fields, we'll ignore all others
@@ -508,6 +508,7 @@ angular.module('accentsApp')
   $scope.allDocsFunc=function() {
     $scope.refreshAllDocList();
   };
+
   //==Delete Record from the partial or whole word searches========//
   $scope.deletedoc = function(id) {
     if($window.confirm('Are you SURE you want to delete this term?')) {
@@ -595,6 +596,19 @@ angular.module('accentsApp')
 
   // Search data
   $scope.getnames=function(searchval){
+    // Pull from the idDocs list instead of from the DB to speed this up
+    // something like:
+    var rows = [];
+    Object.keys($scope.idDocs).forEach(function(id) {
+      var termObj = $scope.idDocs[id];
+      if (termObj.term.indexOf(searchval)>-1) rows.push(termObj);
+    });
+    if (rows.length) {
+      $scope.docs=rows;
+      $scope.count=rows.length;
+    }
+
+    /*
     $http.get('http://'+domainRemoteDb+'/'+remoteDb+'/_design/lists/_view/full_term?startkey="'+searchval+
         '"&endkey="'+searchval+'\\ufff0"&include_docs=true')
     .success(function(data) {
@@ -605,8 +619,10 @@ angular.module('accentsApp')
       }
     })
     .error(function(error) {
-       //
     });
+    */
+
+
   };
 
 
@@ -624,7 +640,8 @@ angular.module('accentsApp')
 
     $scope.filterresult = filtered;
     $scope.viewkey=key;
-    $("span[id^='sideIcon-']").addClass("glyphicon glyphicon-play mr5 openPanel");
+
+    // $("span[id^='sideIcon-']").addClass("glyphicon glyphicon-play mr5 openPanel");
     document.getElementById("sideIcon-"+key).className = "glyphicon glyphicon-chevron-down mr5 openPanel";
     document.getElementById("showDiv-"+key).style.display='block';
   };
@@ -641,10 +658,9 @@ This directive allows us to pass a function in on an enter key to do what we wan
   return function (scope, element, attrs) {
     element.bind("keydown keypress", function (event) {
       if(event.which === 13) {
-        scope.$apply(function (){
+        scope.$apply(function () {
             scope.$eval(attrs.ngEnter);
         });
-
         event.preventDefault();
       }
     });
