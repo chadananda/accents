@@ -52,9 +52,7 @@ angular.module('accentsApp')
       $("#term").val(changedTerm);
       $("#heading-term").html(Utils.ilm2HTML(changedTerm));
     }
-    else {
-      $("#heading-term").html("");
-    }
+    else $("#heading-term").html("");
   });
 
   if(document.getElementById('term')) {
@@ -125,24 +123,18 @@ angular.module('accentsApp')
       return false;
     }
     console.log('termCRUD', action, termObj);
-
     // prune unallowed fields
     termObj = $scope.pruneUnallowedFields(termObj);
 
     // delete action requires _id and _rev
     if (action == 'delete') {
-     // $http.get($scope.db_url() + termObj._id).success(function(data){
-        $http.delete($scope.db_url() + termObj._id +'?rev='+ termObj._rev)
-          .success(function(data, status, headers, config){
-            console.log(status);
-            delete $scope.idDocs[termObj._id]; // remove item from cache
-            if (callback) callback();
-          })
-          .error(function(data, status, headers, config) { console.log(status); });
-
-     // });
-
-
+      $http.delete($scope.db_url() + termObj._id +'?rev='+ termObj._rev)
+        .success(function(data, status, headers, config){
+          console.log(status);
+          delete $scope.idDocs[termObj._id]; // remove item from cache
+          if (callback) callback();
+        })
+        .error(function(data, status, headers, config) { console.log(status); });
 
     // update (put) requires object with _id and _rev, term, wordfamily
     } else if (termObj['_rev']) {
@@ -263,25 +255,18 @@ angular.module('accentsApp')
     // now compress each list down to just one record each
     var verified_count = 0;
     Object.keys(family).forEach(function(term) {
-      family[term] = $scope.compressTerms(family[term]); // takes array of termObjs, returns merged termObj
+      family[term] = $scope.compressTerms(family[term]); // takes array of termObj, returns merged termObj
       if (family[term].verified) verified_count++;
     });
-     setTimeout(function() {
-    $scope.refreshAllDocList();
-     }, 2000);
-    // now set them all to ambiguous or not depending on verified count
-    Object.keys(family).forEach(function(term) {
-      family[term].ambiguous = (verified_count>1);
-     setTimeout(function() {
-     $scope.termCRUD('update', family[term]);
-    }, 2000);
 
-    });
-
-    // wait a second then refresh main cache list
+    // wait a second then set them all to ambiguous or not depending on verified count
     setTimeout(function() {
-     // $scope.refreshAllDocList();
-    }, 2000);
+      Object.keys(family).forEach(function(term) {
+        var termObj = $scope.idDocs[family[term]._id]; // reload object from cache just in case it has changed
+        termObj.ambiguous = (verified_count>1);
+        $scope.termCRUD('update', termObj);
+      });
+    }, 1000);
   };
 
   // compresses array of matching terms into one, returns termObj
