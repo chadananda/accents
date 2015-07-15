@@ -8,7 +8,8 @@
  * Controller of the accentsApp
  */
 angular.module('accentsApp')
-  .controller('getdataCtrl', function($rootScope,$scope,$http,getRecords,$window,$filter,myConfig,Utils,$sce,docData,$modal,$log) {
+  .controller('getdataCtrl',
+    function($rootScope,$scope,$http,getRecords,$window,$filter,myConfig,Utils,$sce,docData,$modal,$log) {
   $scope.docs={};
   $scope.filterresult={};
   $scope.awesomeThings = [
@@ -20,14 +21,6 @@ angular.module('accentsApp')
   var domainRemoteDb=myConfig.remoteDbDomain;
   var remoteDb=myConfig.database;
 
-  //===================Reload Page on route change===========================//
-  //~ $rootScope.$on('$locationChangeStart', function($event, changeTo, changeFrom) {
-    //~ if (changeTo == changeFrom) {
-      //~ return;
-    //~ }
-    //~ window.location.assign(changeTo);
-    //~ window.location.reload(true);
-  //~ });
 
   //===========Calling Utility Functions============//
   $scope.i2html = function(text) {
@@ -40,49 +33,24 @@ angular.module('accentsApp')
     return Utils.dotUndersRevert(text);
   }
 
-  //============On key up of the term textbox change the term=========//
-  //~ $( "#term" ).keyup(function() {
-	  //~ console.log('keytouched');
-    //~ var term = $('#term').val();
-    //~ if(term!="") {
-      //~ // TODO: get cursor position
-      //~ // split the word at the cursor position - part1 & part2
-      //~ // run customi2html on part1
-      //~ // then set val to part1+part2 and set the cursor position to part1.length
-      //~ var changedTerm = $scope.customi2html(term);
-      //~ $("#term").val(changedTerm);
-      //~ $("#heading-term").html(Utils.ilm2HTML(changedTerm));
-    //~ }
-    //~ else $("#heading-term").html("");
-  //~ });
   //=======Called on ng-keyup of term======//
-	$scope.changeTerm=function(){
-		var term = $('#term').val();
-		if(term!="") {
-			// TODO: get cursor position
-			// split the word at the cursor position - part1 & part2
-			// run customi2html on part1
-			// then set val to part1+part2 and set the cursor position to part1.length
-			var changedTerm = $scope.customi2html(term);
-			$("#term").val(changedTerm);
-			$("#heading-term").html(Utils.ilm2HTML(changedTerm));
-		}
-		else $("#heading-term").html("");
-	};
-	
-  //~ if(document.getElementById('term')) {
-    //~ document.getElementById('term').onkeydown = function(e){
-      //~ if (e.keyCode == 13) {
-        //~ // submit.
-        //~ // $scope.allDocsFunc();
-//~ 
-        //~ // what is this?
-        //~ $scope.adddata($scope.docs);
-      //~ }
-    //~ };
-  //~ }
+  $scope.changeTerm=function(){
+    var term = $('#term').val();
+    if(term!="") {
+      // TODO: get cursor position
+      // split the word at the cursor position - part1 & part2
+      // run customi2html on part1
+      // then set val to part1+part2 and set the cursor position to part1.length
+      var changedTerm = $scope.customi2html(term);
+      $("#term").val(changedTerm);
+      $("#heading-term").html(Utils.ilm2HTML(changedTerm));
+    }
+    else $("#heading-term").html("");
+  };
 
-  //Every checkboxes in the page
+
+  // Every checkboxes in the page
+  // Why?
   $('.checkbox input:checkbox').click(function() {
       $('.checkbox input:checkbox').not(this).prop('checked', false);
   });
@@ -143,12 +111,12 @@ angular.module('accentsApp')
 
     // delete action requires _id and _rev
     if (action == 'delete') {
+      // we update global cache first so our cache is valid synchronously
+      delete $scope.idDocs[termObj._id]; // remove item from cache
+        $scope.refreshOldDocsList();
+      // now delete from the database
       $http.delete($scope.db_url() + termObj._id +'?rev='+ termObj._rev)
-        .success(function(data, status, headers, config){
-          console.log(status);
-          delete $scope.idDocs[termObj._id]; // remove item from cache
-          if (callback) callback();
-        })
+        .success(function(data, status, headers, config){ if (callback) callback(); })
         .error(function(data, status, headers, config) { console.log(status); });
 
     // update (put) requires object with _id and _rev, term, wordfamily
@@ -160,10 +128,11 @@ angular.module('accentsApp')
       termObj.type = 'term';
       $http.put($scope.db_url() +termObj._id+'?rev='+termObj._rev,JSON.stringify(termObj))
         .success(function(newdata, status, headers, config) {
-          console.log(newdata);
-          termObj._rev = newdata.rev;
-          $scope.idDocs[termObj._id] = termObj; // update cache
-          if (callback) callback();})
+          termObj._rev = newdata.rev; // update object with new _rev
+          $scope.idDocs[termObj._id] = termObj; // update cache (not sure if this is needed -- ref or copy?)
+            $scope.refreshOldDocsList();
+          if (callback) callback();
+        })
         .error(function(data, status, headers, config) { console.log(status); });
 
 
@@ -179,13 +148,20 @@ angular.module('accentsApp')
         .success(function(newdata, status, headers, config) {
           termObj._rev = newdata.rev;
           termObj._id = newdata.id;
-          console.log('newly added termObj', termObj);
-          $scope.idDocs[termObj._id] = termObj; // add to cache
+          //console.log('newly added termObj', termObj);
+          $scope.idDocs[termObj._id] = termObj; // add to cache now that we have an id
+            $scope.refreshOldDocsList();
           if (callback) callback(termObj);
         })
         .error(function(data, status, headers, config) { console.log(status); });
     }
   };
+
+  // refresh $scope.docs from idDocs without having to query DB
+  $scope.refreshOldDocsList = function() {
+    $scope.docs = Object.keys($scope.idDocs).map(function(key){return obj[key]});;
+    $scope.count = $scope.docs.length;
+  }
 
   // DATABASE read all fields into hash cache ($scope.idDocs[id]) instant access by _id
   $scope.refreshAllDocList = function(callback) {
@@ -206,10 +182,10 @@ angular.module('accentsApp')
               $scope.idDocs[termObj['_id']] = termObj; // add to termObj cache
             }
           });
-          // console.log('refreshed idDocs list: ', $scope.idDocs);
-          //
-          $scope.docs=data.rows; // I think this is used for other stuff
-          $scope.count=data.total_rows;
+
+          // for the time being, we can use this to refresh $scope.docs
+          $scope.refreshOldDocsList();
+
           if (callback) callback();
         }
       })
@@ -261,7 +237,6 @@ angular.module('accentsApp')
     // split into object of one termArray for each spelling
     // eg. { "_Shiráz" => [termObj, termObj, termObj],
     //       "_Shíráz" => [termObj, termObj, termObj] }
-
     terms.forEach(function(termObj) {
       if (!family[termObj.term]) family[termObj.term] = []; // initialize if neccesary
       family[termObj.term].push(termObj);
@@ -288,9 +263,6 @@ angular.module('accentsApp')
   // this is not a whole word-family but just a sub-branch with exactly matching terms
   $scope.compressTerms = function(termsArray) {
     if (termsArray.length===1) return termsArray[0]; // no need to merge if there's only one
-
-    // for some reason, the first term is already compressed
-    //  console.log('compressTerms', termsArray);
     var i, key, keys, term;
     var base = termsArray[0]; // first term we will merge everything into
     var allowedTerms = $scope.termAllowedFields(); // list of allowed fields, we'll ignore all others
@@ -308,10 +280,11 @@ angular.module('accentsApp')
       for (var j = 1; j < keys.length; j++) {
         key = keys[j];
         if (allowedTerms.indexOf(key)!=-1) { // ignore properties not on our allowed list
-			
           if (key == 'verified') {
+            // merge with or, so if either field is verified, the base will now be
             base[key] = (base[key] || term[key]);
           } else if (key == 'ref') {
+            // merge with TRUE causes cleanup of PG and PAR
             base[key] = $scope.scrubField(base[key]+','+term[key], true);
           } else if (key == 'audio') {
             // TODO: not sure how this should merge because we need to keep any file attachment
@@ -319,20 +292,19 @@ angular.module('accentsApp')
           } else if (['_id','_rev','type','term','ambiguous','wordfamily'].indexOf(key)>-1) {
             // skip these, we do not need to merge them
           } else {
-            // default merge style for any other fields
+            // default merge style for all other fields
             base[key] = $scope.scrubField(base[key]+','+term[key]);
           }
         }
       };
-    // discard merged record
-    $scope.termCRUD('delete', term);
+      // discard merged record
+      $scope.termCRUD('delete', term);
     }
-    $scope.refreshAllDocList();
-     setTimeout(function() {
-      $scope.termCRUD('update', base);
-    }, 5000);
     // update base record
+    $scope.termCRUD('update', base);
 
+    // $scope.refreshAllDocList();  -- we don't need to do this because CRUD updats idDocs list
+         // rather we need to make sure everything uses the idDocs list
 
     return base;
   };
@@ -382,8 +354,8 @@ angular.module('accentsApp')
   $scope.clearEditForm = function() {
     // clear all fields except for reference field
     document.getElementById("keyid").value="";
-    document.getElementById("keyrev").value="";
-    if(typeof($scope.addform)!="undefined")	$scope.addform.$setPristine();
+    //document.getElementById("keyrev").value="";
+    if(typeof($scope.addform)!="undefined") $scope.addform.$setPristine();
     //$scope.search.doc.term='';
    // document.getElementById("term").value="";
     // if multi value reference, keep only the first one
@@ -425,19 +397,6 @@ angular.module('accentsApp')
     if (term.term) term.wordfamily = $scope.genWordFamily(term.term);
     if (!term.user) term.user = $scope.getSessionUser();
     return term;
-    //var searchTerm=$scope.search.doc.term;
-    //var original=$scope.editdata.original;
-    //var refrence=$scope.editdata.ref;
-    //refrence=$scope.getUnique(refrence);
-    //var definition=$scope.editdata.definition;
-    //var verified=$scope.verified;
-    //var verified=document.getElementById("verifiedCheckbox").checked;
-    //var ambiguous=$scope.ambiguous;
-    //var wordfamilyField=$scope.search.doc.term;
-    //wordfamilyField= wordfamilyField.replace("_","");
-    //wordfamilyField=Utils.dotUndersRevert(wordfamilyField);
-    //var sessionArray= JSON.parse( localStorage.getItem("session-user"));
-    //var userName=sessionArray.username;
   };
 
   // set the form data from a termObj and set to edit mode
@@ -450,7 +409,7 @@ angular.module('accentsApp')
 
     // override all fields
     document.getElementById("keyid").value = termObj['_id'];
-    document.getElementById("keyrev").value = termObj['_rev']; // we should stop using this one
+    //document.getElementById("keyrev").value = termObj['_rev']; // we should stop using this one
 
     // what does this do?
     //$scope.addform.$setPristine();
@@ -481,15 +440,34 @@ angular.module('accentsApp')
     document.getElementById("toptext").innerHTML="Edit:";
     $("#heading-term").html(Utils.ilm2HTML(termObj.term));
 
-    //setTimeout(function() {
-      $scope.refreshFilteredMatches(termObj);
-    //}, 100);
+    $scope.refreshFilteredMatches(termObj);
 
     // TODO: add audio state
   };
   /********* end of CRUD DRY Utils *************/
+
+
+  // Inititlization Code
   $("#spinner").show();
-  $scope.refreshAllDocList(); // added by Chad to load cache
+  // load data cache
+  $scope.refreshAllDocList(function(){
+    $("#spinner").hide();
+    $(".pagination").css("display","block");
+
+    if(sessionStorage.length>0  && sessionStorage.data) {
+      // get previous term id
+      var arrayDoc=JSON.parse(docData.getFormData());
+      var id=JSON.stringify(arrayDoc[0]['id']);
+      id=id.replace(/"/g,'');
+      // load form with previous term
+      var termObj = $scope.getTermObj(id);
+      $scope.setFormTerm(termObj);
+      setTimeout(function(){$scope.editdoc(id,rev)},5000);
+    }
+
+  });
+
+/*
   getRecords.getAllData()
     .success(function(data) {
       if(data.rows) {
@@ -502,71 +480,56 @@ angular.module('accentsApp')
     .error(function(error) {
       //  console.log(error);
     });
-    if(sessionStorage.length!=0){
-      if(sessionStorage.data) {
-        var arrayDoc=JSON.parse(docData.getFormData());
-        var id=JSON.stringify(arrayDoc[0]['id']);
-        id=id.replace(/"/g,'');
-        var rev=JSON.stringify(arrayDoc[1]['rev']);
-        rev=rev.replace(/"/g,'');
-        setTimeout(function(){$scope.editdoc(id,rev)},5000);
-      }
-    }
+*/
 
 
 
+
+/*
   //===============All docs function======================//
   $scope.allDocsFunc=function() {
     $scope.refreshAllDocList();
   };
+  */
 
   //==Delete Record from the partial or whole word searches========//
   $scope.deletedoc = function(id) {
     if(confirm('Are you SURE you want to delete this term?')) {
       var termObj = $scope.getTermObj(id);
       $scope.termCRUD('delete', termObj, function() {
-		if(typeof($scope.editdata)!="undefined")
-		{
-			// clear form
-			$scope.clearEditForm();
-		}
+        // how could $scope.editdata be undefined at this point? Why would we have a delete button?
+        if (typeof($scope.editdata)!="undefined") {
+          $scope.clearEditForm(); // clear form
+        }
         // clean & compact the word family
         $scope.cleanWordFamily(termObj);
-        // wait a second then refresh global list and filtered matches
-		setTimeout(function(){
-					$scope.refreshFilteredMatches(termObj);
-			},5000);
-		});
+        // refresh global list and filtered matches
+        $scope.refreshFilteredMatches(termObj);
+      });
     }
   };
 
   // Refresh the search with supplied term object
-  $scope.refreshFilteredMatches = function(term){
-	  $scope.refreshAllDocList(function(){
-		    // in case this is a termObj, just grab the term part
-			if (term.hasOwnProperty('term')) term = term.term;
-			// how do we change this to filter on the term instead of on #term.val ?
-			$scope.changeTerm();
-			$("#term").trigger("change");
-	});
-  
+  $scope.refreshFilteredMatches = function(term) {
+    setTimeout(function(){
+      // in case this is a termObj, just grab the term part
+      if (term.hasOwnProperty('term')) term = term.term;
+      $scope.changeTerm(term);
+      $("#term").trigger("change"); // interesting
+    }, 500);
   };
 
 
-  // Form Delete
+  // Delete from Form itself
   $scope.deletedata = function() {
     if($window.confirm('Are you SURE you want to delete this term?')) {
       var termObj = $scope.getFormTerm();
       $scope.termCRUD('delete', termObj, function() {
-        // clear form
-        $scope.clearEditForm();
         // clean & compact the word family
         $scope.cleanWordFamily(termObj);
-        // wait a second then refresh global list and filtered matches
-		 setTimeout(function(){
-					$scope.refreshFilteredMatches(termObj);
-			},5000);
-		});
+        // clear form
+        $scope.clearEditForm();
+      });
     }
   };
 
@@ -586,7 +549,7 @@ angular.module('accentsApp')
   $scope.editdoc = function(id) {
     var termObj = $scope.getTermObj(id);
     if (termObj) $scope.setFormTerm(termObj);
-	else $scope.clearEditForm();
+      else $scope.clearEditForm();
   };
 
   // Form Add
@@ -595,14 +558,10 @@ angular.module('accentsApp')
     if (!termObj.term.trim()) alert('Warning: term field required.');
       else $scope.termCRUD('add', termObj, function(){
         // clean up word family
-        $scope.cleanWordFamily(termObj.wordfamily);
+        $scope.cleanWordFamily(termObj);
         // clear form
         $scope.clearEditForm();
-        // wait a second then refresh global list and filtered matches
-         setTimeout(function(){
-			$scope.refreshFilteredMatches(termObj);
-			},5000);
-      });
+     });
   };
 
   // Form Update
@@ -613,10 +572,6 @@ angular.module('accentsApp')
       $scope.cleanWordFamily(termObj);
       // clear form
       $scope.clearEditForm();
-      // wait a second then refresh global list and filtered matches
-      setTimeout(function(){
-		$scope.refreshFilteredMatches(termObj);
-		},5000);
     });
   };
 
@@ -633,22 +588,6 @@ angular.module('accentsApp')
       $scope.docs=rows;
       $scope.count=rows.length;
     }
-
-    /*
-    $http.get('http://'+domainRemoteDb+'/'+remoteDb+'/_design/lists/_view/full_term?startkey="'+searchval+
-        '"&endkey="'+searchval+'\\ufff0"&include_docs=true')
-    .success(function(data) {
-      console.log(data);
-      if(data.rows) {
-        $scope.docs=data.rows;
-        $scope.count=data.total_rows;
-      }
-    })
-    .error(function(error) {
-    });
-    */
-
-
   };
 
 
@@ -671,11 +610,7 @@ angular.module('accentsApp')
     document.getElementById("sideIcon-"+key).className = "glyphicon glyphicon-chevron-down mr5 openPanel";
     document.getElementById("showDiv-"+key).style.display='block';
   };
- //~ $scope.openModal = function () {
-//~ 
-     //~ $('#myModal').modal('show')                // initializes and invokes show immediately
-  //~ };
-//~ 
+
 
 })
 
@@ -722,7 +657,6 @@ This directive allows us to pass a function in on an enter key to do what we wan
           else {
             count=1;
             mainArray[string]=count;
-
           }
         }
       }

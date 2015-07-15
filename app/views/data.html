@@ -36,7 +36,7 @@
 </div>
   <!-- <a href="javascript:void();"> <img src="images/forkme.png" alt="forkme" class="img-responsive forkme" /></a>-->
         <div class="container  clearfix"  id="main-container" ng-controller="getdataCtrl">
-			
+
 
             <div class="col-lg-12 clearfix  mb10 p0 pt10 pb10">
                 <div class="col-sm-6 logo p0 valignmiddle mt10">
@@ -106,7 +106,7 @@
 
                     <input type="text" class="form-control chkval" ng-keyup="changeTerm()" ng-enter="adddata(docs)" name="term" id="term" style="font-size:20px !important;" ng-model-options="{ debounce: 1000 }" ng-minlength="3" ng-model="search.doc.term" />
                     <input type="hidden" id="keyid"  />
-                    <input type="hidden" id="keyrev"  />
+                   <!-- <input type="hidden" id="keyrev"  /> -->
                      <span class="inputexm">Term</span>
 
                   </div>
@@ -171,7 +171,7 @@
                            <div class="dispinblk playmic">
 								<button id='stop' class="playButton" ><span class="glyphicon glyphicon-stop"></span></button>
 						    </div>
-		 
+
                       </div>
                   <div class="col-sm-7 col-md-7 clearfix"><div class="col-sm-12 clearfix">
                          <button type="submit" class="btn btn-warning pull-right mt20 " id="addword" ng-click="adddata(docs);"><span class="glyphicon glyphicon-plus mr5"></span>Add Term</button>
