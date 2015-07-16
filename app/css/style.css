@@ -101,6 +101,9 @@ background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
 .modal-body > ul {
     list-style-type: none;
 }
+.subGroup{
+	display:none;
+}
 /*=====================================ALL MOBILE VIEW===================================================*/
 @media only screen and (min-width : 0px) and (max-width:767px)
 {

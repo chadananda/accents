@@ -187,58 +187,59 @@
 				<div class="col-lg-12 clearfix mt30" >
 					<div class="col-lg-12 clearfix  pt20 pb20">
 						<div class="col-lg-12 clearfix autosearch-container"  ng-if="search.doc.term">
-							<h5 class="mb10 "><span class="mr5">{{(docs|wholeWordFilterMatch: customi2html(search.doc.term)).length}}</span>Whole Word Matches</h5>
-							<div ng-repeat="docobj in docs |wholeWordFilterMatch: customi2html(search.doc.term)"  class="col-md-11 col-md-offset-1" >
-								<span ng-bind-html="i2html(customi2html(docobj.doc.term))">{{docobj.doc.term}}</span>
-								<span class="glyphicon glyphicon-ok-circle ml10" ng-if="docobj.doc.verified==true"  style="margin-left: 5px;"></span>
-								<span class="glyphicon glyphicon-question-sign" ng-if="docobj.doc.ambiguous==1"  style="margin-left: 5px;"></span>
-								<!--<span class="glyphicon glyphicon-edit ml10" ng-click="editdoc(docobj.doc._id,docobj.doc._rev);"></span>-->
-								<button  ng-click="editdoc(docobj.doc._id,docobj.doc._rev);" class="btn btn-primary btn-xs editbtn mb10" type="button" style="margin-left: 10px;">
-									<span class="glyphicon glyphicon-edit"></span>
-								</button>
-								<!--<span class="glyphicon glyphicon-remove ml10" ng-click="deletedoc(docobj.doc._id,docobj.doc._rev);" ></span>-->
-								<button ng-click="deletedoc(docobj.doc._id,docobj.doc._rev,docs);" class="btn btn-danger btn-xs remove mb10" type="button" style="float:none;margin-left: 10px;">
-									<span class="glyphicon glyphicon-remove"></span>
-								</button>
-								&nbsp;
-								<div class="otherData">
-									<div class="notesClass" ng-show="docobj.doc.original!=''">{{docobj.doc.original}}&nbsp;</div>
-									<div class="notesClass" ng-show="docobj.doc.ref!=''"> {{docobj.doc.ref}}&nbsp;</div>
-									<div class="notesClass" ng-show="docobj.doc.definition!=''"> {{docobj.doc.definition}}&nbsp;</div>
+							<h5 class="mb10 "><span class="mr5">{{wholeWordFilterCount(search.doc.term)}}</span>Whole Word Matches</h5>
+							<div ng-repeat="key in objectKeys(wholeWordFilter(search.doc.term))"  class="col-md-12" >
+								<div ng-repeat="t in wholeWordFilter(search.doc.term)[key]" >
+									<span ng-bind-html="i2html(customi2html(t.term))"></span>
+									<span class="glyphicon glyphicon-ok-circle ml10" ng-if="t.verified==true"  style="margin-left: 5px;"></span>
+									<span class="glyphicon glyphicon-question-sign" ng-if="t.ambiguous==true"  style="margin-left: 5px;"></span>
+									<button  ng-click="editdoc(t._id,t._rev);" class="btn btn-primary btn-xs editbtn mb10" type="button" style="margin-left: 10px;">
+										<span class="glyphicon glyphicon-edit"></span>
+									</button>
+									<!--<span class="glyphicon glyphicon-remove ml10" ng-click="deletedoc(docobj.doc._id,docobj.doc._rev);" ></span>-->
+									<button ng-click="deletedoc(t._id,t._rev,docs);" class="btn btn-danger btn-xs remove mb10" type="button" style="float:none;margin-left: 10px;">
+										<span class="glyphicon glyphicon-remove"></span>
+									</button>
+									&nbsp;
+									<div class="otherData">
+										<div class="notesClass" ng-show="t.original!=''">{{t.original}}&nbsp;</div>
+										<div class="notesClass" ng-show="t.ref!=''"> {{t.ref}}&nbsp;</div>
+										<div class="notesClass" ng-show="t.definition!=''"> {{t.definition}}&nbsp;</div>
+									</div>
 								</div>
 							</div>
 						</div>
 						<div class="col-lg-12 clearfix mt0 autosearch-container" ng-if="search.doc.term">
-							<h5 class="mb10 "><span class="mr5 ">{{(docs|groupfiltercount:customi2html(search.doc.term))}}</span>Partial Matches</h5>
-							<div ng-repeat="(key, value)  in docs |groupfilter:customi2html(search.doc.term)" class="searchGroup" ng-click="getAllRecords('{{key}}',docs)"  ng-show="value!=1" >
-								<span   class="glyphicon glyphicon-play mr5 openPanel" id="sideIcon-{{key}}"></span>	<u>{{key}}</u> ({{value}})
-								<div id="showDiv-{{key}}" class="col-md-11 col-md-offset-1" ng-show="viewkey==key && value!=1">
-									<div ng-repeat="t in filterresult" >
+							<h5 class="mb10 "><span class="mr5 ">{{groupfiltercount(search.doc.term)}}</span>Partial Matches</h5>
+							<div ng-repeat="key in objectKeys(groupfilter(search.doc.term))" class="searchGroup"  ng-click="getAllRecords('{{key}}')">
+								<span class="glyphicon glyphicon-play mr5 openPanel" id="sideIcon-{{key}}"></span>	
+								<u ng-bind-html="i2html(customi2html(key))"></u>								 
+								<span ng-show="groupfilter(search.doc.term)[key].length!=1">({{groupfilter(search.doc.term)[key].length}})</span>
+								<span  ng-show="groupfilter(search.doc.term)[key].length==1">
+									<span class="glyphicon glyphicon-ok-circle ml10" ng-if="groupfilter(search.doc.term)[key][0].verified==true"   style="margin-left: 5px;"></span>
+									<span class="glyphicon glyphicon-question-sign" ng-if="groupfilter(search.doc.term)[key][0].ambiguous==true"  style="margin-left: 5px;"></span>
+									<button  ng-click="editdoc(groupfilter(search.doc.term)[key][0]._id,groupfilter(search.doc.term)[key][0]._rev);" class="btn btn-primary btn-xs editbtn mb10" type="button"  style="margin-left: 10px;">
+										<span class="glyphicon glyphicon-edit"></span>
+									</button>
+									<button ng-click="deletedoc(groupfilter(search.doc.term)[key][0]._id,groupfilter(search.doc.term)[key][0]._rev,docs);" class="btn btn-danger btn-xs remove mb10" type="button" style="float:none;margin-left: 10px;">
+										<span class="glyphicon glyphicon-remove"></span>
+									</button>
+								</span>
+									
+								<div id="showDiv-{{key}}" class="col-md-11 col-md-offset-1 subGroup" ng-show="groupfilter(search.doc.term)[key].length!=1">
+									<div ng-repeat="t in groupfilter(search.doc.term)[key]" >
 										<span ng-bind-html="i2html(customi2html(t.term))">{{t.term}}</span>
-										<span class="glyphicon glyphicon-ok-circle ml10" ng-if="t.verify==1  || t.verified==true"  style="margin-left: 5px;"></span>
-										<span class="glyphicon glyphicon-question-sign" ng-if="t.ambiguous==1"  style="margin-left: 5px;"></span>
+										<span class="glyphicon glyphicon-ok-circle ml10" ng-if="t.verified==true"  style="margin-left: 5px;"></span>
+										<span class="glyphicon glyphicon-question-sign" ng-if="t.ambiguous==true"  style="margin-left: 5px;"></span>
 										<button  ng-click="editdoc(t._id,t._rev);" class="btn btn-primary btn-xs editbtn mb10" type="button" style="margin-left: 10px;">
-											<span class="glyphicon glyphicon-edit"></span>
+										<span class="glyphicon glyphicon-edit"></span>
 										</button>
 										<button ng-click="deletedoc(t._id,t._rev,docs);" class="btn btn-danger btn-xs remove mb10" type="button" style="float:none;margin-left: 10px;">
-											<span class="glyphicon glyphicon-remove"></span>
+										<span class="glyphicon glyphicon-remove"></span>
 										</button>
-											<!--<span class="glyphicon glyphicon-remove ml10" ng-click="deletedoc(t._id,t._rev);" ></span>-->
 									</div>
 								</div>
-							</div>
-							<div ng-repeat="doc  in docs |singlegroupFilter:customi2html(search.doc.term)" class="searchSingle"   >
-								<span class="glyphicon glyphicon-record mr5 openPanel"></span>
-								<span ng-bind-html="i2html(customi2html(doc.doc.term))">{{doc.doc.term}}</span>
-								<span class="glyphicon glyphicon-ok-circle ml10" ng-if="doc.doc.verify==1 || doc.doc.verified==true"  style="margin-left: 5px;"></span>
-								<span class="glyphicon glyphicon-question-sign" ng-if="doc.doc.ambiguous==1"  style="margin-left: 5px;"></span>
-								<button  ng-click="editdoc(doc.doc._id,doc.doc._rev);" class="btn btn-primary btn-xs editbtn mb10" type="button"  style="margin-left: 10px;">
-									<span class="glyphicon glyphicon-edit"></span>
-								</button>
-								<button ng-click="deletedoc(doc.doc._id,doc.doc._rev,docs);" class="btn btn-danger btn-xs remove mb10" type="button" style="float:none;margin-left: 10px;">
-									<span class="glyphicon glyphicon-remove"></span>
-								</button>
-							</div>
+							</div>	
 						</div>
 					</div>
 				</div>

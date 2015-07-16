@@ -631,26 +631,41 @@ angular.module('accentsApp')
 
 
   // is this for the filtered list?
-  $scope.getAllRecords = function(key, docs){
-    // I replace the old code with code that uses the new object-based cache
-    // since the object-based cache has hash lookup and does not need reloaded with each crud change
-    var filtered = [];
-    // iterate termObj cache idDocs, grab matches
-    Object.keys($scope.idDocs).forEach(function(id) {
-      var termObj = $scope.idDocs[id];
-      var match = termObj.wordfamily.toLowerCase();
-      if(((match.indexOf(key)) !=-1) && (match.length == key.length)) filtered.push(termObj);
-    });
-
-    $scope.filterresult = filtered;
-    $scope.viewkey=key;
-
-    // $("span[id^='sideIcon-']").addClass("glyphicon glyphicon-play mr5 openPanel");
+  $scope.getAllRecords = function(key){   
     document.getElementById("sideIcon-"+key).className = "glyphicon glyphicon-chevron-down mr5 openPanel";
     document.getElementById("showDiv-"+key).style.display='block';
   };
-
-
+  $scope.objectKeys = function(obj){
+  return Object.keys(obj);
+}
+$scope.groupfilter=function(term){
+	var search=$scope.customi2html(term);
+	var matchlist = $scope.getMatchLists(search);
+    return  matchlist.partial;
+};
+$scope.groupfiltercount=function(term){
+	var search=$scope.customi2html(term);
+	var matchlist = $scope.getMatchLists(search);
+    var sum=0;
+    angular.forEach(matchlist.partial,function(item){
+			sum+=item.length;
+		});
+      return  sum;
+};
+$scope.wholeWordFilter=function(term){
+	var search=$scope.customi2html(term);
+	var matchlist = $scope.getMatchLists(search);
+    return  matchlist.whole;
+}
+$scope.wholeWordFilterCount=function(term){
+	var search=$scope.customi2html(term);
+	var matchlist = $scope.getMatchLists(search);
+	var sum=0;
+    angular.forEach(matchlist.whole,function(item){
+			sum+=item.length;
+		});
+      return  sum;
+}
 })
 
 
@@ -670,67 +685,6 @@ This directive allows us to pass a function in on an enter key to do what we wan
   };
 })
 
-.filter('singlegroupFilter',['Utils' ,function(Utils){
-  return function(terms, search) {
-    // hmm, we don't seem to have access to $scope functions here. How do access our CRUD utils?
-    //var matchlist = $scope.getMatchLists(search);
-    //console.log('matchlist: ', matchlist);
-
-    var subArray=[];
-    var filtered = [];
-    var mainArray={};
-    var count=1;
-    var wordFamily=[];
-    search = Utils.dotUndersRevert(search.replace('_', '').toLowerCase());
-
-    //console.log(search);
-
-    // list of partial match counts?
-    angular.forEach(terms, function(termObj) {
-      var lowerfamily = termObj.wordfamily.toLowerCase();
-      //console.log(lowerfamily);
-      if ( (lowerfamily.indexOf(search)>-1) && (lowerfamily.length!==search.length) ) {
-        if (mainArray[lowerfamily]) mainArray[lowerfamily]++;
-          else mainArray[lowerfamily]=1;
-      }
-    });
-
-    console.log(mainArray);
-
-    // list of full match
-    angular.forEach(mainArray, function(strcount, lowerfamily) {
-      if(strcount==1) {
-        angular.forEach(terms, function(termObj) {
-          var string=termObj.wordfamily;
-          if(string) {
-            string=string.toLowerCase();
-            if( ((string.indexOf(lowerfamily)) !=-1) && (string.length== lowerfamily.length)) {
-              filtered.push(termObj);
-              return false;
-            }
-          }
-          else {
-            var string=termObj.term;
-            if(string) {
-              string= string.replace("_", "");
-              string=Utils.dotUndersRevert(string);
-              string=string.toLowerCase();
-              if( ((string.indexOf(lowerfamily)) !=-1) && (string.length== lowerfamily.length)) {
-                filtered.push(termObj);
-                return false;
-              }
-            }
-          }
-        });
-      }
-
-    });
-
-    console.log('filtered list: ', filtered);
-    return filtered;
-
-  };
-}])
 
 .filter('offset', function() {
   return function(input, start) {
@@ -765,120 +719,6 @@ This directive allows us to pass a function in on an enter key to do what we wan
       }
     });
     return filtered;
-  };
-}])
-
-.filter('wholeWordFilter',['Utils',function(Utils){
-  return function(items,search) {
-    var filtered = [];
-    angular.forEach(items, function(item) {
-      var string=item.term;
-      if(string) {
-        string= string.replace("_","");
-        //string=string.toLowerCase();
-        string=Utils.dotUndersRevert(string);
-        //search=search.toLowerCase();
-        search= search.replace("_","");
-        search=Utils.dotUndersRevert(search);
-        if( ((string.indexOf(search)) !=-1) && (string.length== search.length)) {
-          filtered.push(item);
-        }
-      }
-    });
-    return filtered;
-  }
-}])
-
-.filter('wholeWordFilterMatch',['Utils',function(Utils){
-  return function(items, search) {
-    var filtered = [];
-    angular.forEach(items, function(item) {
-      if (!item.term) console.log('wholeWordFilterMatch:', item);
-      var string=item.term;
-      if(string) {
-        string= string.replace("_","");
-        string=string.toLowerCase();
-        string=Utils.dotUndersRevert(string);
-        search=search.toLowerCase();
-        search= search.replace("_","");
-        search=Utils.dotUndersRevert(search);
-        if( ((string.indexOf(search)) !=-1) && (string.length== search.length)) {
-          filtered.push(item);
-        }
-      }
-    });
-    return filtered;
-  }
-}])
-
-.filter('groupfilter',['Utils',function(Utils){
-  return function(items,search) {
-    var subArray={};
-    var filtered = [];
-    var mainArray={};
-    var count=1;
-
-    angular.forEach(items, function(item) {
-      var string=item.term;
-      if(string) {
-        string= string.replace("_","");
-        string=string.toLowerCase();
-        string=Utils.dotUndersRevert(string);
-        search=search.toLowerCase();
-        search= search.replace("_","");
-        search=Utils.dotUndersRevert(search);
-        if( ((string.indexOf(search)) !=-1) && (string.length!= search.length)) {
-          if(string in mainArray) {
-            var countnew=mainArray[string];
-            countnew++;
-            mainArray[string]=countnew;
-          }
-          else {
-            count=1;
-            mainArray[string]=count;
-          }
-        }
-      }
-    });
-    //console.log(mainArray);
-    return mainArray;
-  };
-}])
-
-.filter('groupfiltercount',['Utils',function(Utils){
-  return function(items,search) {
-    var subArray={};
-    var filtered = [];
-    var mainArray={};
-    var count=1;
-
-    angular.forEach(items, function(item) {
-      var string=item.term;
-      if(string) {
-        string= string.replace("_","");
-        string=string.toLowerCase();
-        string=Utils.dotUndersRevert(string);
-        search=search.toLowerCase();
-        search= search.replace("_","");
-        search=Utils.dotUndersRevert(search);
-        if( ((string.indexOf(search)) !=-1) && (string.length!= search.length)) {
-          if(string in mainArray) {
-            var countnew=mainArray[string];
-            countnew++;
-            mainArray[string]=countnew;
-          }
-          else {
-            count=1;
-            mainArray[string]=count;
-          }
-        }
-      }
-    });
-    var sum=0;
-    angular.forEach(mainArray,function(it) {
-      sum=sum+it;
-    });
-    return sum;
   };
 }])
 
