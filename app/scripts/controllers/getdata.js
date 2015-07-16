@@ -159,9 +159,9 @@ angular.module('accentsApp')
 
   // refresh $scope.docs from idDocs without having to query DB
   $scope.refreshOldDocsList = function() {
-    $scope.docs = Object.keys($scope.idDocs).map(function(key){return obj[key]});;
+    $scope.docs = Object.keys($scope.idDocs).map(function(key){ return $scope.idDocs[key]; });
     $scope.count = $scope.docs.length;
-  }
+  };
 
   // DATABASE read all fields into hash cache ($scope.idDocs[id]) instant access by _id
   $scope.refreshAllDocList = function(callback) {
@@ -444,16 +444,54 @@ angular.module('accentsApp')
 
     // TODO: add audio state
   };
+
+
+  // Generate an object of word families
+  $scope.getMatchLists = function(search) {
+    // Each member being an object of terms,
+    // Each term holds an array of matching term objects
+    // Because each sub-group is an array, we don't need to keep count, just use length
+    //
+    // {
+    //  whole: {
+    //    Shiraz:  {_Shiraz:  [termObj, termObj],  _Shiráz: [termObj, termObj],   Shiráz:  [termObj] }
+    //  }
+    //  partial: {
+    //    Shirazi: {_Shirazi: [termObj, termObj],  _Shirázi: [termObj, termObj],  Shirázi: [termObj] }
+    //  }
+    // }
+    var whole = {}, partial = {}; // format of our result object
+    search = $scope.genWordFamily(search).toLowerCase(); // properly format search term
+    // iterate all terms in cache
+    angular.forEach($scope.idDocs, function(termObj) {
+      // matching objects added to either the partial or whole objects
+      if (termObj.wordfamily.toLowerCase().indexOf(search)>-1) {
+        if (termObj.wordfamily.length === search.length) {
+          // create the sub-array if necessary before attaching the object
+          if (!whole[termObj.term]) whole[termObj.term] = [];
+          whole[termObj.term].push(termObj);
+        } else {
+          if (!partial[termObj.term]) partial[termObj.term] = [];
+          partial[termObj.term].push(termObj);
+        }
+      }
+    });
+    return {whole: whole, partial: partial};
+  };
+
+
   /********* end of CRUD DRY Utils *************/
 
 
   // Inititlization Code
   $("#spinner").show();
+
   // load data cache
   $scope.refreshAllDocList(function(){
     $("#spinner").hide();
     $(".pagination").css("display","block");
 
+    // wahat does this do?
     if(sessionStorage.length>0  && sessionStorage.data) {
       // get previous term id
       var arrayDoc=JSON.parse(docData.getFormData());
@@ -462,9 +500,10 @@ angular.module('accentsApp')
       // load form with previous term
       var termObj = $scope.getTermObj(id);
       $scope.setFormTerm(termObj);
+
+      //??
       setTimeout(function(){$scope.editdoc(id,rev)},5000);
     }
-
   });
 
 /*
@@ -631,55 +670,53 @@ This directive allows us to pass a function in on an enter key to do what we wan
   };
 })
 
-.filter('singlegroupFilter',['Utils',function(Utils){
-  return function(items,search) {
+.filter('singlegroupFilter',['Utils' ,function(Utils){
+  return function(terms, search) {
+    // hmm, we don't seem to have access to $scope functions here. How do access our CRUD utils?
+    //var matchlist = $scope.getMatchLists(search);
+    //console.log('matchlist: ', matchlist);
+
     var subArray=[];
     var filtered = [];
     var mainArray={};
     var count=1;
     var wordFamily=[];
+    search = Utils.dotUndersRevert(search.replace('_', '').toLowerCase());
 
-    angular.forEach(items, function(item) {
-      var string=item.doc.term;
-      if(string) {
-        string= string.replace("_","");
-        string=string.toLowerCase();
-        string=Utils.dotUndersRevert(string);
-        search=search.toLowerCase();
-        search= search.replace("_","");
-        search=Utils.dotUndersRevert(search);
-        if( ((string.indexOf(search)) !=-1) && (string.length!= search.length)) {
-          if(string in mainArray) {
-            var countnew=mainArray[string];
-            countnew++;
-            mainArray[string]=countnew;
-          }
-          else {
-            count=1;
-            mainArray[string]=count;
-          }
-        }
+    //console.log(search);
+
+    // list of partial match counts?
+    angular.forEach(terms, function(termObj) {
+      var lowerfamily = termObj.wordfamily.toLowerCase();
+      //console.log(lowerfamily);
+      if ( (lowerfamily.indexOf(search)>-1) && (lowerfamily.length!==search.length) ) {
+        if (mainArray[lowerfamily]) mainArray[lowerfamily]++;
+          else mainArray[lowerfamily]=1;
       }
     });
-    angular.forEach(mainArray,function(value,key) {
-      if(value==1) {
-        angular.forEach(items, function(item) {
-          var string=item.doc.wordfamily;
+
+    console.log(mainArray);
+
+    // list of full match
+    angular.forEach(mainArray, function(strcount, lowerfamily) {
+      if(strcount==1) {
+        angular.forEach(terms, function(termObj) {
+          var string=termObj.wordfamily;
           if(string) {
             string=string.toLowerCase();
-            if( ((string.indexOf(key)) !=-1) && (string.length== key.length)) {
-              filtered.push(item);
+            if( ((string.indexOf(lowerfamily)) !=-1) && (string.length== lowerfamily.length)) {
+              filtered.push(termObj);
               return false;
             }
           }
           else {
-            var string=item.doc.term;
+            var string=termObj.term;
             if(string) {
-              string= string.replace("_","");
+              string= string.replace("_", "");
               string=Utils.dotUndersRevert(string);
               string=string.toLowerCase();
-              if( ((string.indexOf(key)) !=-1) && (string.length== key.length)) {
-                filtered.push(item);
+              if( ((string.indexOf(lowerfamily)) !=-1) && (string.length== lowerfamily.length)) {
+                filtered.push(termObj);
                 return false;
               }
             }
@@ -688,7 +725,10 @@ This directive allows us to pass a function in on an enter key to do what we wan
       }
 
     });
+
+    console.log('filtered list: ', filtered);
     return filtered;
+
   };
 }])
 
@@ -708,7 +748,7 @@ This directive allows us to pass a function in on an enter key to do what we wan
     var count=1;
 
     angular.forEach(items, function(item) {
-      var string=item.doc.term;
+      var string=item.term;
       if(string) {
         string= string.replace("_","");
         //string=string.toLowerCase();
@@ -732,7 +772,7 @@ This directive allows us to pass a function in on an enter key to do what we wan
   return function(items,search) {
     var filtered = [];
     angular.forEach(items, function(item) {
-      var string=item.doc.term;
+      var string=item.term;
       if(string) {
         string= string.replace("_","");
         //string=string.toLowerCase();
@@ -750,10 +790,11 @@ This directive allows us to pass a function in on an enter key to do what we wan
 }])
 
 .filter('wholeWordFilterMatch',['Utils',function(Utils){
-  return function(items,search) {
+  return function(items, search) {
     var filtered = [];
     angular.forEach(items, function(item) {
-      var string=item.doc.term;
+      if (!item.term) console.log('wholeWordFilterMatch:', item);
+      var string=item.term;
       if(string) {
         string= string.replace("_","");
         string=string.toLowerCase();
@@ -778,7 +819,7 @@ This directive allows us to pass a function in on an enter key to do what we wan
     var count=1;
 
     angular.forEach(items, function(item) {
-      var string=item.doc.term;
+      var string=item.term;
       if(string) {
         string= string.replace("_","");
         string=string.toLowerCase();
@@ -812,7 +853,7 @@ This directive allows us to pass a function in on an enter key to do what we wan
     var count=1;
 
     angular.forEach(items, function(item) {
-      var string=item.doc.term;
+      var string=item.term;
       if(string) {
         string= string.replace("_","");
         string=string.toLowerCase();
@@ -846,9 +887,9 @@ This directive allows us to pass a function in on an enter key to do what we wan
     var filtered = [];
     if(search) {
       angular.forEach(items, function(item) {
-        var string=item.doc.term;
+        var string=item.term;
         if(string) {
-          if( ((string.toLowerCase().indexOf(search.toLowerCase())) !=-1) && item.doc.verified==1) {
+          if( ((string.toLowerCase().indexOf(search.toLowerCase())) !=-1) && item.verified==1) {
             filtered.push(item);
           }
         }
