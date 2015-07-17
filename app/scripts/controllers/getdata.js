@@ -501,36 +501,11 @@ angular.module('accentsApp')
       var termObj = $scope.getTermObj(id);
       $scope.setFormTerm(termObj);
 
-      //??
+      //to call the edit function from allterms page
       setTimeout(function(){$scope.editdoc(id,rev)},5000);
     }
   });
-
-/*
-  getRecords.getAllData()
-    .success(function(data) {
-      if(data.rows) {
-        $scope.docs=data.rows;
-        $scope.count=data.total_rows;
-        $("#spinner").hide();
-        $(".pagination").css("display","block");
-      }
-    })
-    .error(function(error) {
-      //  console.log(error);
-    });
-*/
-
-
-
-
-/*
-  //===============All docs function======================//
-  $scope.allDocsFunc=function() {
-    $scope.refreshAllDocList();
-  };
-  */
-
+  
   //==Delete Record from the partial or whole word searches========//
   $scope.deletedoc = function(id) {
     if(confirm('Are you SURE you want to delete this term?')) {
@@ -693,52 +668,52 @@ This directive allows us to pass a function in on an enter key to do what we wan
     return input.slice(start);
   };
 })
-
-.filter('myfilterData',['Utils',function(Utils){
-  return function(items,search) {
-    var subArray={};
-    var filtered = [];
-    var mainArray={};
-    var count=1;
-
-    angular.forEach(items, function(item) {
-      var string=item.term;
-      if(string) {
-        string= string.replace("_","");
-        //string=string.toLowerCase();
-        string=Utils.dotUndersRevert(string);
-        if(search) {
-        //  search=search.toLowerCase();
-          search= search.replace("_","");
-          search=Utils.dotUndersRevert(search);
-          if( ((string.indexOf(search)) !=-1) && (string.length!= search.length)) {
-            filtered.push(item);
-          }
-        }
-
-      }
-    });
-    return filtered;
-  };
-}])
-
-.filter('newfilter',function(){
-  return function(items,search) {
-    var filtered = [];
-    if(search) {
-      angular.forEach(items, function(item) {
-        var string=item.term;
-        if(string) {
-          if( ((string.toLowerCase().indexOf(search.toLowerCase())) !=-1) && item.verified==1) {
-            filtered.push(item);
-          }
-        }
-      });
-      return filtered;
-    }
-    else return items;
-  }
-})
+//~ 
+//~ .filter('myfilterData',['Utils',function(Utils){
+  //~ return function(items,search) {
+    //~ var subArray={};
+    //~ var filtered = [];
+    //~ var mainArray={};
+    //~ var count=1;
+//~ 
+    //~ angular.forEach(items, function(item) {
+      //~ var string=item.term;
+      //~ if(string) {
+        //~ string= string.replace("_","");
+        //~ //string=string.toLowerCase();
+        //~ string=Utils.dotUndersRevert(string);
+        //~ if(search) {
+        //~ //  search=search.toLowerCase();
+          //~ search= search.replace("_","");
+          //~ search=Utils.dotUndersRevert(search);
+          //~ if( ((string.indexOf(search)) !=-1) && (string.length!= search.length)) {
+            //~ filtered.push(item);
+          //~ }
+        //~ }
+//~ 
+      //~ }
+    //~ });
+    //~ return filtered;
+  //~ };
+//~ }])
+//~ 
+//~ .filter('newfilter',function(){
+  //~ return function(items,search) {
+    //~ var filtered = [];
+    //~ if(search) {
+      //~ angular.forEach(items, function(item) {
+        //~ var string=item.term;
+        //~ if(string) {
+          //~ if( ((string.toLowerCase().indexOf(search.toLowerCase())) !=-1) && item.verified==1) {
+            //~ filtered.push(item);
+          //~ }
+        //~ }
+      //~ });
+      //~ return filtered;
+    //~ }
+    //~ else return items;
+  //~ }
+//~ })
 
 .controller("PaginationCtrl", function($scope) {
   $scope.itemsPerPage = 10;

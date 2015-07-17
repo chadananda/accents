@@ -42,561 +42,356 @@ angular.module('accentsApp')
 	 docData.setFormData(list);
 	 window.location.href="http://localhost:9000/#/getdata";
  };
-	//////////////////////////Fetch  data/////////////////////////////////////
-	// $scope.getAllData = function() {
-	$("#spinner").show();
-	getRecords.getAllData()
-	.success(function(data) 
-	{			
-		if(data.rows)
-		{		
-			$scope.docs=data.rows;
-			$scope.count=data.total_rows;
-			$("#spinner").hide();
-			$(".pagination").css("display","block");
-		}	          
-	})     
- //==========Change the verified field to 1 for all the records with original field value==========//
- $scope.changeVerify=function(alldocs){
-	  angular.forEach(alldocs, function(docs) {
-		  if(docs.doc.original!="" && docs.doc.original)
-		  {
-			var id=docs.id;
-			console.log(id);
-			var rev=docs.doc._rev;
-			 var data= JSON.stringify
-			   ({
-				   "source": "Swarandeep",   
-				   "original":docs.doc.original , 
-				   "definition":docs.doc.definition, 
-				   "type": "term", 
-				   "user": "Swarandeep",
-				   "term": docs.doc.term,
-				   "ref":  docs.doc.ref,
-				   "verify":"1",
-				   "ambiguous":0,
-				});
-				
-				$http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev, data).
-				success(function(data, status, headers, config) 
-				{
-					console.log(status);
-					$scope.message='Record Added Successfully';
-				}).
-				error(function(data, status, headers, config) 
-				{
-					console.log(status);
-					$scope.message='Records Updated Successfully';
-				});
-				 
-		  }
-		  else
-		  {
-			console.log(docs.id+"no original");
-		  }
-    });
-     $http.get('http://'+domainRemoteDb+'/'+remoteDb+'/_all_docs?include_docs=true')
-		.success(function(data) 
-		{
-			if(data.rows)
-			{		
-				$scope.docs=data.rows;
-				$scope.count=data.total_rows;
-			}	
-		})
-		.error(function(error) 
-		{
-			console.log(error);
-		});
-    $scope.setAmbiguous($scope.docs);
- };
- 
- 
- //===================Delete Duplicate Records================//
- $scope.deleteDuplicate=function(alldocs){
-	 var idArray=[];
-	  angular.forEach(alldocs, function(docs) {		
-		 angular.forEach(alldocs,function(doc)
-		 {
-			 if((docs.doc._id!=doc.doc._id )&& (docs.doc._rev!=doc.doc._rev))
-			 {
-				 if(doc.doc.term==docs.doc.term && doc.doc.original==docs.doc.original && doc.doc.definition==docs.doc.definition && doc.doc.source==docs.doc.source)
-				 {
-					if(doc.doc.verify && doc.doc.verify=="1")
-					{
-						var id=docs.id;
-						var rev=docs.doc._rev;
-					}
-					else
-					{
-						var id=doc.id; 
-						var rev=doc.doc._rev;
-					}
-					idArray.push(id);
-					
-					//~ $http.delete('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev).
-					//~ success(function(data, status, headers, config) 
-					//~ {
-						//~ //$("#spinner").show();
-						//~ $scope.message='Records Deleted Successfully';					
-					//~ }).
-					//~ error(function(data, status, headers, config) 
-					//~ {
-						//~ $scope.message='Error Deleting Record';
-					//~ });		
-				 }
-			 }
-		 });
-		 //$scope.allDocsFunc();
-	  });
-	  console.log(idArray);
- };
+	/******************************************************/
+	// some helper functions to clean up CRUD operations
+	/******************************************************/
+
+  // single point for DB path in case we want to change it later (including http)
+  $scope.db_url = function() {
+    // detect page https?
+    return 'http://'+domainRemoteDb+'/'+remoteDb + '/';
+  };
+  // returns a "word family" stripped down version of the term
+  // parameter can be a wordfamily, termObj, HTML or glyph
+  $scope.genWordFamily = function(term) {
+    if (!term) return;
+    // given any version of a term, even an object, return the word family
+    if (term.hasOwnProperty('term')) term = term.term;
+    return Utils.dotUndersRevert(term).replace(/\_|<[\/]?u>/g, '').trim();
+  };
+ // scrub any user generated field (may contain multiple items)
+  $scope.scrubField = function(field, isReference) {
+    // scrub any user-generated field part
+    var scrubItem = function(item, isReference) {
+      // this is good for reference fields and other fields
+      if (isReference) return item.replace(/(pg[\.]?|page|p\.)/ig, 'pg ') // cleanup PG
+                  .replace(/(par[\.]?|pp[\.]?)/ig,'par ') // cleanup PAR
+                  .replace(/\s+/ig, ' ') // remove any excess spaces
+                  .trim(); // remove surrounding spaces
+        else return item.replace(/\s+/ig, ' ').trim();
+    };
+
+    if (!field) return '';
+    return field.split(",").
+      // clean up field
+      map(scrubItem, isReference).
+      // remove duplicates and empties
+      filter(function(ref, index, self) {
+        return ((index == self.indexOf(ref)) && (ref.length>1));
+      }).
+      // re-join with a comma and a space
+      join(', ');
+  };
+  
+  // remove fields that are not allowed -- we use this on loading records and before saving
+  $scope.pruneUnallowedFields = function(termObj) {
+    var fields = Object.keys(termObj);
+    var allowedFields = $scope.termAllowedFields();
+    for (var i=0; i<fields.length; i++) {
+      if (allowedFields.indexOf(fields[i])<0) delete termObj[fields[i]];
+    }
+    return termObj;
+  };
+  
+  // returns array of allowable term fields (so we can adjust this on one place)
+  $scope.termAllowedFields = function() {
+    return ['definition', 'original', 'source', 'term', 'user', 'wordfamily', 'ref',
+            'verified', 'ambiguous', 'audio', '_id', '_rev', 'type'];
+  };
+    // refresh $scope.docs from idDocs without having to query DB
+  $scope.refreshOldDocsList = function() {
+    $scope.docs = Object.keys($scope.idDocs).map(function(key){ return $scope.idDocs[key]; });
+    $scope.count = $scope.docs.length;
+  };
+  // DATABASE read all fields into hash cache ($scope.idDocs[id]) instant access by _id
+  $scope.refreshAllDocList = function(callback) {
+    var termObj;
+    $http.get($scope.db_url() + '_all_docs?include_docs=true')
+      .success(function(data)  {
+        if(data.rows) {
+          $scope.idDocs = {}; // clear termObj cache
+          data.rows.forEach(function(doc){
+            termObj = doc.doc;
+            if (termObj.type === 'term') {
+              termObj.wordfamily = $scope.genWordFamily(termObj.term); // in case it is not there already
+              termObj.original = termObj.original || ''; // default blank string
+              termObj.definition = termObj.definition || ''; // default blank
+              termObj.ref = $scope.scrubField(termObj.ref, true);
+              termObj.verified = termObj.verified || false;
+              termObj = $scope.pruneUnallowedFields(termObj); // remove any extraneous fields
+              $scope.idDocs[termObj['_id']] = termObj; // add to termObj cache
+            }
+          });
+
+          // for the time being, we can use this to refresh $scope.docs
+          $scope.refreshOldDocsList();
+
+          if (callback) callback();
+        }
+      })
+      .error(function(error) { console.log(error); });
+  };   
+  //////////////////////////Fetch  data/////////////////////////////////////
+	$scope.refreshAllDocList(function(){
+		$("#spinner").hide();
+		$(".pagination").css("display","block");
+		// wahat does this do?
+		if(sessionStorage.length>0  && sessionStorage.data) {
+		  // get previous term id
+		  var arrayDoc=JSON.parse(docData.getFormData());
+		  var id=JSON.stringify(arrayDoc[0]['id']);
+		  id=id.replace(/"/g,'');
+		  // load form with previous term
+		  var termObj = $scope.getTermObj(id);
+		  $scope.setFormTerm(termObj);
+		}
+  }); 
+   // DATABASE term WRITE functions in one place for easy override
+  $scope.termCRUD = function(action, termObj, callback) {
+    if (['put', 'update', 'post', 'add', 'delete'].indexOf(action) < 0) {
+      console.log('No db action: '+action);
+      return false;
+    }
+    console.log('termCRUD', action, termObj);
+    // prune unallowed fields
+    termObj = $scope.pruneUnallowedFields(termObj);
+
+    // delete action requires _id and _rev
+    if (action == 'delete') {
+      // we update global cache first so our cache is valid synchronously
+      delete $scope.idDocs[termObj._id]; // remove item from cache
+        $scope.refreshOldDocsList();
+      // now delete from the database
+      $http.delete($scope.db_url() + termObj._id +'?rev='+ termObj._rev)
+        .success(function(data, status, headers, config){ if (callback) callback(); })
+        .error(function(data, status, headers, config) { console.log(status); });
+
+    // update (put) requires object with _id and _rev, term, wordfamily
+    } else if (termObj['_rev']) {
+      if (!termObj.term || !termObj._id || !termObj._rev) {
+        console.log('Error: put (update) requires term, _id and _rev');
+      }
+      termObj.wordfamily = $scope.genWordFamily(termObj.term);
+      termObj.type = 'term';
+      $http.put($scope.db_url() +termObj._id+'?rev='+termObj._rev,JSON.stringify(termObj))
+        .success(function(newdata, status, headers, config) {
+          termObj._rev = newdata.rev; // update object with new _rev
+          $scope.idDocs[termObj._id] = termObj; // update cache (not sure if this is needed -- ref or copy?)
+            $scope.refreshOldDocsList();
+          if (callback) callback();
+        })
+        .error(function(data, status, headers, config) { console.log(status); });
+
+
+    // add (post) requires object with term, wordfamily
+    } else if (!termObj['_rev']) {
+      if (!termObj.term) {
+        console.log('Error: post (add) requires term');
+        return;
+      }
+      termObj.wordfamily = $scope.genWordFamily(termObj.term);
+      termObj.type = 'term';
+      $http.post($scope.db_url(), JSON.stringify(termObj))
+        .success(function(newdata, status, headers, config) {
+          termObj._rev = newdata.rev;
+          termObj._id = newdata.id;
+          //console.log('newly added termObj', termObj);
+          $scope.idDocs[termObj._id] = termObj; // add to cache now that we have an id
+            $scope.refreshOldDocsList();
+          if (callback) callback(termObj);
+        })
+        .error(function(data, status, headers, config) { console.log(status); });
+    }
+  };
+
 	//==================For slide toggle of help divs====================//
 	$scope.slideShow=function(calledId)
 	{
 		$( "#"+calledId ).slideToggle( "3000" );
 	}
-	//==================For add family field in the docs====================//
-	$scope.addFamilyField=function(items)
-	{
-		var filtered = [];
-		angular.forEach(items, function(item) 
-		{
-			var string=item.doc.term;
-			if(string)
-			{
-				string= string.replace("_","");	
-				string=Utils.dotUndersRevert(string);
-				var id=item.doc._id;
-				var rev=item.doc._rev;
-				var original=item.doc.original;
-				var definition=item.doc.definition;
-				var term=item.doc.term;
-				var refrence=item.doc.ref;
-				var additemverify=item.doc.verify;
-				var sessionArray= JSON.parse( localStorage.getItem("session-user"));
-				var userName=sessionArray.username;
-				if(item.doc.ambiguous)
-				{
-					var ambiguous=item.doc.ambiguous;
-				}
-				else
-				{
-					var ambiguous=0;
-				}
+  // compresses family down to one record per unique term, merging fields as appropriate
+  // also sets ambiguous if there is more than one remaining verfied member
+  // this function should be run after any CRUD operation to reset and clean word family
+  // parameter can be a wordfamily, termObj, HTML or glyph
+  $scope.cleanWordFamily = function(wordfamily) {
+    if (!wordfamily) return;
+    wordfamily = $scope.genWordFamily(wordfamily); // cleanup just in case
+    var terms = $scope.getWordFamilyTerms(wordfamily);
+    var family = {};
+    // split into object of one termArray for each spelling
+    // eg. { "_Shiráz" => [termObj, termObj, termObj],
+    //       "_Shíráz" => [termObj, termObj, termObj] }
+    terms.forEach(function(termObj) {
+      if (!family[termObj.term]) family[termObj.term] = []; // initialize if neccesary
+      family[termObj.term].push(termObj);
+    });
+    //console.log('cleanWordFamily: '+ wordfamily, family);
+    // now compress each list down to just one record each
+    var verified_count = 0;
+    Object.keys(family).forEach(function(term) {
+      family[term] = $scope.compressTerms(family[term]); // takes array of termObj, returns merged termObj
+      if (family[term].verified) verified_count++;
+    });
+
+    // wait a second then set them all to ambiguous or not depending on verified count
+    setTimeout(function() {
+      Object.keys(family).forEach(function(term) {
+        var termObj = $scope.idDocs[family[term]._id]; // reload object from cache just in case it has changed
+        termObj.ambiguous = (verified_count>1);
+        $scope.termCRUD('update', termObj);
+      });
+    }, 1000);
+  };
+  
+  // compresses array of matching terms into one, returns termObj
+  // this is not a whole word-family but just a sub-branch with exactly matching terms
+  $scope.compressTerms = function(termsArray) {
+    if (termsArray.length===1) return termsArray[0]; // no need to merge if there's only one
+    var i, key, keys, term;
+    var base = termsArray[0]; // first term we will merge everything into
+    var allowedTerms = $scope.termAllowedFields(); // list of allowed fields, we'll ignore all others
+    // sanity check, make sure all terms match
+    for (i = 0; i < termsArray.length; i++) {
+      if (base.term != termsArray[i].term) {
+        console.log('Error: compressTerms received non-matching terms list');
+        return false;
+      }
+    }
+    // now merge records #1-n into termObj #0 and then discard each merged record
+    for (var i = 1; i < termsArray.length; i++) {
+      term = termsArray[i];
+      keys = Object.keys(term); // iterate through each field of termObj to be discarded
+      for (var j = 1; j < keys.length; j++) {
+        key = keys[j];
+        if (allowedTerms.indexOf(key)!=-1) { // ignore properties not on our allowed list
+          if (key == 'verified') {
+            // merge with or, so if either field is verified, the base will now be
+            base[key] = (base[key] || term[key]);
+          } else if (key == 'ref') {
+            // merge with TRUE causes cleanup of PG and PAR
+            base[key] = $scope.scrubField(base[key]+','+term[key], true);
+          } else if (key == 'audio') {
+            // TODO: not sure how this should merge because we need to keep any file attachment
+            //
+          } else if (['_id','_rev','type','term','ambiguous','wordfamily'].indexOf(key)>-1) {
+            // skip these, we do not need to merge them
+          } else {
+            // default merge style for all other fields
+            base[key] = $scope.scrubField(base[key]+','+term[key]);
+          }
+        }
+      };
+      // discard merged record
+      $scope.termCRUD('delete', term);
+    }
+    // update base record
+    $scope.termCRUD('update', base);
+
+    // $scope.refreshAllDocList();  -- we don't need to do this because CRUD updats idDocs list
+         // rather we need to make sure everything uses the idDocs list
+
+    return base;
+  };
+  // returns unique array of all word families
+  $scope.getAllWordFamilies = function() {
+    var result = {};
+    // loop through entire cache and grab unique word families
+    Object.keys($scope.idDocs).forEach(function(id) {
+      result[$scope.idDocs[id].wordfamily] = 1; // faster than removing duplicates with an array
+    });
+    return Object.keys(result); // return array of the object properties
+  };
+   // returns array of termObjects matching this family
+  // loads entire db and generates correct wordfamily for each so should be backwards compatible
+  $scope.getWordFamilyTerms = function(wordfamily) {
+    if (!wordfamily) return [];
+    var result = [];
+    wordfamily = $scope.genWordFamily(wordfamily); // just to make sure
+    // loop through entire cache and grab matches. This should be very fast
+    Object.keys($scope.idDocs).forEach(function(id) {
+      var termObj = $scope.idDocs[id];
+      if (termObj.wordfamily === wordfamily) result.push(termObj);
+    });
+    return result;
+  };
+  
+   //==========Change the verified field to 1 for all the records with original field value==========//
+	 $scope.changeVerify=function(){
+		 angular.forEach($scope.idDocs, function(termObj) {
+			 if(termObj.original && termObj.original!="")
+			 {
+				 var term = {};
+							 
+				 //term = {term:doc.term, ref:doc.ref, definition:doc.definition, original:doc.original, verified:true, wordFamily:doc.wordFamily};
+				 //console.log(term);
+				  var allowedTerms = $scope.termAllowedFields();
+				  for(var i=0;i<allowedTerms.length;i++){
+					  if(allowedTerms[i]=="verified") term[allowedTerms[i]]=true;
+					  else  term[allowedTerms[i]]=termObj[allowedTerms[i]];
+				  }
+					$scope.termCRUD('update', term);
+			 }
 				
-				var data= JSON.stringify(
-											{
-												"source": userName,   
-												"original":original , 
-												"definition":definition, 
-												"type": "term", 
-												"user": userName,
-												"term": term,
-												"ref":refrence,
-												"wordfamily":string,
-												"verify":additemverify,
-												"ambiguous":ambiguous,
-											}
-										); 
-				$http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev, data).
-				success(function(data, status, headers, config) 
-				{
-					console.log(status);
-				}).
-				error(function(data, status, headers, config) 
-				{
-					console.log(status);
-				});
-			}
-		});
-	}
+				
+		 });
+		 $scope.setAmbiguous();
+	 };
 	//==================SET EACH RECORD IN A WORD FAMILY GROUP TO AMBIGUOUS IF MORE THAN ONE VERIFIED OR IF NONE===============//
-	$scope.setAmbiguous=function(alldocs)
+	$scope.setAmbiguous=function()
 	{
-		var groupFamily={};
-		var count=1;
-		console.log('calledhere');
-		//=================Making a group array for all family groups==================//
-		angular.forEach(alldocs,function(doc)
-		{
-			if(doc.doc.wordfamily)
-			{
-				var family=doc.doc.wordfamily; 
-			}
-			else
-			{
-				var string=doc.doc.term;
-				if(string)
-				{
-					string= string.replace("_","");	
-					string=Utils.dotUndersRevert(string);
-					var family=string;				
-				}
-				else
-				{
-					return false;
-				}
-			}			
-			if(family in groupFamily)
-			{
-				var countnew=groupFamily[family];	
-				countnew++;
-				groupFamily[family]=countnew;
-			}
-			else
-			{
-				count=1;
-				groupFamily[family]=count;
-			}
+		 var wordFamilies = $scope.getAllWordFamilies();
+		console.log('Cleaning up '+wordFamilies.length+' word families');
+		wordFamilies.forEach(function(wordFamily){
+		  console.log('Cleaning up word family: '+wordFamily);
+		  $scope.cleanWordFamily(wordFamily);
 		});
-		var i=1;
-		//===============Traversing through the group=================//
-		angular.forEach(groupFamily,function(item,key)
-		{
-			//~ if( i==200)
-				//~ return false;
-			var mainArray=[];
-			//===========Traversing through the main docs array to form a sub array of family for each word family group========//
-			angular.forEach(alldocs,function(doc)
-			{
-				var searchString=doc.doc.term;
-				if(searchString)
-				{
-					searchString= searchString.replace("_","");
-					searchString=Utils.dotUndersRevert(searchString);	
-					if(key==searchString)
-					{
-						mainArray.push(doc);
-					}
-				}				
-			});
-			//==================Check count of ambiguous and verified records===========================//
-			var countVerified=0;
-			var countAmbiguous=0;
-			var arrlength=mainArray.length;
-			for(var j=0;j<arrlength;j++)
-			{
-				var verifyVal=mainArray[j].doc.verify;
-				if(verifyVal)
-				{
-					if(verifyVal==1)
-					{
-						countVerified++;
-					}
-				}
-			}
-			if(countVerified==1)
-			{
-				//=====only one verified term=====//
-				if(arrlength>1)
-				{
-					var allRef=[];
-					//====Compressing the references====//
-					for(var j=0;j<arrlength;j++)
-					{
-						if(mainArray[j].doc.ref)
-							allRef.push(mainArray[j].doc.ref);
-					}
-					//========compress into one record======//
-					for(var j=0;j<arrlength;j++)
-					{	
-						var verifyVal=mainArray[j].doc.verify;
-						if(verifyVal && verifyVal==1)
-						{
-							//==verified record==//
-							var updateid=mainArray[j].doc._id;
-							var revid=mainArray[j].doc._rev;
-							var term=mainArray[j].doc.term;
-							var original=mainArray[j].doc.original;						
-							var refrence=mainArray[j].doc.ref;	
-							var source=mainArray[j].doc.source;	
-							var user=mainArray[j].doc.user;
-							if(refrence)					
-								allRef.push(refrence);
-							var allReferences=allRef.join();
-							allReferences=$scope.getUnique(allReferences);						
-							var definition=mainArray[j].doc.definition;
-							if(mainArray[j].doc.wordfamily)
-							{
-								var wordfamilyField=mainArray[j].doc.wordfamily;
-							}
-							else
-							{
-								var wordfamilyField=mainArray[j].doc.term;
-								wordfamilyField= wordfamilyField.replace("_","");	
-								wordfamilyField=Utils.dotUndersRevert(wordfamilyField);
-							}
-							var data= JSON.stringify
-							({
-								"source": source,   
-								"original":original , 
-								"definition":definition, 
-								"type": "term", 
-								"user": user,
-								"term": term,
-								"ref":allReferences,
-								"wordfamily":wordfamilyField,
-								"verify":1,
-								"ambiguous":0
-							});
-							$http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+updateid+'?rev='+revid, data).
-							success(function(data, status, headers, config) 
-							{
-								console.log(status);												
-							}).
-							error(function(data, status, headers, config) 
-							{
-								console.log(status);
-							});
-						}
-						else
-						{
-							//==unverified record to be deleted==//
-							var delid=mainArray[j].doc._id;
-							var delrev=mainArray[j].doc._rev;
-							$http.delete('http://'+domainRemoteDb+'/'+remoteDb+'/'+delid+'?rev='+delrev).
-							success(function(data, status, headers, config) 
-							{
-								console.log(status);
-							}).
-							error(function(data, status, headers, config) 
-							{
-								console.log(status);
-							});
-						}
-					}
-				}				
-			}
-			else if(countVerified>1)
-			{
-				//=====more than one verified term=====//
-				var verifiedArray=[];
-				for(var j=0;j<arrlength;j++)
-				{
-					var verifyVal=mainArray[j].doc.verify;
-					if(verifyVal && verifyVal==1)
-					{
-						verifiedArray.push(mainArray[j].doc.term);
-					}
-				}
-				angular.forEach(verifiedArray,function(ver)
-				{
-					var allRef=[];
-					for(var j=0;j<arrlength;j++)
-					{
-						if(mainArray[j].doc.verify && mainArray[j].doc.verify==0)
-						{
-							if((ver.indexOf(mainArray[j].doc.term))!=-1)
-							{
-								//if the ambiguous record term matches the verified term
-								// get its reference 
-								allRef.push(mainArray[j].doc.ref);
-								//and delete the term
-								var delid=mainArray[j].doc._id;
-								var delrev=mainArray[j].doc._rev;
-								$http.delete('http://'+domainRemoteDb+'/'+remoteDb+'/'+delid+'?rev='+delrev).
-								success(function(data, status, headers, config) 
-								{
-									console.log(status);
-								}).
-								error(function(data, status, headers, config) 
-								{
-									console.log(status);
-								});
-							}
-							
-						}
-						else if(mainArray[j].doc.verify && mainArray[j].doc.verify==1)
-						{
-							allRef.push(mainArray[j].doc.ref);
-							var updateid=mainArray[j].doc._id;
-							var revid=mainArray[j].doc._rev;
-							var term=mainArray[j].doc.term;
-							var original=mainArray[j].doc.original;						
-							var refrence=mainArray[j].doc.ref;	
-							var source=mainArray[j].doc.source;	
-							var user=mainArray[j].doc.user;					
-							var definition=mainArray[j].doc.definition;
-							if(mainArray[j].doc.wordfamily)
-							{
-								var wordfamilyField=mainArray[j].doc.wordfamily;
-							}
-							else
-							{
-								var wordfamilyField=mainArray[j].doc.term;
-								wordfamilyField= wordfamilyField.replace("_","");	
-								wordfamilyField=Utils.dotUndersRevert(wordfamilyField);
-							}
-						}
-						else
-						{
-						}
-						if(j==(arrlength-1))
-						{
-							var allReferences=allRef.join();
-							allReferences=$scope.getUnique(allReferences);
-							//save the verified record
-							var data= JSON.stringify
-							({
-								"source": source,   
-								"original":original , 
-								"definition":definition, 
-								"type": "term", 
-								"user": user,
-								"term": term,
-								"ref":allReferences,
-								"wordfamily":wordfamilyField,
-								"verify":1,
-								"ambiguous":1
-							});
-							$http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+updateid+'?rev='+revid, data).
-							success(function(data, status, headers, config) 
-							{
-								console.log(status);												
-							}).
-							error(function(data, status, headers, config) 
-							{
-								console.log(status);
-							});	
-						}
-					}
-				});
-				
-				
-			}
-			else
-			{
-				//=====no verified term=====//
-				console.log("no one verified term");
-			}
-			
-			i++;
-		});
-		 $scope.allDocsFunc();
 	}
-	
-	//==========================COMPRESS RECORDS TO PACK ALL REFERENCES IN ONE SINGLE VERIFIED RECORD===============================//
-	$scope.compressVerify=function(docs)
-	{
-		var groupFamily=[];
-		var mainGroup=[];
-		var count=1;
-		angular.forEach(docs, function(item) 
-		{
-				var family=item.doc.wordfamily; 	
-				if(family in groupFamily)
+	//===================Delete Duplicate Records================//
+	$scope.deleteDuplicate=function(){
+		 angular.forEach($scope.idDocs, function(termObj) {
+			 angular.forEach($scope.idDocs, function(termObj1){
+				if((termObj._id!=termObj1._id )&& (termObj._rev!=termObj1._rev))
 				{
-					var countnew=groupFamily[family];	
-					countnew++;
-					groupFamily[family]=countnew;
-					// mainGroup[family][countnew]=item;
+					if((termObj.term==termObj1.term) && (termObj.original==termObj1.original) && (termObj.definition==termObj1.definition) && (termObj.source==termObj1.source))
+					{
+						if(termObj1.verify && termObj1.verify=="1")
+						{
+							var term=termObj;
+						}
+						else
+						{
+							var term=termObj1;
+						}
+						console.log(term);
+						 $scope.termCRUD('delete', term);
+					}
 				}
-				else
-				{
-					count=1;
-					groupFamily[family]=count;
-					//~ mainGroup.push([][]); 
-					//~ mainGroup[family][count] = item;
-				}	
-					
+			 });
+		 });
+		 $scope.addFamilyField();
+	}
+	//==================For add family field in the docs====================//
+	$scope.addFamilyField=function()
+	{
+		angular.forEach($scope.idDocs, function(termObj) {
+			var familyField=$scope.genWordFamily(termObj);
+			 var term = {};
+				  var allowedTerms = $scope.termAllowedFields();
+				  for(var i=0;i<allowedTerms.length;i++){
+					  if(allowedTerms[i]=="wordfamily") term[allowedTerms[i]]=familyField;
+					  else  term[allowedTerms[i]]=termObj[allowedTerms[i]];
+				  }
+					$scope.termCRUD('update', term);
 		});
-		//console.log(mainGroup);
-		
+		$scope.removeUnusedData();
 	}
 	//==================================REMOVING UNUSED DATA IN DOCUMENTS=========================================//
-	$scope.removeUnusedData=function(docs)
+	$scope.removeUnusedData=function()
 	{
-		angular.forEach(docs, function(item) 
-		{
-			var id=item.doc._id;
-			var rev=item.doc._rev;
-			var term=item.doc.term;
-			var source=item.doc.source;
-			var original=item.doc.original;
-			var definition=item.doc.definition;
-			var type=item.doc.type;
-			var user=item.doc.user;
-			var wordfamily=item.doc.wordfamily;
-			if(item.doc.ambiguous)
-			{
-				var ambiguous=item.doc.ambiguous;
-			}
-			else
-			{
-				var ambiguous=0;
-			}
-			if(item.doc.ref)
-			{
-				var ref=item.doc.ref;
-			}
-			else
-			{
-				var ref="";
-			}
-			
-			if(item.doc.verify)
-			{
-				var verify=item.doc.verify;
-			}
-			else
-			{
-				var verify=0;
-			}
-			var data= JSON.stringify(
-								{
-									"source": source,   
-									"original":original , 
-									"definition":definition, 
-									"type": type, 
-									"user": user,
-									"term": term,
-									"ref":ref,
-									"wordfamily":wordfamily,
-									"verify":verify,
-									"ambiguous":ambiguous									
-								}
-							);
-			$http.put('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev, data).
-			success(function(data, status, headers, config) 
-			{
-				console.log(status);
-			}).
-			error(function(data, status, headers, config) 
-			{
-				console.log(status);
-			});
+		angular.forEach($scope.idDocs, function(termObj) {			
+			var term=$scope.pruneUnallowedFields(termObj);
+			console.log(term);
+			$scope.termCRUD('update', term);
 		});
 	}
-		$scope.getUnique = function(arrayNew)
-	{
-		var u = {}, a = [];   
-		var refArr=arrayNew.split(",");
-			for(var i = 0, l = refArr.length; i < l; ++i){
-      if(u.hasOwnProperty(refArr[i])) {
-         continue;
-      }
-      a.push(refArr[i]);
-      u[refArr[i]] = 1;
-   }
-   var aString=a.join()
-   return aString;
-}
- //===============All docs function======================//
-	 $scope.allDocsFunc=function()
-	 {
-		 $http.get('http://'+domainRemoteDb+'/'+remoteDb+'/_all_docs?include_docs=true')
-		.success(function(data) 
-		{
-			if(data.rows)
-			{		
-				$scope.docs=data.rows;
-				$scope.count=data.total_rows;
-			}	
-		})
-		.error(function(error) 
-		{
-			console.log(error);
-		});
-	 };
  });
