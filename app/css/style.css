@@ -107,7 +107,7 @@ background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
 /*=====================================ALL MOBILE VIEW===================================================*/
 @media only screen and (min-width : 0px) and (max-width:767px)
 {
-	.term-top 
+	.term-top
 	{
 		margin-top: 20px;
 	}
@@ -188,16 +188,19 @@ background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
 		margin-left: 10px;
 		margin-top: 7px;
 		width: 100%;
+		text-align: left !important;
+		float: none !important;
+		margin-top: 10px !important;
 	}
 	.form-control.chkval
 	{
 		font-size: 20px;
 	}
-	.notesClass 
+	.notesClass
 	{
 		max-width: 200px;
 	}
-	.otherData 
+	.otherData
 	{
 		display: block;
 	}
@@ -277,9 +280,10 @@ background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
 	{
 		float: right;
 		margin-left: 10px;
-		font-size: 20px;
 		padding-right: 1em;
 	}
+
+
 	.form-control.chkval
 	{
 		font-size: 20px;
@@ -607,10 +611,17 @@ background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
 		padding: 20px;
 	}
 
- 	.divThird
-	{
-		font-size: 24px;
+ 	.divThird 	{
+ 		text-align: right;
+ 		padding-top:0 !important;
+ 		margin-top: -5px;
 	}
+
+
+  .divThird label {
+  	font-size: 14px;
+  }
+
 	.divThird input[type=checkbox] {
 	  /* Double-sized Checkboxes */
 	  -ms-transform: scale(2); /* IE */
@@ -619,6 +630,9 @@ background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
 	  -o-transform: scale(2); /* Opera */
 	  transform: scale(2,2);
 	  padding: 10px;
+	  margin-right: 0 !important;
+	  padding-right: 5px !important;
+
 	}
 
   h5.mb10 {

@@ -335,12 +335,19 @@ angular.module('accentsApp')
 
   // re-cleans all word families in DB
   $scope.cleanAllWordFamilies = function() {
+    // since this is such a major operation, let's refresh the cache first
+    $scope.getAllWordFamilies();
+    // now gather and clean up every single word family:
     var wordFamilies = $scope.getAllWordFamilies();
-    console.log('Cleaning up '+wordFamilies.length+' word families');
+    console.log('Cleaning up '+wordFamilies.length+' word families. '+
+      ' Total records: '+ Object.keys($scope.idDocs).length);
     wordFamilies.forEach(function(wordFamily){
-      console.log('Cleaning up word family: '+wordFamily);
+      console.log('Cleaning up word family: '+wordFamily +
+        ' Total records: '+ Object.keys($scope.idDocs).length);
       $scope.cleanWordFamily(wordFamily);
     });
+    console.log("Done cleaning word families. "+
+      ' Total records: '+ Object.keys($scope.idDocs).length);
   };
 
   // get current session user
@@ -505,7 +512,7 @@ angular.module('accentsApp')
       setTimeout(function(){$scope.editdoc(id,rev)},5000);
     }
   });
-  
+
   //==Delete Record from the partial or whole word searches========//
   $scope.deletedoc = function(id) {
     if(confirm('Are you SURE you want to delete this term?')) {
@@ -606,7 +613,7 @@ angular.module('accentsApp')
 
 
   // is this for the filtered list?
-  $scope.getAllRecords = function(key){   
+  $scope.getAllRecords = function(key){
     document.getElementById("sideIcon-"+key).className = "glyphicon glyphicon-chevron-down mr5 openPanel";
     document.getElementById("showDiv-"+key).style.display='block';
   };
@@ -668,14 +675,14 @@ This directive allows us to pass a function in on an enter key to do what we wan
     return input.slice(start);
   };
 })
-//~ 
+//~
 //~ .filter('myfilterData',['Utils',function(Utils){
   //~ return function(items,search) {
     //~ var subArray={};
     //~ var filtered = [];
     //~ var mainArray={};
     //~ var count=1;
-//~ 
+//~
     //~ angular.forEach(items, function(item) {
       //~ var string=item.term;
       //~ if(string) {
@@ -690,13 +697,13 @@ This directive allows us to pass a function in on an enter key to do what we wan
             //~ filtered.push(item);
           //~ }
         //~ }
-//~ 
+//~
       //~ }
     //~ });
     //~ return filtered;
   //~ };
 //~ }])
-//~ 
+//~
 //~ .filter('newfilter',function(){
   //~ return function(items,search) {
     //~ var filtered = [];

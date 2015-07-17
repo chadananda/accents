@@ -13,38 +13,38 @@ angular.module('accentsApp')
       'HTML5 Boilerplate',
       'AngularJS',
       'Karma'
-    ]; 
-	var domainRemoteDb=myConfig.remoteDbDomain;
-	var remoteDb=myConfig.database;
-	//===================Reload Page on route change===========================//
+    ];
+  var domainRemoteDb=myConfig.remoteDbDomain;
+  var remoteDb=myConfig.database;
+  //===================Reload Page on route change===========================//
 //~ $rootScope.$on('$locationChangeStart', function($event, changeTo, changeFrom) {
       //~ if (changeTo == changeFrom) {
         //~ return;
       //~ }
- //~ 
+ //~
       //~ window.location.assign(changeTo);
       //~ window.location.reload(true);
     //~ });
-	//===========Calling Utility Functions============//
+  //===========Calling Utility Functions============//
  $scope.i2html = function(text)
  {
-	return $sce.trustAsHtml(Utils.ilm2HTML(text));
+  return $sce.trustAsHtml(Utils.ilm2HTML(text));
  }
  $scope.customi2html=function(text)
  {
-	 return Utils.renderGlyph2UTF(text);
+   return Utils.renderGlyph2UTF(text);
  }
  //=========Pass document data to edit page=================//
  $scope.editdocPage=function(docid,rev)
  {
-	 //alert(docid+rev);
-	 var list=[{"id":docid},{"rev":rev}];
-	 docData.setFormData(list);
-	 window.location.href="http://localhost:9000/#/getdata";
+   //alert(docid+rev);
+   var list=[{"id":docid},{"rev":rev}];
+   docData.setFormData(list);
+   window.location.href="http://localhost:9000/#/getdata";
  };
-	/******************************************************/
-	// some helper functions to clean up CRUD operations
-	/******************************************************/
+  /******************************************************/
+  // some helper functions to clean up CRUD operations
+  /******************************************************/
 
   // single point for DB path in case we want to change it later (including http)
   $scope.db_url = function() {
@@ -82,7 +82,7 @@ angular.module('accentsApp')
       // re-join with a comma and a space
       join(', ');
   };
-  
+
   // remove fields that are not allowed -- we use this on loading records and before saving
   $scope.pruneUnallowedFields = function(termObj) {
     var fields = Object.keys(termObj);
@@ -92,7 +92,7 @@ angular.module('accentsApp')
     }
     return termObj;
   };
-  
+
   // returns array of allowable term fields (so we can adjust this on one place)
   $scope.termAllowedFields = function() {
     return ['definition', 'original', 'source', 'term', 'user', 'wordfamily', 'ref',
@@ -130,22 +130,22 @@ angular.module('accentsApp')
         }
       })
       .error(function(error) { console.log(error); });
-  };   
+  };
   //////////////////////////Fetch  data/////////////////////////////////////
-	$scope.refreshAllDocList(function(){
-		$("#spinner").hide();
-		$(".pagination").css("display","block");
-		// wahat does this do?
-		if(sessionStorage.length>0  && sessionStorage.data) {
-		  // get previous term id
-		  var arrayDoc=JSON.parse(docData.getFormData());
-		  var id=JSON.stringify(arrayDoc[0]['id']);
-		  id=id.replace(/"/g,'');
-		  // load form with previous term
-		  var termObj = $scope.getTermObj(id);
-		  $scope.setFormTerm(termObj);
-		}
-  }); 
+  $scope.refreshAllDocList(function(){
+    $("#spinner").hide();
+    $(".pagination").css("display","block");
+    // wahat does this do?
+    if(sessionStorage.length>0  && sessionStorage.data) {
+      // get previous term id
+      var arrayDoc=JSON.parse(docData.getFormData());
+      var id=JSON.stringify(arrayDoc[0]['id']);
+      id=id.replace(/"/g,'');
+      // load form with previous term
+      var termObj = $scope.getTermObj(id);
+      $scope.setFormTerm(termObj);
+    }
+  });
    // DATABASE term WRITE functions in one place for easy override
   $scope.termCRUD = function(action, termObj, callback) {
     if (['put', 'update', 'post', 'add', 'delete'].indexOf(action) < 0) {
@@ -204,11 +204,11 @@ angular.module('accentsApp')
     }
   };
 
-	//==================For slide toggle of help divs====================//
-	$scope.slideShow=function(calledId)
-	{
-		$( "#"+calledId ).slideToggle( "3000" );
-	}
+  //==================For slide toggle of help divs====================//
+  $scope.slideShow=function(calledId)
+  {
+    $( "#"+calledId ).slideToggle( "3000" );
+  }
   // compresses family down to one record per unique term, merging fields as appropriate
   // also sets ambiguous if there is more than one remaining verfied member
   // this function should be run after any CRUD operation to reset and clean word family
@@ -242,7 +242,7 @@ angular.module('accentsApp')
       });
     }, 1000);
   };
-  
+
   // compresses array of matching terms into one, returns termObj
   // this is not a whole word-family but just a sub-branch with exactly matching terms
   $scope.compressTerms = function(termsArray) {
@@ -314,84 +314,84 @@ angular.module('accentsApp')
     });
     return result;
   };
-  
+
    //==========Change the verified field to 1 for all the records with original field value==========//
-	 $scope.changeVerify=function(){
-		 angular.forEach($scope.idDocs, function(termObj) {
-			 if(termObj.original && termObj.original!="")
-			 {
-				 var term = {};
-							 
-				 //term = {term:doc.term, ref:doc.ref, definition:doc.definition, original:doc.original, verified:true, wordFamily:doc.wordFamily};
-				 //console.log(term);
-				  var allowedTerms = $scope.termAllowedFields();
-				  for(var i=0;i<allowedTerms.length;i++){
-					  if(allowedTerms[i]=="verified") term[allowedTerms[i]]=true;
-					  else  term[allowedTerms[i]]=termObj[allowedTerms[i]];
-				  }
-					$scope.termCRUD('update', term);
-			 }
-				
-				
-		 });
-		 $scope.setAmbiguous();
-	 };
-	//==================SET EACH RECORD IN A WORD FAMILY GROUP TO AMBIGUOUS IF MORE THAN ONE VERIFIED OR IF NONE===============//
-	$scope.setAmbiguous=function()
-	{
-		 var wordFamilies = $scope.getAllWordFamilies();
-		console.log('Cleaning up '+wordFamilies.length+' word families');
-		wordFamilies.forEach(function(wordFamily){
-		  console.log('Cleaning up word family: '+wordFamily);
-		  $scope.cleanWordFamily(wordFamily);
-		});
-	}
-	//===================Delete Duplicate Records================//
-	$scope.deleteDuplicate=function(){
-		 angular.forEach($scope.idDocs, function(termObj) {
-			 angular.forEach($scope.idDocs, function(termObj1){
-				if((termObj._id!=termObj1._id )&& (termObj._rev!=termObj1._rev))
-				{
-					if((termObj.term==termObj1.term) && (termObj.original==termObj1.original) && (termObj.definition==termObj1.definition) && (termObj.source==termObj1.source))
-					{
-						if(termObj1.verify && termObj1.verify=="1")
-						{
-							var term=termObj;
-						}
-						else
-						{
-							var term=termObj1;
-						}
-						console.log(term);
-						 $scope.termCRUD('delete', term);
-					}
-				}
-			 });
-		 });
-		 $scope.addFamilyField();
-	}
-	//==================For add family field in the docs====================//
-	$scope.addFamilyField=function()
-	{
-		angular.forEach($scope.idDocs, function(termObj) {
-			var familyField=$scope.genWordFamily(termObj);
-			 var term = {};
-				  var allowedTerms = $scope.termAllowedFields();
-				  for(var i=0;i<allowedTerms.length;i++){
-					  if(allowedTerms[i]=="wordfamily") term[allowedTerms[i]]=familyField;
-					  else  term[allowedTerms[i]]=termObj[allowedTerms[i]];
-				  }
-					$scope.termCRUD('update', term);
-		});
-		$scope.removeUnusedData();
-	}
-	//==================================REMOVING UNUSED DATA IN DOCUMENTS=========================================//
-	$scope.removeUnusedData=function()
-	{
-		angular.forEach($scope.idDocs, function(termObj) {			
-			var term=$scope.pruneUnallowedFields(termObj);
-			console.log(term);
-			$scope.termCRUD('update', term);
-		});
-	}
+   $scope.changeVerify=function(){
+     angular.forEach($scope.idDocs, function(termObj) {
+       if(termObj.original && termObj.original!="")
+       {
+         var term = {};
+
+         //term = {term:doc.term, ref:doc.ref, definition:doc.definition, original:doc.original, verified:true, wordFamily:doc.wordFamily};
+         //console.log(term);
+          var allowedTerms = $scope.termAllowedFields();
+          for(var i=0;i<allowedTerms.length;i++){
+            if(allowedTerms[i]=="verified") term[allowedTerms[i]]=true;
+            else  term[allowedTerms[i]]=termObj[allowedTerms[i]];
+          }
+          $scope.termCRUD('update', term);
+       }
+
+
+     });
+     $scope.setAmbiguous();
+   };
+  //==================SET EACH RECORD IN A WORD FAMILY GROUP TO AMBIGUOUS IF MORE THAN ONE VERIFIED OR IF NONE===============//
+  $scope.setAmbiguous=function()
+  {
+     var wordFamilies = $scope.getAllWordFamilies();
+    console.log('Cleaning up '+wordFamilies.length+' word families');
+    wordFamilies.forEach(function(wordFamily){
+      console.log('Cleaning up word family: '+wordFamily);
+      $scope.cleanWordFamily(wordFamily);
+    });
+  }
+  //===================Delete Duplicate Records================//
+  $scope.deleteDuplicate=function(){
+     angular.forEach($scope.idDocs, function(termObj) {
+       angular.forEach($scope.idDocs, function(termObj1){
+        if((termObj._id!=termObj1._id )&& (termObj._rev!=termObj1._rev))
+        {
+          if((termObj.term==termObj1.term) && (termObj.original==termObj1.original) && (termObj.definition==termObj1.definition) && (termObj.source==termObj1.source))
+          {
+            if(termObj1.verify && termObj1.verify=="1")
+            {
+              var term=termObj;
+            }
+            else
+            {
+              var term=termObj1;
+            }
+            console.log(term);
+             $scope.termCRUD('delete', term);
+          }
+        }
+       });
+     });
+     $scope.addFamilyField();
+  }
+  //==================For add family field in the docs====================//
+  $scope.addFamilyField=function()
+  {
+    angular.forEach($scope.idDocs, function(termObj) {
+      var familyField=$scope.genWordFamily(termObj);
+       var term = {};
+          var allowedTerms = $scope.termAllowedFields();
+          for(var i=0;i<allowedTerms.length;i++){
+            if(allowedTerms[i]=="wordfamily") term[allowedTerms[i]]=familyField;
+            else  term[allowedTerms[i]]=termObj[allowedTerms[i]];
+          }
+          $scope.termCRUD('update', term);
+    });
+    $scope.removeUnusedData();
+  }
+  //==================================REMOVING UNUSED DATA IN DOCUMENTS=========================================//
+  $scope.removeUnusedData=function()
+  {
+    angular.forEach($scope.idDocs, function(termObj) {
+      var term=$scope.pruneUnallowedFields(termObj);
+      console.log(term);
+      $scope.termCRUD('update', term);
+    });
+  }
  });
