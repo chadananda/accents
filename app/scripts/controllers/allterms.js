@@ -63,11 +63,13 @@ var remoteDb=myConfig.database;
  //===============All docs function======================//
 	 $scope.allDocsFunc=function()
 	 {
+		 $scope.attachments={};
 		 $http.get('http://'+domainRemoteDb+'/'+remoteDb+'/_all_docs?include_docs=true')
 		.success(function(data) 
 		{
+			
 			if(data.rows)
-			{		
+			{
 				$scope.docs=data.rows;
 				$scope.count=data.total_rows;
 			}	
@@ -88,6 +90,12 @@ var remoteDb=myConfig.database;
 			$scope.count=data.total_rows;
 			$("#spinner").hide();
 			$(".pagination").css("display","block");
+			angular.forEach(data.rows,function(row){
+				if (!$scope.attachments[row.doc._id]) $scope.attachments[row.doc._id] = [];
+				if(row.doc._attachments)
+					$scope.attachments[row.doc._id]=row.doc._attachments;
+				//console.log(row.doc._attachments);
+			});
 			if(sessionStorage.getItem('term')!="undefined")
 			{
 				document.getElementById('term').value=sessionStorage.getItem('term') ;
@@ -290,16 +298,27 @@ var remoteDb=myConfig.database;
 	}
 }])
 .filter("checkfilter",function(){
-	return function(items)
+	return function(items,scope)
 	{
 		var filtered = [];
 		var checked=document.getElementById("verifiedCheckbox");
+		var audioChecked=document.getElementById("noaudioCheckbox");
 		if(checked.checked)
 		{
 			angular.forEach(items, function(item) 
 			{
 				if(!item.verified)
 					filtered.push(item);
+			});
+		}
+		else if(audioChecked.checked)
+		{
+			angular.forEach(items, function(item) 
+			{
+				var attachmentArr=scope.attachments[item._id];
+				if(attachmentArr.length==0)
+					filtered.push(item);
+				//console.log(JSON.stringify(item._id));
 			});
 		}
 		else
