@@ -32,7 +32,30 @@ angular.module('accentsApp')
   $scope.dotUnderRevert=function(text) {
     return Utils.dotUndersRevert(text);
   }
-
+  
+//////////////////////////Fetch  data/////////////////////////////////////
+	// $scope.getAllData = function() {
+	 $scope.attachments={};
+	 $scope.allAttachmentsFunc=function()
+	 {
+		 $scope.attachments={};
+		 $http.get('http://'+domainRemoteDb+'/'+remoteDb+'/_all_docs?include_docs=true&attachments=true')
+		.success(function(data) 
+		{
+			if(data.rows)
+			{
+				angular.forEach(data.rows,function(row){
+					if(!$scope.attachments[row.doc._id])$scope.attachments[row.doc._id]=[];
+					 $scope.attachments[row.doc._id]=row.doc._attachments;
+				});
+			}	
+		})
+		
+		.error(function(error) 
+		{
+			console.log(error);
+		});
+	 };
   //=======Called on ng-keyup of term======//
   $scope.changeTerm=function(){
     var term = $('#term').val();
@@ -159,7 +182,7 @@ angular.module('accentsApp')
 
           // for the time being, we can use this to refresh $scope.docs
          crudFunctions.refreshOldDocsList($scope);
-
+		//$scope.allAttachmentsFunc();
           if (callback) callback();
         }
       })
@@ -467,21 +490,87 @@ angular.module('accentsApp')
       $scope.clearEditForm();
     });
   };
-//~ $scope.saveAudio=function(){
-	//~ console.log("testing");
-	//~ var xhr = new XMLHttpRequest();
-//~ xhr.open('GET', 'blob:http://localhost:9000/a9b74b9e-d626-4d66-84ce-108b9e03f346', true);
-//~ xhr.responseType = 'blob';
-//~ xhr.onload = function(e) {
-  //~ if (this.status == 200) {
-    //~ var myBlob = this.response;
-    //~ // myBlob is now the blob that the object URL pointed to.
-    //~ console.log(myBlob);
-  //~ }
-//~ };
-//~ xhr.send();
-//~ console.log(myBlob);
-//~ };
+$scope.saveAudio=function(){
+	var url = $("ul#recordingslist a:first").attr("href");
+	var docId='003D4FAA-1533-47F5-A066-4C56D6D2616D';
+	var attachmentId="meowth.mp3";
+	var type="audio/mp3";
+	var rev=$scope.idDocs[docId]._rev;	
+	var db = new PouchDB('http://127.0.0.1:5988/accents');
+	
+	var display = document.getElementById('display');
+  var catImage = document.getElementById('cat');
+  var src=$("ul#recordingslist a:first").attr("href");
+	var xhr = new XMLHttpRequest();
+	xhr.open('GET',src, true);
+	xhr.responseType = 'blob';
+	xhr.onload = function(e) {
+		if (this.status == 200) {
+		var myBlob = this.response;
+		// myBlob is now the blob that the object URL pointed to.
+		console.log(myBlob);
+		db.putAttachment(docId, attachmentId,rev, myBlob, type);
+		
+		}
+	};
+xhr.send();
+	db.getAttachment(docId, attachmentId, {rev: rev},function(err,blob){
+		console.log(blob);
+		 if (err) { return console.log(err); }
+			  var url = URL.createObjectURL(blob);
+			  var display=document.getElementById("display");
+			 display.innerHTML="<audio controls='controls' autobuffer='autobuffer' autoplay='autoplay'><source src='"+url+"'/></audio>";
+			 });
+	
+};
+$scope.getAudio=function(){	
+	var attachment = 
+        "TGVnZW5kYXJ5IGhlYXJ0cywgdGVhciB1cyBhbGwgYXBhcnQKTWFrZS" +
+        "BvdXIgZW1vdGlvbnMgYmxlZWQsIGNyeWluZyBvdXQgaW4gbmVlZA==";
+	var docId='003D4FAA-1533-47F5-A066-4C56D6D2616D';
+	var attachmentId='meowth.png';
+	var type="image/png";
+	var rev="27-0966c7b8bbd450c24f231f2a73c5fee1";
+	var db = new PouchDB('http://127.0.0.1:5988/accents');
+	 //~ db.getAttachment(docId, attachmentId,function (blob) {
+  //~ var url = URL.createObjectURL(blob);
+  //~ var img = document.createElement('img');
+  //~ img.src = url;
+  //~ document.body.appendChild(img);
+  //~ // handle result
+//~ });
+
+		//~ var objectNew=$scope.attachments['003D4FAA-1533-47F5-A066-4C56D6D2616D'];
+		//~ console.log(objectNew);
+		//~ angular.forEach(objectNew,function(attach,key){
+			//~ var blob=attach.data;
+			//~ var decodedData = window.atob(blob);
+			//~ // base64 string
+			//~ var base64str = blob;
+			//~ console.log(base64str.length);
+			//~ // decode base64 string, remove space for IE compatibility
+			//~ var binary = atob(base64str);
+			//~ // get binary length
+			//~ var len = binary.length;
+			//~ console.log(len);
+			//~ // create ArrayBuffer with binary length
+			//~ var buffer = new ArrayBuffer(len);
+			//~ // create 8-bit Array
+			//~ var view = new Uint8Array(buffer);
+			//~ // save unicode of binary data into 8-bit Array
+			//~ for (var i = 0; i < len; i++) {
+				//~ view[i] = binary.charCodeAt(i);
+			//~ }
+			//~ // create the blob object with content-type "application/pdf"               
+			//~ var blobnew = new Blob( [view], { type: "audio/mp3" });
+			//~ var blobURL = window.URL.createObjectURL(blobnew);
+			//~ console.log(blobnew);
+			//~ var display=document.getElementById("display");
+			//~ display.innerHTML="<audio controls='controls' autobuffer='autobuffer' autoplay='autoplay'><source src='"+blobURL+"'/></audio>";
+		//~ });
+
+	
+};
   // Search data
   $scope.getnames=function(searchval){
     // Pull from the idDocs list instead of from the DB to speed this up

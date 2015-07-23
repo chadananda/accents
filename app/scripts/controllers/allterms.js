@@ -94,7 +94,6 @@ var remoteDb=myConfig.database;
 				if (!$scope.attachments[row.doc._id]) $scope.attachments[row.doc._id] = [];
 				if(row.doc._attachments)
 					$scope.attachments[row.doc._id]=row.doc._attachments;
-				//console.log(row.doc._attachments);
 			});
 			if(sessionStorage.getItem('term')!="undefined")
 			{
@@ -111,15 +110,7 @@ var remoteDb=myConfig.database;
           
 	})
     .error(function(error) {  /*  console.log(error);*/    });
-	$scope.users = 
-	[
-	  {"aa": "á"}, 
-	  {"'aa":'ʾā'},
-	  {"'áa":'ʾā'},
-	  {"'ā":'ʾā'},
-	  {"'ʼā":'ʾā'},
-	  {"gh":"ḡ"}
-	];      
+     
    $scope.$watch("search.doc.term",function(v)
 	{
 		$scope.searchterm=v;

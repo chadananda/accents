@@ -20,8 +20,8 @@ angular
   ])
   //======DEFINE ALL CONSTANTS HERE=========/
    .constant("myConfig", {
-        "url": "http://127.0.0.1:5987/accents/",
-        "remoteDbDomain":"127.0.0.1:5987",
+        "url": "http://127.0.0.1:5988/accents/",
+        "remoteDbDomain":"127.0.0.1:5988",
         "database":"accents"
     })
     //======ALL ROUTES AND CORRESSPONDING CONTROLLERS ARE DEFINED HERE=======/
