@@ -104,6 +104,11 @@ background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
 .subGroup{
 	display:none;
 }
+#editRecording .checkBoxes {
+    height: 25px;
+    margin-left: 20px;
+    width: 25px;
+}
 /*=====================================ALL MOBILE VIEW===================================================*/
 @media only screen and (min-width : 0px) and (max-width:767px)
 {

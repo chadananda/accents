@@ -151,7 +151,7 @@ angular.module('accentsApp')
         .success(function(newdata, status, headers, config) {
           termObj._rev = newdata.rev;
           termObj._id = newdata.id;
-          //console.log('newly added termObj', termObj);
+          console.log('newly added termObj', termObj);
           $scope.idDocs[termObj._id] = termObj; // add to cache now that we have an id
             crudFunctions.refreshOldDocsList($scope);
           if (callback) callback(termObj);
@@ -202,7 +202,7 @@ angular.module('accentsApp')
     if (termsArray.length===1) return termsArray[0]; // no need to merge if there's only one
     var i, key, keys, term;
     var base = termsArray[0]; // first term we will merge everything into
-    var allowedTerms = $scope.termAllowedFields(); // list of allowed fields, we'll ignore all others
+    var allowedTerms = crudFunctions.termAllowedFields(); // list of allowed fields, we'll ignore all others
     // sanity check, make sure all terms match
     for (i = 0; i < termsArray.length; i++) {
       if (base.term != termsArray[i].term) {
@@ -223,9 +223,10 @@ angular.module('accentsApp')
           } else if (key == 'ref') {
             // merge with TRUE causes cleanup of PG and PAR
             base[key] = crudFunctions.scrubField(base[key]+','+term[key], true);
-          } else if (key == 'audio') {
+          } else if (key == '_attachments') {
             // TODO: not sure how this should merge because we need to keep any file attachment
             //
+             base[key] = (base[key] || term[key]);
           } else if (['_id','_rev','type','term','ambiguous','wordfamily'].indexOf(key)>-1) {
             // skip these, we do not need to merge them
           } else {
@@ -310,19 +311,15 @@ angular.module('accentsApp')
   $scope.setFormTerm = function(termObj) {
     // clear form -- (it will set to "add" mode temporarily but that does not matter)
     $scope.clearEditForm();
-
+	var db = new PouchDB(myConfig.url);	
     // what is this?
     $scope.editdata=termObj;
 
     // override all fields
     document.getElementById("keyid").value = termObj['_id'];
-    //document.getElementById("keyrev").value = termObj['_rev']; // we should stop using this one
 
     // what does this do?
     //$scope.addform.$setPristine();
-
-    // what is this one??
-    //$scope.search.doc.term = t.wordfamily.toLowerCase();
 
     // if multi value reference, keep only the first one
     //$scope.editdata.term = t.term.trim();
@@ -331,14 +328,39 @@ angular.module('accentsApp')
     document.getElementById("original").value = termObj.original.trim();
     document.getElementById("definition").value = termObj.definition.trim();
     document.getElementById("verifiedCheckbox").checked = termObj.verified;
-
+	
     // why do we need this?
     $scope.editdata.original =termObj.original.trim();
-    //$scope.editdata.definition = t.definition.trim();
+	var docId=termObj['_id'];
+	var blobArray=[];
+	var rev=termObj['_id']._rev;
+	db.get(docId, {attachments: true}).then(function (doc) {	
+		angular.forEach(doc._attachments,function(attach,key){
+			blobArray.push(key);
+		});
+		angular.forEach(blobArray,function(blob){
+			console.log(blob);
+			var attachmentId=blob;
+			db.getAttachment(docId, attachmentId, {rev: rev},function(err,blob){
+				var url = URL.createObjectURL(blob);
+				var display=document.getElementById("editRecording");
+				//display.innerHTML="";
+				display.innerHTML+="<li><audio controls='controls' autobuffer='autobuffer' autoplay='autoplay'><source src='"+url+"'/></audio><input type='checkbox' id='"+attachmentId+"' class='checkBoxes'/></li>";
+			});
+		});
+	});
+	
+	
+		//var attachmentId=blob
+		// db.getAttachment(docId, attachmentId, {rev: rev},function(err,blob){
+		//~ console.log(blob);
+		 //~ if (err) { return console.log(err); }
+			  //~ var url = URL.createObjectURL(blob);
+			  //~ var display=document.getElementById("display");
+			 //~ display.innerHTML="<audio controls='controls' autobuffer='autobuffer' autoplay='autoplay'><source src='"+url+"'/></audio>";
+			 //~ });
 
-    //$scope.addState();
-    //$scope.allDocsFunc();
-
+	
     // set edit mode
     $('#addword').css({ "display":"none" });
     $('#Button2').css({ "display":"block" });
@@ -473,7 +495,27 @@ angular.module('accentsApp')
     var termObj = $scope.getFormTerm();
     if (!termObj.term.trim()) alert('Warning: term field required.');
       else $scope.termCRUD('add', termObj, function(){
-        // clean up word family
+		var WordFamily= crudFunctions.genWordFamily(termObj);
+        var termId=termObj._id;        
+        //call to save the recording if any
+         if($("#recordingslist").length)
+         {
+			 if(typeof($scope.idDocs[termId])!="undefined"){
+				//if the records are recorded
+				$scope.saveAudio(termId);
+			}
+			else{
+				setTimeout(function(){
+					var familyTerms=crudFunctions.getWordFamilyTerms(WordFamily,$scope);
+					angular.forEach(familyTerms,function(fam){
+					$scope.saveAudio(fam._id);
+					});
+					console.log(familyTerms);
+				},1000);
+				
+			}
+		 }
+		// clean up word family
         crudFunctions.cleanWordFamily(termObj,$scope);
         // clear form
         $scope.clearEditForm();
@@ -484,93 +526,51 @@ angular.module('accentsApp')
   $scope.updatedata=function() {
     var termObj = $scope.getFormTerm();
     $scope.termCRUD("update", termObj, function() {
+       //call to save the recording if any
+		 if($("#recordingslist").length)
+		 {
+			//if the records are recorded
+			$scope.saveAudio(termObj._id);
+		 }
+		 
       // clean & compact the word family
       crudFunctions.cleanWordFamily(termObj,$scope);
       // clear form
       $scope.clearEditForm();
     });
   };
-$scope.saveAudio=function(){
-	var url = $("ul#recordingslist a:first").attr("href");
-	var docId='003D4FAA-1533-47F5-A066-4C56D6D2616D';
-	var attachmentId="meowth.mp3";
-	var type="audio/mp3";
-	var rev=$scope.idDocs[docId]._rev;	
-	var db = new PouchDB('http://127.0.0.1:5988/accents');
-	
-	var display = document.getElementById('display');
-  var catImage = document.getElementById('cat');
-  var src=$("ul#recordingslist a:first").attr("href");
-	var xhr = new XMLHttpRequest();
-	xhr.open('GET',src, true);
-	xhr.responseType = 'blob';
-	xhr.onload = function(e) {
-		if (this.status == 200) {
-		var myBlob = this.response;
-		// myBlob is now the blob that the object URL pointed to.
-		console.log(myBlob);
-		db.putAttachment(docId, attachmentId,rev, myBlob, type);
-		
-		}
-	};
-xhr.send();
-	db.getAttachment(docId, attachmentId, {rev: rev},function(err,blob){
-		console.log(blob);
-		 if (err) { return console.log(err); }
-			  var url = URL.createObjectURL(blob);
-			  var display=document.getElementById("display");
-			 display.innerHTML="<audio controls='controls' autobuffer='autobuffer' autoplay='autoplay'><source src='"+url+"'/></audio>";
-			 });
+$scope.saveAudio=function(termId){
+	//termId="01A2C771-D09B-3DEA-A651-7DAB69C8E468";
+	var docId=termId;
+	$('ul#recordingslist').find('a').each(function() {
+		var attachmentId=$(this).text();
+		var type="audio/mp3";
+		var rev=$scope.idDocs[docId]._rev;	
+		var db = new PouchDB(myConfig.url);	
+		var display = document.getElementById('display');
+		var src=$("ul#recordingslist a:first").attr("href");
+		var xhr = new XMLHttpRequest();
+		xhr.open('GET',src, true);
+		xhr.responseType = 'blob';
+		xhr.onload = function(e) {
+			if (this.status == 200) {
+				var myBlob = this.response;
+				// myBlob is now the blob that the object URL pointed to.
+				db.putAttachment(docId, attachmentId,rev, myBlob, type,function (err, res) {
+					if(!err)
+					{						
+						$scope.idDocs[docId]._rev=res.rev;
+						console.log($scope.idDocs[docId]);
+					}
+				})	;		
+					 
+			}
+		};
+		xhr.send();
+	});
 	
 };
-$scope.getAudio=function(){	
-	var attachment = 
-        "TGVnZW5kYXJ5IGhlYXJ0cywgdGVhciB1cyBhbGwgYXBhcnQKTWFrZS" +
-        "BvdXIgZW1vdGlvbnMgYmxlZWQsIGNyeWluZyBvdXQgaW4gbmVlZA==";
-	var docId='003D4FAA-1533-47F5-A066-4C56D6D2616D';
-	var attachmentId='meowth.png';
-	var type="image/png";
-	var rev="27-0966c7b8bbd450c24f231f2a73c5fee1";
-	var db = new PouchDB('http://127.0.0.1:5988/accents');
-	 //~ db.getAttachment(docId, attachmentId,function (blob) {
-  //~ var url = URL.createObjectURL(blob);
-  //~ var img = document.createElement('img');
-  //~ img.src = url;
-  //~ document.body.appendChild(img);
-  //~ // handle result
-//~ });
 
-		//~ var objectNew=$scope.attachments['003D4FAA-1533-47F5-A066-4C56D6D2616D'];
-		//~ console.log(objectNew);
-		//~ angular.forEach(objectNew,function(attach,key){
-			//~ var blob=attach.data;
-			//~ var decodedData = window.atob(blob);
-			//~ // base64 string
-			//~ var base64str = blob;
-			//~ console.log(base64str.length);
-			//~ // decode base64 string, remove space for IE compatibility
-			//~ var binary = atob(base64str);
-			//~ // get binary length
-			//~ var len = binary.length;
-			//~ console.log(len);
-			//~ // create ArrayBuffer with binary length
-			//~ var buffer = new ArrayBuffer(len);
-			//~ // create 8-bit Array
-			//~ var view = new Uint8Array(buffer);
-			//~ // save unicode of binary data into 8-bit Array
-			//~ for (var i = 0; i < len; i++) {
-				//~ view[i] = binary.charCodeAt(i);
-			//~ }
-			//~ // create the blob object with content-type "application/pdf"               
-			//~ var blobnew = new Blob( [view], { type: "audio/mp3" });
-			//~ var blobURL = window.URL.createObjectURL(blobnew);
-			//~ console.log(blobnew);
-			//~ var display=document.getElementById("display");
-			//~ display.innerHTML="<audio controls='controls' autobuffer='autobuffer' autoplay='autoplay'><source src='"+blobURL+"'/></audio>";
-		//~ });
-
-	
-};
   // Search data
   $scope.getnames=function(searchval){
     // Pull from the idDocs list instead of from the DB to speed this up
