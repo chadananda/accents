@@ -64,10 +64,9 @@ var remoteDb=myConfig.database;
 	 $scope.allDocsFunc=function()
 	 {
 		 $scope.attachments={};
-		 $http.get('http://'+domainRemoteDb+'/'+remoteDb+'/_all_docs?include_docs=true')
+		 $http.get('http://'+domainRemoteDb+'/'+remoteDb+'/_all_docs?include_docs=true&attachments=true')
 		.success(function(data) 
 		{
-			
 			if(data.rows)
 			{
 				$scope.docs=data.rows;
@@ -306,9 +305,10 @@ var remoteDb=myConfig.database;
 		{
 			angular.forEach(items, function(item) 
 			{
-				var attachmentArr=scope.attachments[item._id];
-				if(attachmentArr.length==0)
+				//~ var attachmentArr=scope.attachments[item._id];
+				if(!item._attachments){
 					filtered.push(item);
+				}
 				//console.log(JSON.stringify(item._id));
 			});
 		}

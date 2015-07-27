@@ -81,11 +81,13 @@ angular.module('accentsApp')
     //console.log('cleanWordFamily: '+ wordfamily, family);
     // now compress each list down to just one record each
     var verified_count = 0;
+    var termscount=0;
     Object.keys(family).forEach(function(term) {
       family[term] = scope.compressTerms(family[term]); // takes array of termObj, returns merged termObj
       if (family[term].verified) verified_count++;
+      termscount++;
     });
-
+	if(termscount>1){
     // wait a second then set them all to ambiguous or not depending on verified count
     setTimeout(function() {
       Object.keys(family).forEach(function(term) {
@@ -94,7 +96,9 @@ angular.module('accentsApp')
         scope.termCRUD('update', termObj);
       });
     }, 1000);
+	}
   },
+  
   // returns a "word family" stripped down version of the term
   // parameter can be a wordfamily, termObj, HTML or glyph
   genWordFamily : function(term) {
@@ -116,6 +120,7 @@ angular.module('accentsApp')
     });
     return result;
   },
+  
  // scrub any user generated field (may contain multiple items)
   scrubField : function(field, isReference) {
     // scrub any user-generated field part
@@ -138,6 +143,12 @@ angular.module('accentsApp')
       }).
       // re-join with a comma and a space
       join(', ');
+  },
+  scrubAttachmentField : function(baseData,termData){
+	  obj3 = $.extend(baseData, termData);
+	  console.log("obj3:"+obj3);
+	  return obj3; 
+
   },
    // refresh $scope.docs from idDocs without having to query DB
   refreshOldDocsList : function(scope) {

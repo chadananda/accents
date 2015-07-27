@@ -151,7 +151,7 @@ angular.module('accentsApp')
         .success(function(newdata, status, headers, config) {
           termObj._rev = newdata.rev;
           termObj._id = newdata.id;
-          console.log('newly added termObj', termObj);
+        //  console.log('newly added termObj', termObj);
           $scope.idDocs[termObj._id] = termObj; // add to cache now that we have an id
             crudFunctions.refreshOldDocsList($scope);
           if (callback) callback(termObj);
@@ -163,7 +163,7 @@ angular.module('accentsApp')
   // DATABASE read all fields into hash cache ($scope.idDocs[id]) instant access by _id
   $scope.refreshAllDocList = function(callback) {
     var termObj;
-    $http.get(crudFunctions.db_url() + '_all_docs?include_docs=true')
+    $http.get(crudFunctions.db_url() + '_all_docs?include_docs=true&attachments=true')
       .success(function(data)  {
         if(data.rows) {
           $scope.idDocs = {}; // clear termObj cache
@@ -203,6 +203,7 @@ angular.module('accentsApp')
     var i, key, keys, term;
     var base = termsArray[0]; // first term we will merge everything into
     var allowedTerms = crudFunctions.termAllowedFields(); // list of allowed fields, we'll ignore all others
+    
     // sanity check, make sure all terms match
     for (i = 0; i < termsArray.length; i++) {
       if (base.term != termsArray[i].term) {
@@ -212,7 +213,11 @@ angular.module('accentsApp')
     }
     // now merge records #1-n into termObj #0 and then discard each merged record
     for (var i = 1; i < termsArray.length; i++) {
-      term = termsArray[i];
+	var docId=termsArray[i]._id;
+	var db = new PouchDB(myConfig.url);	
+	db.get(docId).then(function (doc) {
+	  var term=doc;
+	
       keys = Object.keys(term); // iterate through each field of termObj to be discarded
       for (var j = 1; j < keys.length; j++) {
         key = keys[j];
@@ -226,7 +231,7 @@ angular.module('accentsApp')
           } else if (key == '_attachments') {
             // TODO: not sure how this should merge because we need to keep any file attachment
             //
-             base[key] = (base[key] || term[key]);
+             base[key] = crudFunctions.scrubAttachmentField(base[key],term[key]);
           } else if (['_id','_rev','type','term','ambiguous','wordfamily'].indexOf(key)>-1) {
             // skip these, we do not need to merge them
           } else {
@@ -235,15 +240,18 @@ angular.module('accentsApp')
           }
         }
       };
+      
       // discard merged record
       $scope.termCRUD('delete', term);
+       });
     }
+   
     // update base record
     $scope.termCRUD('update', base);
 
     // $scope.refreshAllDocList();  -- we don't need to do this because CRUD updats idDocs list
          // rather we need to make sure everything uses the idDocs list
-
+console.log(base);
     return base;
   };
 
@@ -502,7 +510,7 @@ angular.module('accentsApp')
          {
 			 if(typeof($scope.idDocs[termId])!="undefined"){
 				//if the records are recorded
-				$scope.saveAudio(termId);
+				$scope.saveAudio(termId);		
 			}
 			else{
 				setTimeout(function(){
@@ -515,8 +523,11 @@ angular.module('accentsApp')
 				
 			}
 		 }
-		// clean up word family
-        crudFunctions.cleanWordFamily(termObj,$scope);
+	
+	// clean up word family
+	setTimeout(function(){		
+		  crudFunctions.cleanWordFamily(termObj,$scope);		
+		},2000);
         // clear form
         $scope.clearEditForm();
      });
@@ -530,16 +541,15 @@ angular.module('accentsApp')
 		 if($("#recordingslist").length)
 		 {
 			//if the records are recorded
-			$scope.saveAudio(termObj._id);
+			$scope.saveAudio(termObj._id);		
 		 }
-		 
-      // clean & compact the word family
-      crudFunctions.cleanWordFamily(termObj,$scope);
+		 // clean up word family
+	setTimeout(function(){crudFunctions.cleanWordFamily(termObj,$scope);},2000);
       // clear form
       $scope.clearEditForm();
-    });
+	});
   };
-$scope.saveAudio=function(termId){
+$scope.saveAudio=function(termId,callback){
 	//termId="01A2C771-D09B-3DEA-A651-7DAB69C8E468";
 	var docId=termId;
 	$('ul#recordingslist').find('a').each(function() {
@@ -560,7 +570,6 @@ $scope.saveAudio=function(termId){
 					if(!err)
 					{						
 						$scope.idDocs[docId]._rev=res.rev;
-						console.log($scope.idDocs[docId]);
 					}
 				})	;		
 					 
@@ -568,7 +577,9 @@ $scope.saveAudio=function(termId){
 		};
 		xhr.send();
 	});
-	
+	var termObj=$scope.idDocs[docId];
+	crudFunctions.refreshOldDocsList($scope);
+	if (callback) callback();
 };
 
   // Search data
