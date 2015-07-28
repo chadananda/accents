@@ -285,7 +285,7 @@ console.log(base);
     $('#Button3').css({ "display":"none" });
     $('#updateword').css({ "display":"none" });
     $('#addword').css({ "display":"block" });
-
+	$('#editRecording').empty();
     // what does sessionstorage handle?
     if(sessionStorage.length!=0)   {
       var sessionTerm=sessionStorage.term;
@@ -347,27 +347,15 @@ console.log(base);
 			blobArray.push(key);
 		});
 		angular.forEach(blobArray,function(blob){
-			console.log(blob);
 			var attachmentId=blob;
 			db.getAttachment(docId, attachmentId, {rev: rev},function(err,blob){
 				var url = URL.createObjectURL(blob);
 				var display=document.getElementById("editRecording");
 				//display.innerHTML="";
-				display.innerHTML+="<li><audio controls='controls' autobuffer='autobuffer' autoplay='autoplay'><source src='"+url+"'/></audio><input type='checkbox' id='"+attachmentId+"' class='checkBoxes'/></li>";
+				display.innerHTML+="<li id='"+attachmentId+"'><audio controls='controls' autobuffer='autobuffer' autoplay='autoplay'><source src='"+url+"'/></audio><a onclick=deleteAttachment('"+attachmentId+"','"+docId+"')><span class='glyphicon glyphicon-trash'></span></a></li>";
 			});
 		});
 	});
-	
-	
-		//var attachmentId=blob
-		// db.getAttachment(docId, attachmentId, {rev: rev},function(err,blob){
-		//~ console.log(blob);
-		 //~ if (err) { return console.log(err); }
-			  //~ var url = URL.createObjectURL(blob);
-			  //~ var display=document.getElementById("display");
-			 //~ display.innerHTML="<audio controls='controls' autobuffer='autobuffer' autoplay='autoplay'><source src='"+url+"'/></audio>";
-			 //~ });
-
 	
     // set edit mode
     $('#addword').css({ "display":"none" });
@@ -382,6 +370,27 @@ console.log(base);
     // TODO: add audio state
   };
 
+$scope.deleteAttachment=function(attachmentId,docId){
+	var db = new PouchDB(myConfig.url);
+	var rev = $scope.idDocs[docId]._rev;
+	db.removeAttachment(docId,attachmentId, rev, function(err, res) {
+	  if (err) { return console.log(err); }
+	  // handle result    
+	  if(res){ 
+			$scope.idDocs[docId]._rev = res.rev;
+			var display=document.getElementById(attachmentId);
+			display.innerHTML="";
+			db.get(docId, {attachments: true}).then(function (doc) {	
+				$scope.idDocs[docId]=doc;
+			});
+			//~ var attachments=$scope.idDocs[docId]._attachments;
+			//~ delete attachments[attachmentId];
+			//~ console.log(attachments[attachmentId]);
+			//~ $scope.idDocs[docId]._attachments=attachments;
+			console.log($scope.idDocs[docId]);
+		}                  
+	});
+};
 
   // Generate an object of word families
   $scope.getMatchLists = function(search) {
@@ -632,6 +641,9 @@ $scope.wholeWordFilterCount=function(term){
 		});
       return  sum;
 }
+ $scope.openModal=function(){
+		 $('#myModal').modal({show:true}); 
+	}
 })
 
 

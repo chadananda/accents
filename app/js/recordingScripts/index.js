@@ -56,6 +56,8 @@ document.addEventListener("DOMContentLoaded", function() {
           li.appendChild(hf);
           recordingslist.appendChild(li);   
     }
-    function openModal(){
-		 $('#myModal').modal('show'); 
-	}
+   function deleteAttachment(attachmentId,docId)
+   {
+	   var scope = angular.element($("#main-container")).scope();
+	   scope.deleteAttachment(attachmentId,docId);
+   }
