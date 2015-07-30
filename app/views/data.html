@@ -4,260 +4,158 @@
 		localStorage.removeItem('session-user');
 		window.location.href="/";
 	}
-	//var session=localStorage.getItem('session-user');
 	if(localStorage.getItem("session-user") === null)
 	{
 		window.location.href="/";
 	}
-	function changeterm()
-	{
-		//console.log("functioncalled");
-		//$('#checkedStrict').trigger('click');
-	}
 </script>
-
-    <!-- Modal -->
-<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="myModalLabel">All Recordings</h4>
-      </div>
-      <div class="modal-body">
-		  <ul id="editRecording"></ul>
-        <ul id="recordingslist"></ul>
-      </div>
-<!--
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
-      </div>
--->
-    </div>
-  </div>
-</div>
-  <!-- <a href="javascript:void();"> <img src="images/forkme.png" alt="forkme" class="img-responsive forkme" /></a>-->
-        <div class="container  clearfix"  id="main-container" ng-controller="getdataCtrl">
-
-
-            <div class="col-lg-12 clearfix  mb10 p0 pt10 pb10">
-                <div class="col-sm-6 logo p0 valignmiddle mt10">
-                      <div class="media">
-                          <div class="media-left pull-left mainlogo">
-                            <a href="index.html">
-                                <img src="images/ocean-logo.svg" alt="logo" class="img-responsive dispinblk valignmiddle"/>
-                            </a>
-                          </div>
-                          <div class="media-body">
-                              <h3 class="dispinblk m0 valignmiddle">Interminable<br /> Accents</h3>
-                              <p  class=" m0 valignmiddle">A dictionary builder for Bahá’í terms</p>
-                          </div>
-                       </div>
-                </div>
-                 <div class="col-sm-6 logo p0 valignmiddle text-right topbutton mt10" style="display:none;">
-                    <button type="button" class="btn btn-info txtuppcase "><span class="glyphicon glyphicon-plus mr5"></span>add words</button>
-                    <button type="button" class="btn btn-default txtuppcase "><span class="glyphicon glyphicon-ok mr5"></span>Auto Correct</button>
-                    <button type="button" class="btn btn-danger txtuppcase " title="Logout" onclick="logout()"><span class="glyphicon glyphicon-off"></span></button>
-                 </div>
-                <div class="col-md-5 col-md-offset-1 col-sm-5 custom-width-media logo p0 valignmiddle text-right topbutton mt10" >
-					<div class="header">
-					  <div class="navbar navbar-default" role="navigation">
-						<!--div class="container"-->
-						  <div class="navbar-header">
-
-							<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#js-navbar-collapse">
-							  <span class="sr-only">Toggle navigation</span>
-							  <span class="icon-bar"></span>
-							  <span class="icon-bar"></span>
-							  <span class="icon-bar"></span>
+<div ng-controller="getdataCtrl">
+	<!-- Modal -->
+	<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	  <div class="modal-dialog" role="document">
+		<div class="modal-content">
+		  <div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+			<h4 class="modal-title" id="myModalLabel">All Recordings</h4>
+		  </div>
+		  <div class="modal-body">
+			  <ul id="editRecording"></ul>
+			<ul id="recordingslist"></ul>
+		  </div>
+		</div>
+	  </div>
+	</div>
+	<!-- Modal end -->
+	<div class="col-lg-12 clearfix mb10 p0 pt10 pb30 addtext mt30">
+		<div class="col-lg-12 mobile-margin">
+			<div class="row">
+				<div class="col-md-12 col-xs-12">
+					 <h2 class="pl15 pr15" style="font-weight:bold;"><div  id="toptext" style="display:inline;">Add: </div>
+					 <div id="heading-term" style="display:inline;margin-left: 10px;" ng-model="headingterm"></div></h2>
+				</div>
+			</div>
+		</div>
+		<div class="col-lg-12 clearfix">
+			<form class="form-inline clearfix" id="addform" name="addform" >
+				<div class="col-md-12">
+					<div class="form-group col-sm-6 ">
+						<input type="text" class="form-control chkval" ng-keyup="changeTerm()" ng-enter="adddata(docs)" name="term" id="term" style="font-size:20px !important;" ng-model-options="{ debounce: 1000 }" ng-minlength="3" ng-model="search.doc.term" />
+						<input type="hidden" id="keyid"  />
+						<span class="inputexm">Term</span>
+					</div>
+					<div class="form-group posrleative col-sm-6 ">
+						<input type="text" name="reference"  class="form-control chkval" id="reference" ng-model="editdata.ref" value="" ng-model-options="{ debounce: 250 }" ng-enter="adddata(docs)"/>
+						<span class="inputexm">Reference e.g. Iqan pg 72</span>				
+					</div>
+				</div>
+				<div class="col-md-12">
+					<div class="form-group posrleative col-sm-6 ">
+						<input type="text" name="original" class="form-control chkval openautochoose"  id="original" ng-model-options="{ debounce: 250 }" ng-enter="adddata(docs)" ng-model="editdata.original" style="font-size:20px !important;" ng-change="checkVerifiedCheckBox()"/>
+						<span class="inputexm">Original</span>
+					</div>
+					<div class="form-group col-sm-6 ">
+						<input type="text" class="form-control chkval" name="definition" ng-model-options="{ debounce: 250 }" ng-model="editdata.definition" ng-enter="adddata(docs)" id="definition" />
+						<span class="inputexm">Notes</span>
+					</div>
+				</div>
+			</form>
+		</div>
+		<div class="col-lg-12 clearfix  mt10">
+			<div class="col-sm-5 col-md-5 clearfix ">
+				<div class="checkbox mt20 dispinblk">
+					<label style="padding-left:13px;"><input type="checkbox" ng-model="verified" id="verifiedCheckbox" ng-checked="editdata.verify==1  || editdata.verified==true"/> Verified</label>
+				</div>
+				<div class="dispinblk playmic">
+					<a ng-click="openModal();" id="playButton"><span class="glyphicon glyphicon-play"></span></a>
+				</div>
+				<div class="dispinblk playmic">
+					<button id='start' class="recordButton"><span class="glyphicon glyphicon-record"></button>
+				</div>
+				<div class="dispinblk playmic">
+					<button id='stop' class="playButton" ><span class="glyphicon glyphicon-stop"></span></button>
+				</div>
+				<div id="display"></div>					
+			</div>
+			<div class="col-sm-7 col-md-7 clearfix">
+				<div class="col-sm-12 clearfix">
+					<button type="submit" class="btn btn-warning pull-right mt20 " id="addword" ng-click="adddata(docs);">
+						<span class="glyphicon glyphicon-plus mr5"></span>Add Term
+					</button>
+					<button type="submit" class="btn btn-warning pull-right mt20 " id="updateword" ng-click="updatedata(docs);"  style="display:none;">
+						<span class="glyphicon glyphicon-edit mr5"></span>Update
+					</button>
+					<button type="submit" class="btn btn-danger pull-right mt20 mr20" id="Button2" style="display:none;" ng-click="deletedata(docs);" >
+						<span class="glyphicon glyphicon-trash mr5"></span>Delete
+					</button>
+					<button type="submit" class="btn btn-danger pull-right mt20 mr20" id="Button3" style="display:none;" ng-click="cancelUpdate();" >
+						<span class="glyphicon glyphicon-remove mr5"></span>Cancel
+					</button>
+				</div>  
+			</div>
+		</div>
+		<!--=========================SIMPLE EDIT AND SEARCH=============================-->
+		<div class="col-lg-12 clearfix mt30" >
+			<div class="col-lg-12 clearfix  pt20 pb20">
+				<div class="col-lg-12 clearfix autosearch-container"  ng-if="search.doc.term">
+					<h5 class="mb10 ">
+						<span class="mr5">{{wholeWordFilterCount(search.doc.term)}}</span>Whole Word Matches
+					</h5>
+					<div ng-repeat="key in objectKeys(wholeWordFilter(search.doc.term))"  class="col-md-12" >
+						<div ng-repeat="t in wholeWordFilter(search.doc.term)[key]" >
+							<span ng-bind-html="i2html(customi2html(t.term))"></span>
+							<span class="glyphicon glyphicon-ok-circle ml10" ng-if="t.verified==true"  style="margin-left: 5px;"></span>
+							<span class="glyphicon glyphicon-question-sign" ng-if="t.ambiguous==true"  style="margin-left: 5px;"></span>
+							<button  ng-click="editdoc(t._id,t._rev);" class="btn btn-primary btn-xs editbtn mb10" type="button" style="margin-left: 10px;">
+								<span class="glyphicon glyphicon-edit"></span>
 							</button>
-
-							<!--a class="navbar-brand" href="#/">accents</a-->
-						  </div>
-
-						  <div class="collapse navbar-collapse" id="js-navbar-collapse" >
-
-							<ul class="nav navbar-nav">
-							  <li><a ng-href="#/allterms">All Terms</a></li>
-							  <li class="active"><a href="#/getdata">Add</a></li>
-							 <!-- <li><a ng-href="#/about">Verify</a></li>-->
-							  <li><a class="btn-danger txtuppcase logout" title="Logout" onclick="logout()"><span class="glyphicon glyphicon-off"></span></a></li>
-							   <li><a ng-href="#/settings"><span class="glyphicon glyphicon-cog"></span></a></li>
-							</ul>
-						  </div>
-						</div>
-					  <!--/div-->
-					</div>
-                </div>
-            </div>
-
-            <div class="col-lg-12 clearfix mb10 p0 pt10 pb30 addtext mt30">
-				<div class="col-lg-12 mobile-margin">
-					<div class="row">
-						<div class="col-md-12 col-xs-12">
-							 <h2 class="pl15 pr15" style="font-weight:bold;"><div  id="toptext" style="display:inline;">Add: </div>
-							 <div id="heading-term" style="display:inline;margin-left: 10px;" ng-model="headingterm"></div></h2>
-						</div>
-					</div>
-				</div>
-
-                <div class="col-lg-12 clearfix">
-                <form class="form-inline clearfix" id="addform" name="addform" >
-				 <div class="col-md-12">
-                  <div class="form-group col-sm-6 ">
-
-                    <input type="text" class="form-control chkval" ng-keyup="changeTerm()" ng-enter="adddata(docs)" name="term" id="term" style="font-size:20px !important;" ng-model-options="{ debounce: 1000 }" ng-minlength="3" ng-model="search.doc.term" />
-                    <input type="hidden" id="keyid"  />
-                   <!-- <input type="hidden" id="keyrev"  /> -->
-                     <span class="inputexm">Term</span>
-
-                  </div>
-                  <div class="form-group posrleative col-sm-6 ">
-					  <input type="text" name="reference"  class="form-control chkval" id="reference" ng-model="editdata.ref" value="" ng-model-options="{ debounce: 250 }" ng-enter="adddata(docs)"/>
-                     <span class="inputexm">Reference e.g. Iqan pg 72</span>
-
-
-                  </div>
-                  </div>
-                   <div class="col-md-12">
-                  <div class="form-group posrleative col-sm-6 ">
-                     <input type="text" name="original" class="form-control chkval openautochoose"  id="original" ng-model-options="{ debounce: 250 }" ng-enter="adddata(docs)" ng-model="editdata.original" style="font-size:20px !important;" ng-change="checkVerifiedCheckBox()"/>
-
-                       <div class=" col-lg-12">
-                                <div class=" autochoose">
-                                      <div class="checkbox">
-                                        <label><input type="checkbox"/> Word One</label>
-                                      </div>
-                                      <div class="checkbox">
-                                        <label><input type="checkbox"/> Word Two</label>
-                                      </div>
-                                      <div class="checkbox">
-                                        <label><input type="checkbox"/> Word Three</label>
-                                      </div>
-                                      <div class="checkbox">
-                                        <label><input type="checkbox"/> Word Four</label>
-                                      </div>
-                                      <div class="checkbox">
-                                        <label><input type="checkbox"/> Word Five</label>
-                                      </div>
-                                </div>
-
-                   </div>
-                     <span class="inputexm">Original</span>
-
-                  </div>
-				  <div class="form-group col-sm-6 ">
-                    <input type="text" class="form-control chkval" name="definition" ng-model-options="{ debounce: 250 }" ng-model="editdata.definition" ng-enter="adddata(docs)" id="definition" />
-                    <span class="inputexm">Notes</span>
-                  </div>
-				</div>
-			   </form>
-                </div>
-
-                <div class="col-lg-12 clearfix  mt10   ">
-                  <div class="col-sm-5 col-md-5 clearfix ">
-                         <div class="checkbox mt20 dispinblk">
-                            <label style="padding-left:13px;"><input type="checkbox" ng-model="verified" id="verifiedCheckbox" ng-checked="editdata.verify==1  || editdata.verified==true"/> Verified</label>
-                          </div>
-                          <!--
-                          <div class="checkbox mt20 dispinblk">
-                            <label style="padding-left:10px;"><input type="checkbox" ng-model="ambiguous"  />Ambiguous</label>
-                          </div>
-                          --->
-                          <div class="dispinblk playmic">
-                             <a ng-click="openModal();">  <img src="images/play.png" alt="mic" /></a>
-                          </div>
-                          <div class="dispinblk playmic">
-                              <button id='start' class="recordButton">  <img src="images/mic.png" alt="mic" /></button>
-                          </div>
-                           <div class="dispinblk playmic">
-								<button id='stop' class="playButton" ><span class="glyphicon glyphicon-stop"></span></button>
-						    </div>
-
-<!--
-							<a ng-click="saveAudio()">SaveAudio</a>
--->
-							<div id="display"></div>
-							
-                      </div>
-                  <div class="col-sm-7 col-md-7 clearfix"><div class="col-sm-12 clearfix">
-                         <button type="submit" class="btn btn-warning pull-right mt20 " id="addword" ng-click="adddata(docs);"><span class="glyphicon glyphicon-plus mr5"></span>Add Term</button>
-                         <button type="submit" class="btn btn-warning pull-right mt20 " id="updateword" ng-click="updatedata(docs);"  style="display:none;">
-							 <span class="glyphicon glyphicon-edit mr5"></span>Update</button>
-                         <button type="submit" class="btn btn-danger pull-right mt20 mr20" id="Button2" style="display:none;" ng-click="deletedata(docs);" >
-							 <span class="glyphicon glyphicon-trash mr5"></span>Delete</button>
-					      <button type="submit" class="btn btn-danger pull-right mt20 mr20" id="Button3" style="display:none;" ng-click="cancelUpdate();" >
-							 <span class="glyphicon glyphicon-remove mr5"></span>Cancel</button>
-                  </div>  </div>
-                </div>
-				<!--=========================SIMPLE EDIT AND SEARCH=============================-->
-				<div class="col-lg-12 clearfix mt30" >
-					<div class="col-lg-12 clearfix  pt20 pb20">
-						<div class="col-lg-12 clearfix autosearch-container"  ng-if="search.doc.term">
-							<h5 class="mb10 "><span class="mr5">{{wholeWordFilterCount(search.doc.term)}}</span>Whole Word Matches</h5>
-							<div ng-repeat="key in objectKeys(wholeWordFilter(search.doc.term))"  class="col-md-12" >
-								<div ng-repeat="t in wholeWordFilter(search.doc.term)[key]" >
-									<span ng-bind-html="i2html(customi2html(t.term))"></span>
-									<span class="glyphicon glyphicon-ok-circle ml10" ng-if="t.verified==true"  style="margin-left: 5px;"></span>
-									<span class="glyphicon glyphicon-question-sign" ng-if="t.ambiguous==true"  style="margin-left: 5px;"></span>
-									<button  ng-click="editdoc(t._id,t._rev);" class="btn btn-primary btn-xs editbtn mb10" type="button" style="margin-left: 10px;">
-										<span class="glyphicon glyphicon-edit"></span>
-									</button>
-									<!--<span class="glyphicon glyphicon-remove ml10" ng-click="deletedoc(docobj.doc._id,docobj.doc._rev);" ></span>-->
-									<button ng-click="deletedoc(t._id,t._rev,docs);" class="btn btn-danger btn-xs remove mb10" type="button" style="float:none;margin-left: 10px;">
-										<span class="glyphicon glyphicon-remove"></span>
-									</button>
-									&nbsp;
-									<div class="otherData">
-										<div class="notesClass" ng-show="t.original!=''">{{t.original}}&nbsp;</div>
-										<div class="notesClass" ng-show="t.ref!=''"> {{t.ref}}&nbsp;</div>
-										<div class="notesClass" ng-show="t.definition!=''"> {{t.definition}}&nbsp;</div>
-									</div>
-								</div>
+							<button ng-click="deletedoc(t._id,t._rev,docs);" class="btn btn-danger btn-xs remove mb10" type="button" style="float:none;margin-left: 10px;">
+								<span class="glyphicon glyphicon-remove"></span>
+							</button>
+							&nbsp;
+							<div class="otherData">
+								<div class="notesClass" ng-show="t.original!=''">{{t.original}}&nbsp;</div>
+								<div class="notesClass" ng-show="t.ref!=''"> {{t.ref}}&nbsp;</div>
+								<div class="notesClass" ng-show="t.definition!=''"> {{t.definition}}&nbsp;</div>
 							</div>
 						</div>
-						<div class="col-lg-12 clearfix mt0 autosearch-container" ng-if="search.doc.term">
-							<h5 class="mb10 "><span class="mr5 ">{{groupfiltercount(search.doc.term)}}</span>Partial Matches</h5>
-							<div ng-repeat="key in objectKeys(groupfilter(search.doc.term))" class="searchGroup"  ng-click="getAllRecords('{{key}}')">
-								<span class="glyphicon glyphicon-play mr5 openPanel" id="sideIcon-{{key}}"></span>	
-								<u ng-bind-html="i2html(customi2html(key))"></u>								 
-								<span ng-show="groupfilter(search.doc.term)[key].length!=1">({{groupfilter(search.doc.term)[key].length}})</span>
-								<span  ng-show="groupfilter(search.doc.term)[key].length==1">
-									<span class="glyphicon glyphicon-ok-circle ml10" ng-if="groupfilter(search.doc.term)[key][0].verified==true"   style="margin-left: 5px;"></span>
-									<span class="glyphicon glyphicon-question-sign" ng-if="groupfilter(search.doc.term)[key][0].ambiguous==true"  style="margin-left: 5px;"></span>
-									<button  ng-click="editdoc(groupfilter(search.doc.term)[key][0]._id,groupfilter(search.doc.term)[key][0]._rev);" class="btn btn-primary btn-xs editbtn mb10" type="button"  style="margin-left: 10px;">
-										<span class="glyphicon glyphicon-edit"></span>
-									</button>
-									<button ng-click="deletedoc(groupfilter(search.doc.term)[key][0]._id,groupfilter(search.doc.term)[key][0]._rev,docs);" class="btn btn-danger btn-xs remove mb10" type="button" style="float:none;margin-left: 10px;">
-										<span class="glyphicon glyphicon-remove"></span>
-									</button>
-								</span>
-									
-								<div id="showDiv-{{key}}" class="col-md-11 col-md-offset-1 subGroup" ng-show="groupfilter(search.doc.term)[key].length!=1">
-									<div ng-repeat="t in groupfilter(search.doc.term)[key]" >
-										<span ng-bind-html="i2html(customi2html(t.term))">{{t.term}}</span>
-										<span class="glyphicon glyphicon-ok-circle ml10" ng-if="t.verified==true"  style="margin-left: 5px;"></span>
-										<span class="glyphicon glyphicon-question-sign" ng-if="t.ambiguous==true"  style="margin-left: 5px;"></span>
-										<button  ng-click="editdoc(t._id,t._rev);" class="btn btn-primary btn-xs editbtn mb10" type="button" style="margin-left: 10px;">
-										<span class="glyphicon glyphicon-edit"></span>
-										</button>
-										<button ng-click="deletedoc(t._id,t._rev,docs);" class="btn btn-danger btn-xs remove mb10" type="button" style="float:none;margin-left: 10px;">
-										<span class="glyphicon glyphicon-remove"></span>
-										</button>
-									</div>
-								</div>
-							</div>	
-						</div>
 					</div>
 				</div>
-
-
-
-                 <div class="col-lg-12 clearfix">
-                     <h5 class="blankalert"> Ref &amp; Term can't be blank</h5>
-                 </div>
-            </div>
-       <div>{{message}}</div>
-
+				<div class="col-lg-12 clearfix mt0 autosearch-container" ng-if="search.doc.term">
+					<h5 class="mb10 ">
+						<span class="mr5 ">{{groupfiltercount(search.doc.term)}}</span>Partial Matches
+					</h5>
+					<div ng-repeat="key in objectKeys(groupfilter(search.doc.term))" class="searchGroup"  ng-click="getAllRecords('{{key}}')">
+						<span class="glyphicon glyphicon-play mr5 openPanel" id="sideIcon-{{key}}"></span>	
+						<u ng-bind-html="i2html(customi2html(key))"></u>								 
+						<span ng-show="groupfilter(search.doc.term)[key].length!=1">({{groupfilter(search.doc.term)[key].length}})</span>
+						<span  ng-show="groupfilter(search.doc.term)[key].length==1">
+							<span class="glyphicon glyphicon-ok-circle ml10" ng-if="groupfilter(search.doc.term)[key][0].verified==true"   style="margin-left: 5px;"></span>
+							<span class="glyphicon glyphicon-question-sign" ng-if="groupfilter(search.doc.term)[key][0].ambiguous==true"  style="margin-left: 5px;"></span>
+							<button  ng-click="editdoc(groupfilter(search.doc.term)[key][0]._id,groupfilter(search.doc.term)[key][0]._rev);" class="btn btn-primary btn-xs editbtn mb10" type="button"  style="margin-left: 10px;">
+								<span class="glyphicon glyphicon-edit"></span>
+							</button>
+							<button ng-click="deletedoc(groupfilter(search.doc.term)[key][0]._id,groupfilter(search.doc.term)[key][0]._rev,docs);" class="btn btn-danger btn-xs remove mb10" type="button" style="float:none;margin-left: 10px;">
+								<span class="glyphicon glyphicon-remove"></span>
+							</button>
+						</span>							
+						<div id="showDiv-{{key}}" class="col-md-11 col-md-offset-1 subGroup" ng-show="groupfilter(search.doc.term)[key].length!=1">
+							<div ng-repeat="t in groupfilter(search.doc.term)[key]" >
+								<span ng-bind-html="i2html(customi2html(t.term))">{{t.term}}</span>
+								<span class="glyphicon glyphicon-ok-circle ml10" ng-if="t.verified==true"  style="margin-left: 5px;"></span>
+								<span class="glyphicon glyphicon-question-sign" ng-if="t.ambiguous==true"  style="margin-left: 5px;"></span>
+								<button  ng-click="editdoc(t._id,t._rev);" class="btn btn-primary btn-xs editbtn mb10" type="button" style="margin-left: 10px;">
+								<span class="glyphicon glyphicon-edit"></span>
+								</button>
+								<button ng-click="deletedoc(t._id,t._rev,docs);" class="btn btn-danger btn-xs remove mb10" type="button" style="float:none;margin-left: 10px;">
+								<span class="glyphicon glyphicon-remove"></span>
+								</button>
+							</div>
+						</div>
+					</div>	
+				</div>
+			</div>
+		</div>
+	</div>
+    <div>{{message}}</div>
+</div>
 

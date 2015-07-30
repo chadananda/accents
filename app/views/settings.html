@@ -4,152 +4,86 @@
 		localStorage.removeItem('session-user');
 		window.location.href="/";
 	}
-	//var session=localStorage.getItem('session-user');
 	if(localStorage.getItem("session-user") === null)
 	{
 		window.location.href="/";
-	}    
-	function changeterm()
-	{
-		//console.log("functioncalled");
-		//$('#checkedStrict').trigger('click');
-	}                                                              
+	}                                                            
 </script>
-   <!-- <a href="javascript:void();"> <img src="images/forkme.png" alt="forkme" class="img-responsive forkme" /></a>-->
-        <div class="container  clearfix"  id="main-container" ng-controller="getdataCtrl">
-            <div class="col-lg-12 clearfix  mb10 p0 pt10 pb10">
-                <div class="col-sm-6 logo p0 valignmiddle mt10">
-                      <div class="media">
-                          <div class="media-left pull-left">
-                            <a href="index.html">
-                                <img src="images/ocean-logo.svg" alt="logo" class="img-responsive dispinblk valignmiddle" style="height: 56px;" />
-                            </a>
-                          </div>
-                          <div class="media-body">
-                              <h3 class="dispinblk m0 valignmiddle">Interminable<br /> Accents</h3>
-                              <br/>
-                              <p  class="dispinblk m0 valignmiddle">A proof of concept suggestion builder for Baha’i terms</p>
-                          </div>
-                       </div>
-                </div>
-                 <div class="col-sm-6 logo p0 valignmiddle text-right topbutton mt10" style="display:none;">
-                    <button type="button" class="btn btn-info txtuppcase "><span class="glyphicon glyphicon-plus mr5"></span>add words</button>
-                    <button type="button" class="btn btn-default txtuppcase "><span class="glyphicon glyphicon-ok mr5"></span>Auto Correct</button>
-                    <button type="button" class="btn btn-danger txtuppcase " title="Logout" onclick="logout()"><span class="glyphicon glyphicon-off"></span></button>
-                 </div>
-                <div class="col-md-5 col-md-offset-1 col-sm-5 custom-width-media logo p0 valignmiddle text-right topbutton mt10" >
-					<div class="header">
-					  <div class="navbar navbar-default" role="navigation">
-						<!--div class="container"-->
-						  <div class="navbar-header">
-
-							<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#js-navbar-collapse">
-							  <span class="sr-only">Toggle navigation</span>
-							  <span class="icon-bar"></span>
-							  <span class="icon-bar"></span>
-							  <span class="icon-bar"></span>
-							</button>
-
-							<!--a class="navbar-brand" href="#/">accents</a-->
-						  </div>
-
-						  <div class="collapse navbar-collapse" id="js-navbar-collapse" >
-
-							<ul class="nav navbar-nav">
-							  <li><a ng-href="#/allterms">All Terms</a></li>
-							  <li><a href="#/getdata">Add</a></li>
-								<!-- <li><a ng-href="#/about">Verify</a></li>-->
-								<li>
-								  <a class="btn-danger txtuppcase logout" title="Logout" onclick="logout()">
-								  <span class="glyphicon glyphicon-off"></span></a>
-								</li>
-							   <li class="active"><a ng-href="#/settings"><span class="glyphicon glyphicon-cog"></span></a></li>
-							</ul>
-						  </div>
-						</div>
-					  <!--/div-->
-					</div>
-                </div>
-            </div>                    
-             
-            <div class="col-lg-12 clearfix mb10 p0 pt10 pb30 addtext mt30 mr10">
-				<h3 class="pl15 pr15">Data Cleanup Utilities</h3>
-				<div class="panel-box">
-					<div class="row mb10">
-						<div class="col-sm-10 col-xs-10">
-							<button class="btn btn-primary btn-block" ng-click="deleteDuplicate()">
-								<span class="glyphicon glyphicon-trash" style="float: left !important;margin-left: 2% !important;"></span>
-								 Cleanup Database
-							</button>
-						</div>
-						<div class="col-sm-2 col-xs-2" >
-							<button type="button" class="btn btn-primary btn-circle" id="firstClick" ng-click="slideShow('firstBox');">
-								<span class="glyphicon glyphicon-question-sign" style="color:white;"></span>
-							</button>
-						</div>
-					</div>
-					<div class="row" id="firstBox" style="display:none;">
-						<div class="col-sm-10 col-xs-10">
-							<div class="well first-well">
-								<h4>Cleanup Database</h4>
-								<p>
-									<ul>
-										<li>
-											Remove records which exactly match another record -- 
-											comparing the four primary content fields which are:   
-											<b>term, source, original </b>and<b> definition</b>
-										</li>
-										<li>
-											Add a <b>word-family</b> field to all records missing this field
-										</li>
-										<li>
-											Remove all but the following fields:
-											<ul>
-												<li><b>term, source, original, definition, type, user, word-family, verified, ambiguous, audio, _id</b> and <b> _rev</b></li>
-											</ul>
-										</li>
-									</ul>
-								</p>
-							</div>
-						</div>
-					</div>
-					<div class="row mb10">
-						<div class="col-sm-10 col-xs-10">
-							<button class="btn btn-warning btn-block" ng-click="changeVerify()">
-								<span class="glyphicon glyphicon-compressed" style="float: left !important;margin-left: 2% !important;"></span>
-								Compress Records
-							</button>
-						</div>
-						<div class="col-sm-2 col-xs-2" >
-								<button type="button" class="btn btn-warning btn-circle"  ng-click="slideShow('fourthBox');">
-									<span class="glyphicon glyphicon-question-sign" style="color:white;"></span>
-								</button>
-							</div>
-						</div>
-					<div class="row" id="fourthBox" style="display:none;">
-						<div class="col-sm-10 col-xs-10">
-							<div class="well fourth-well">
-								<h4>Compress Records</h4>
-								<p>
-									<ul>
-										<li>Set all fields with an <b>original</b> entry to <b>verified</b>.</li>
-										<li>
-											If a word-family group contains more than one verified record, set each to <b>ambiguous</b>
-											<ul>
-												<li>For all word families with at least one ambiguous record, mark all other records in that word family as ambiguous</li>
-											</ul>
-										</li>
-										<li>For each word family containing just one verified record, delete non-verified records -- appending their <b>reference</b> values to the <b>reference</b> field of the one remaining verified record. (Comma + space delimited)</li>										
-									</ul>
-								</p>
-							</div>
-						</div>
-					</div>
-                     <h5 class="blankalert"> {{message}}</h5>
-				
-            </div> 
-                        
-         </div>
-        </div>
+<div class="col-lg-12 clearfix mb10 p0 pt10 pb30 addtext mt30 mr10" ng-controller="getdataCtrl">
+	<h3 class="pl15 pr15">Data Cleanup Utilities</h3>
+	<div class="panel-box">
+		<div class="row mb10">
+			<div class="col-sm-10 col-xs-10">
+				<button class="btn btn-primary btn-block" ng-click="deleteDuplicate()">
+					<span class="glyphicon glyphicon-trash" style="float: left !important;margin-left: 2% !important;"></span>
+					Cleanup Database
+				</button>
+			</div>
+			<div class="col-sm-2 col-xs-2" >
+				<button type="button" class="btn btn-primary btn-circle" id="firstClick" ng-click="slideShow('firstBox');">
+				<span class="glyphicon glyphicon-question-sign" style="color:white;"></span>
+				</button>
+			</div>
+		</div>
+		<div class="row" id="firstBox" style="display:none;">
+			<div class="col-sm-10 col-xs-10">
+				<div class="well first-well">
+					<h4>Cleanup Database</h4>
+					<p>
+						<ul>
+							<li>
+								Remove records which exactly match another record -- 
+								comparing the four primary content fields which are:   
+								<b>term, source, original </b>and<b> definition</b>
+							</li>
+							<li>
+								Add a <b>word-family</b> field to all records missing this field
+							</li>
+							<li>
+								Remove all but the following fields:
+								<ul>
+									<li><b>term, source, original, definition, type, user, word-family, verified, ambiguous, audio, _id</b> and <b> _rev</b></li>
+								</ul>
+							</li>
+						</ul>
+					</p>
+				</div>
+			</div>
+		</div>
+		<div class="row mb10">
+			<div class="col-sm-10 col-xs-10">
+				<button class="btn btn-warning btn-block" ng-click="changeVerify()">
+					<span class="glyphicon glyphicon-compressed" style="float: left !important;margin-left: 2% !important;"></span>
+					Compress Records
+				</button>
+			</div>
+			<div class="col-sm-2 col-xs-2" >
+				<button type="button" class="btn btn-warning btn-circle"  ng-click="slideShow('fourthBox');">
+					<span class="glyphicon glyphicon-question-sign" style="color:white;"></span>
+				</button>
+			</div>
+		</div>
+		<div class="row" id="fourthBox" style="display:none;">
+			<div class="col-sm-10 col-xs-10">
+				<div class="well fourth-well">
+					<h4>Compress Records</h4>
+					<p>
+						<ul>
+							<li>Set all fields with an <b>original</b> entry to <b>verified</b>.</li>
+							<li>
+								If a word-family group contains more than one verified record, set each to <b>ambiguous</b>
+								<ul>
+								<li>For all word families with at least one ambiguous record, mark all other records in that word family as ambiguous</li>
+								</ul>
+							</li>
+							<li>For each word family containing just one verified record, delete non-verified records -- appending their <b>reference</b> values to the <b>reference</b> field of the one remaining verified record. (Comma + space delimited)</li>										
+						</ul>
+					</p>
+				</div>
+			</div>
+		</div>
+		<h5 class="blankalert"> {{message}}</h5>
+	</div> 
+</div>
 
 

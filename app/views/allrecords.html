@@ -4,217 +4,91 @@
 		localStorage.removeItem('session-user');
 		window.location.href="/";
 	}
-	//var session=localStorage.getItem('session-user');
 	if(localStorage.getItem("session-user") === null)
 	{
 		window.location.href="/";
 	}
-	function changeterm()
-	{
-		//console.log("functioncalled");
-		//$('#checkedStrict').trigger('click');
-	}
 </script>
-    <!-- <a href="javascript:void();"> <img src="images/forkme.png" alt="forkme" class="img-responsive forkme" /></a>-->
-        <div class="container  clearfix"  id="main-container" ng-controller="getdataCtrl">
-            <div class="col-lg-12 clearfix  mb10 p0 pt10 pb10">
-                <div class="col-sm-6 logo p0 valignmiddle mt10">
-                      <div class="media">
-                          <div class="media-left pull-left">
-                            <a href="index.html">
-                                <img src="images/ocean-logo.svg" alt="logo" class="img-responsive dispinblk valignmiddle"/>
-                            </a>
-                          </div>
-                          <div class="media-body">
-                              <h3 class="dispinblk m0 valignmiddle">Interminable<br /> Accents</h3>
-                              <br/>
-                              <p  class="dispinblk m0 valignmiddle">A proof of concept suggestion builder for Baha’i terms</p>
-                          </div>
-                       </div>
-                </div>
-                 <div class="col-sm-6 logo p0 valignmiddle text-right topbutton mt10" style="display:none;">
-                    <button type="button" class="btn btn-info txtuppcase "><span class="glyphicon glyphicon-plus mr5"></span>add words</button>
-                    <button type="button" class="btn btn-default txtuppcase "><span class="glyphicon glyphicon-ok mr5"></span>Auto Correct</button>
-                    <button type="button" class="btn btn-danger txtuppcase " title="Logout" onclick="logout()"><span class="glyphicon glyphicon-off"></span></button>
-                 </div>
-                <div class="col-md-5 col-md-offset-1 col-sm-5 custom-width-media logo p0 valignmiddle text-right topbutton mt10" >
-					<div class="header">
-					  <div class="navbar navbar-default" role="navigation">
-						<!--div class="container"-->
-						  <div class="navbar-header">
-
-							<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#js-navbar-collapse">
-							  <span class="sr-only">Toggle navigation</span>
-							  <span class="icon-bar"></span>
-							  <span class="icon-bar"></span>
-							  <span class="icon-bar"></span>
-							</button>
-
-							<!--a class="navbar-brand" href="#/">accents</a-->
-						  </div>
-
-						  <div class="collapse navbar-collapse" id="js-navbar-collapse" >
-
-							<ul class="nav navbar-nav ">
-							  <li class="active"><a ng-href="#/allterms">All Terms</a></li>
-							  <li><a href="#/getdata">Add</a></li>
-							 <!-- <li><a ng-href="#/about">Verify</a></li>-->
-							  <li><a class="btn-danger txtuppcase logout" title="Logout" onclick="logout()"><span class="glyphicon glyphicon-off"></span></a></li>
-							   <li><a ng-href="#/settings"><span class="glyphicon glyphicon-cog"></span></a></li>
-							</ul>
-						  </div>
-						</div>
-					  <!--/div-->
-					</div>
-                </div>
-            </div>
-
-            <div class="col-lg-12 clearfix mb10 p0 pt10 addtext mt30">
-				<div class="col-lg-12 text-center mb10 mt10 ">
+<div ng-controller="getdataCtrl">
+	<div class="col-lg-12 clearfix mb10 p0 pt10 addtext mt30">
+		<div class="col-lg-12 text-center mb10 mt10 ">
 					<!--h2 ng-bind-html="i2html(customi2html(search.doc.term))" style="color:#ffffff"></h2-->
-				</div>
-				<div  class="divFirst">
-					<h3 id="toptextnew" class="nb"><!--class="pl15 pr15"-->
-							<label for="inputEmail3">Filter : </label>
-					</h3>
-				</div>
-				<div class="divSecond">
-					<input type="text" size="150" onfocus="changeterm()" placeholder="Search Transliterated Term" id="term" ng-model-options="{debounce: 200}"  ng-model="search.doc.term" name="term" value="" class="form-control chkval ng-pristine ng-untouched ng-valid">
-				</div>
-				<div  class="divThird">
-          <label for="unverified">Unverified Only:</label>
-					<input type="checkbox" name="unverified" ng-checked="doc.checked" ng-model="search.doc.verify.checked" id="verifiedCheckbox" name="verifiedCheckbox"/><br>
-          <label for="noaudio">No Audio Only:</label>
-          <input type="checkbox" name="noaudio" ng-checked="doc.na_checked" ng-model="audio.checked" id="noaudioCheckbox" name="noaudioCheckbox"/>
-        </div>
-
-
-					<input type="hidden" id="keyid">
-					<input type="hidden" id="keyrev">
-				</div>
-
-        <div class="col-lg-12 clearfix  mb10 p0 mt10"><!--mt30-->
-                <div role="tabpanel">
-					
-                      <div class="tab-content">
-                        <div role="tabpanel" class="tab-pane active" id="home">
-                            <h3>Matching Terms: {{(docs |newfilter:customi2html(search.doc.term)|checkfilter:this).length}}</h3>
-                            <input type="hidden" value="{{(docs | filter:search).length}}" name="totalRows" ng-model="rowxount" id="totalRows"/>
-                            <!----------------TABLE---------------------->
-                        <div class="table-responsive tablecontainer mt10" >
-                             <table class="table  table-bordered ">
-                                  <thead>
-                                     <tr>
-                                         <!--th>id</th-->
-                                         <th>Term</th>
-                                         <th>Reference</th>
-                                         <th>Original</th>
-                                         <th>Notes</th>
-                                         <th></th>
-                                         <th></th>
-                                       </tr>
-                                   </thead>
-                      <tbody>
-
-                 <tr ng-repeat="doc in docs |newfilter:customi2html(search.doc.term)|checkfilter:this|orderBy:'term' | offset: currentPage*itemsPerPage | limitTo: itemsPerPage">
-                        <!--td class="id" ng-model="did">{{doc.doc.id}}</td-->
-                        <td class="term" ng-bind-html="i2html(customi2html(doc.term))" style="width: 300px;"></td>
-                        <td class="term" ng-model="terms" style="overflow: hidden;" >{{doc.ref}}</td>
-                        <td class="ref" style="font-size: 16px;" >{{doc.original}}</td>
-                        <td class="user"><div  style=" max-height: 62px;overflow-x: hidden;overflow-y:auto;text-align: justify;">{{doc.definition}}</div></td>
-                          <td class="user">
-							  <div  ng-show="doc.verified || doc.doc.ambiguous">
-								   <div ng-show="doc.verified==true" class="verifyy"><span class='glyphicon glyphicon-ok-circle'></span></div>
-								   <div ng-show="doc.ambiguous==true" class="verifyy"><span class='glyphicon glyphicon-question-sign'></span></div>
-							  </div>
-
-						</td>
-                        <td class="action" style="width:65px;"><button type="button" class="btn btn-danger btn-xs remove" ng-click="deletedoc(doc._id,doc._rev);"><span class="glyphicon glyphicon-remove"></span></button>
-                        <button type="button" class="btn btn-primary btn-xs editbtn" ng-click="editdocPage(doc._id,doc._rev);" ><span class="glyphicon glyphicon-edit"></span></button>
-                        </td>
-                    </tr>
-
- <img id="spinner" ng-src="images/loading-x.gif" style="display:none;width:50px;height:50px;text-align:center;">
-                </table>
-                <div ng-if="(docs | newfilter:customi2html(search.doc.term)).length>=itemsPerPage">
-					<!-- code to render a large video block-->
-					<div class="pagination">
-						<ul>
-							<li ng-class="prevPageDisabled()">
-								<a href ng-click="prevPage()">« Prev</a>
-							</li>
-							<li ng-repeat="n in range((docs | newfilter:customi2html(search.doc.term)).length)" ng-class="{active: n == currentPage}" ng-click="setPage(n)">
-								<a >{{n+1}}</a>
-							</li>
-							<li ng-class="nextPageDisabled()">
-								<a href ng-click="nextPage()">Next »</a>
-							</li>
-						</ul>
-					</div>
-				</div>
-
-
-                        </div>
-                          <!--------------------TABLE-END------------------------->
-                        </div>
-                        <div role="tabpanel" class="tab-pane" id="profile">
-                          <!----------------TABLE---------------------->
-                            <div class="table-responsive tablecontainer mt20">
-                                 <table class="table  table-bordered">
-                                     <thead><tr> <th>Term</th> <th>Count</th> </tr></thead>
-                                            <tbody><tr>
-                                        <td class="term">Ab</td>
-                                        <td class="count">3</td>
-                                    </tr><tr>
-                                        <td class="term">Áb</td>
-                                        <td class="count">3</td>
-                                    </tr><tr>
-                                        <td class="term">Abá</td>
-                                        <td class="count">3</td>
-                                    </tr><tr>
-                                        <td class="term">‘Abá</td>
-                                        <td class="count">3</td>
-                                    </tr><tr>
-                                        <td class="term">Abá-Baṣír</td>
-                                        <td class="count">2</td>
-                                    </tr><tr>
-                                        <td class="term">‘Abá-Baṣír</td>
-                                        <td class="count">1</td>
-                                    </tr><tr>
-                                        <td class="term">Ábád</td>
-                                        <td class="count">3</td>
-                                    </tr><tr>
-                                        <td class="term">Ábádih</td>
-                                        <td class="count">1</td>
-                                    </tr><tr>
-                                        <td class="term">‘Abbás</td>
-                                        <td class="count">4</td>
-                                    </tr>
-
-                                 </table>
-                             </div>
-                          <!----------------TABLE-END--------------------->
-                        </  div>
-                      </div>
-                    </div>
-                        <!-- Modal -->
-                        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                          <div class="modal-dialog modalDialog">
-                            <div class="modal-content">
-                              <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                <h4 class="modal-title" id="myModalLabel">Confirm Row Delete</h4>
-                              </div>
-                              <div class="modal-body text-center">
-                                <h4>Are You Sure?</h4>
-                              </div>
-                              <div class="modal-footer text-center m0">
-                                <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
-                                <button type="button" class="btn btn-danger">Yes</button>
-                              </div>
-                            </div>
-                          </div>
-                    </div>
-         </div>
-        </div>
-
+		</div>
+		<div  class="divFirst  mb10 mt10 ">
+			<h3 id="toptextnew" class="nb">
+				<label for="inputEmail3">Filter : </label>
+			</h3>
+		</div>
+		<div class="divSecond">
+			<input type="text" size="150"  placeholder="Search Transliterated Term" id="term" ng-model-options="{debounce: 200}"  ng-model="search.doc.term" name="term" value="" class="form-control chkval ng-pristine ng-untouched ng-valid">
+		</div>
+		<div  class="divThird">
+			<label for="unverified">Unverified Only:</label>
+			<input type="checkbox" name="unverified" ng-checked="doc.checked" ng-model="search.doc.verify.checked" id="verifiedCheckbox" name="verifiedCheckbox"/><br>
+			<label for="noaudio">No Audio Only:</label>
+			<input type="checkbox" name="noaudio" ng-checked="doc.na_checked" ng-model="audio.checked" id="noaudioCheckbox" name="noaudioCheckbox"/>
+		</div>
+		<input type="hidden" id="keyid">
+		<input type="hidden" id="keyrev">
+	</div>
+	<div class="col-lg-12 clearfix  mb10 p0 mt10" ngCloak><!--mt30-->
+		<div role="tabpanel">
+			<div class="tab-content">
+				<div role="tabpanel" class="tab-pane active" id="home">
+					<img id="spinnernew" ng-src="images/loading.gif" style="margin-left: 28%;text-align: center;width:29%;">	
+					<h3 ng-if="showAllData">Matching Terms: {{(docs |newfilter:customi2html(search.doc.term)|checkfilter:this).length}}</h3>
+					<input type="hidden" value="{{(docs | filter:search).length}}" name="totalRows" ng-model="rowxount" id="totalRows"/>					
+					<!----------------TABLE---------------------->
+					<div class="table-responsive tablecontainer mt10" ng-if="showAllData">										
+						<table class="table  table-bordered ">
+							<thead>
+								<tr>
+									<th>Term</th>
+									<th>Reference</th>
+									<th>Original</th>
+									<th>Notes</th>
+									<th></th>
+									<th></th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr ng-repeat="doc in docs  |newfilter:customi2html(search.doc.term)|checkfilter:this|orderBy:'term' | offset: currentPage*itemsPerPage | limitTo: itemsPerPage track by $index" >
+									<td class="term" ng-bind-html="i2html(customi2html(doc.term))" style="width: 300px;"></td>
+									<td class="term" ng-model="terms" style="overflow: hidden;" >{{doc.ref}}</td>
+									<td class="ref" style="font-size: 16px;" >{{doc.original}}</td>
+									<td class="user"><div  style=" max-height: 62px;overflow-x: hidden;overflow-y:auto;text-align: justify;">{{doc.definition}}</div></td>
+									<td class="user">
+										<div  ng-show="doc.verified || doc.doc.ambiguous">
+											<div ng-show="doc.verified==true" class="verifyy"><span class='glyphicon glyphicon-ok-circle'></span></div>
+											<div ng-show="doc.ambiguous==true" class="verifyy"><span class='glyphicon glyphicon-question-sign'></span></div>
+										</div>
+									</td>
+									<td class="action" style="width:65px;"><button type="button" class="btn btn-danger btn-xs remove" ng-click="deletedoc(doc._id,doc._rev);"><span class="glyphicon glyphicon-remove"></span></button>
+										<button type="button" class="btn btn-primary btn-xs editbtn" ng-click="editdocPage(doc._id,doc._rev);" ><span class="glyphicon glyphicon-edit"></span></button>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<!--------------------TABLE-END------------------------->
+						<div ng-if="(docs | newfilter:customi2html(search.doc.term)).length>=itemsPerPage">
+							<!-- code to render a large video block-->
+							<div class="pagination">
+								<ul>
+									<li ng-class="prevPageDisabled()">
+										<a href ng-click="prevPage()">« Prev</a>
+									</li>
+									<li ng-repeat="n in range((docs | newfilter:customi2html(search.doc.term)).length)" ng-class="{active: n == currentPage}" ng-click="setPage(n)">
+										<a >{{n+1}}</a>
+									</li>
+									<li ng-class="nextPageDisabled()">
+										<a href ng-click="nextPage()">Next »</a>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</div>	
+				</div>	
+			</div>
+		</div>
+	</div>
+</div>

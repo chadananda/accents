@@ -185,7 +185,7 @@ var remoteDb=myConfig.database;
 		return items;
 	}
     $scope.paginationFunc=function(count){
-		$scope.itemsPerPage = 100;
+		$scope.itemsPerPage = 50;
 		$scope.currentPage = 0;
 		$scope.items = [];
 		$scope.totalRows=count;

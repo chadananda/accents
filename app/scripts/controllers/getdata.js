@@ -9,7 +9,7 @@
  */
 angular.module('accentsApp')
   .controller('getdataCtrl',
-    function($rootScope,$scope,$http,getRecords,$window,$filter,myConfig,Utils,$sce,docData,$modal,$log,crudFunctions) {
+    function($rootScope,$scope,$http,getRecords,$window,$filter,myConfig,Utils,$sce,docData,$modal,$log,crudFunctions,$location) {
   $scope.docs={};
   $scope.filterresult={};
   $scope.awesomeThings = [
@@ -32,7 +32,11 @@ angular.module('accentsApp')
   $scope.dotUnderRevert=function(text) {
     return Utils.dotUndersRevert(text);
   }
-  
+  //========get active path========//
+  $scope.activePath = null;
+  $scope.$on('$routeChangeSuccess', function(){
+    $scope.activePath = $location.path();
+  });
 //////////////////////////Fetch  data/////////////////////////////////////
 	// $scope.getAllData = function() {
 	 $scope.attachments={};
@@ -430,11 +434,13 @@ $scope.deleteAttachment=function(attachmentId,docId){
 
 
   // Inititlization Code
-  $("#spinner").show();
-
+  setTimeout(function(){$("#spinnernew").show()},2000);
+  //$("#spinnernew").show();
+  $scope.showAllData=false;
   // load data cache
   $scope.refreshAllDocList(function(){
-    $("#spinner").hide();
+	$scope.showAllData=true;  
+    $("#spinnernew").hide();
     $(".pagination").css("display","block");
 
     // wahat does this do?
@@ -446,9 +452,6 @@ $scope.deleteAttachment=function(attachmentId,docId){
       // load form with previous term
       var termObj = $scope.getTermObj(id);
       $scope.setFormTerm(termObj);
-
-      //to call the edit function from allterms page
-      setTimeout(function(){$scope.editdoc(id,rev)},5000);
     }
   });
 
