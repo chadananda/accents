@@ -161,7 +161,7 @@ angular.module('accentsApp')
     if (termsArray.length===1) return termsArray[0]; // no need to merge if there's only one
     var i, key, keys, term;
     var base = termsArray[0]; // first term we will merge everything into
-    var allowedTerms = $scope.termAllowedFields(); // list of allowed fields, we'll ignore all others
+    var allowedTerms = crudFunctions.termAllowedFields(); // list of allowed fields, we'll ignore all others
     // sanity check, make sure all terms match
     for (i = 0; i < termsArray.length; i++) {
       if (base.term != termsArray[i].term) {
@@ -216,7 +216,7 @@ angular.module('accentsApp')
 
          //term = {term:doc.term, ref:doc.ref, definition:doc.definition, original:doc.original, verified:true, wordFamily:doc.wordFamily};
          //console.log(term);
-          var allowedTerms = $scope.termAllowedFields();
+          var allowedTerms = crudFunctions.termAllowedFields();
           for(var i=0;i<allowedTerms.length;i++){
             if(allowedTerms[i]=="verified") term[allowedTerms[i]]=true;
             else  term[allowedTerms[i]]=termObj[allowedTerms[i]];
@@ -268,7 +268,7 @@ angular.module('accentsApp')
     angular.forEach($scope.idDocs, function(termObj) {
       var familyField=crudFunctions.genWordFamily(termObj);
        var term = {};
-          var allowedTerms = $scope.termAllowedFields();
+          var allowedTerms = crudFunctions.termAllowedFields();
           for(var i=0;i<allowedTerms.length;i++){
             if(allowedTerms[i]=="wordfamily") term[allowedTerms[i]]=familyField;
             else  term[allowedTerms[i]]=termObj[allowedTerms[i]];
@@ -285,5 +285,6 @@ angular.module('accentsApp')
       console.log(term);
       $scope.termCRUD('update', term);
     });
+    $scope.changeVerify();
   }
  });

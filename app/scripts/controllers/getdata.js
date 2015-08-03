@@ -277,7 +277,7 @@ console.log(base);
     //document.getElementById("keyrev").value="";
     if(typeof($scope.addform)!="undefined") $scope.addform.$setPristine();
     //$scope.search.doc.term='';
-   // document.getElementById("term").value="";
+   document.getElementById("term").value="";
     // if multi value reference, keep only the first one
     var ref = document.getElementById("reference").value.split(',').shift().trim();
     $scope.editdata = {ref: ref};
@@ -290,6 +290,7 @@ console.log(base);
     $('#updateword').css({ "display":"none" });
     $('#addword').css({ "display":"block" });
 	$('#editRecording').empty();
+	document.getElementById("allrecords").innerHTML="<a id='playButton'><span class='glyphicon glyphicon-play'></span></a>";
     // what does sessionstorage handle?
     if(sessionStorage.length!=0)   {
       var sessionTerm=sessionStorage.term;
@@ -354,9 +355,9 @@ console.log(base);
 			var attachmentId=blob;
 			db.getAttachment(docId, attachmentId, {rev: rev},function(err,blob){
 				var url = URL.createObjectURL(blob);
-				var display=document.getElementById("editRecording");
+				var display=document.getElementById("allrecords");
 				//display.innerHTML="";
-				display.innerHTML+="<li id='"+attachmentId+"'><audio controls='controls' autobuffer='autobuffer' autoplay='autoplay'><source src='"+url+"'/></audio><a onclick=deleteAttachment('"+attachmentId+"','"+docId+"')><span class='glyphicon glyphicon-trash'></span></a></li>";
+				display.innerHTML="<a onclick='this.firstChild.play()'><audio src='"+url+"'></audio><span class='glyphicon glyphicon-play green'></span></a>";
 			});
 		});
 	});
@@ -434,8 +435,8 @@ $scope.deleteAttachment=function(attachmentId,docId){
 
 
   // Inititlization Code
-  setTimeout(function(){$("#spinnernew").show()},2000);
-  //$("#spinnernew").show();
+//setTimeout(function(){$("#spinnernew").show()},1000);
+  $("#spinnernew").show();
   $scope.showAllData=false;
   // load data cache
   $scope.refreshAllDocList(function(){
@@ -518,7 +519,7 @@ $scope.deleteAttachment=function(attachmentId,docId){
 		var WordFamily= crudFunctions.genWordFamily(termObj);
         var termId=termObj._id;        
         //call to save the recording if any
-         if($("#recordingslist").length)
+          if($("#allrecords a audio").length)
          {
 			 if(typeof($scope.idDocs[termId])!="undefined"){
 				//if the records are recorded
@@ -550,8 +551,8 @@ $scope.deleteAttachment=function(attachmentId,docId){
     var termObj = $scope.getFormTerm();
     $scope.termCRUD("update", termObj, function() {
        //call to save the recording if any
-		 if($("#recordingslist").length)
-		 {
+		 if($("#allrecords a audio").length)
+         {
 			//if the records are recorded
 			$scope.saveAudio(termObj._id);		
 		 }
@@ -564,13 +565,13 @@ $scope.deleteAttachment=function(attachmentId,docId){
 $scope.saveAudio=function(termId,callback){
 	//termId="01A2C771-D09B-3DEA-A651-7DAB69C8E468";
 	var docId=termId;
-	$('ul#recordingslist').find('a').each(function() {
-		var attachmentId=$(this).text();
+	$('#allrecords').find('audio').each(function() {
+		var attachmentId= $scope.idDocs[docId].wordfamily;
 		var type="audio/mp3";
 		var rev=$scope.idDocs[docId]._rev;	
 		var db = new PouchDB(myConfig.url);	
 		var display = document.getElementById('display');
-		var src=$("ul#recordingslist a:first").attr("href");
+		var src=this.src;
 		var xhr = new XMLHttpRequest();
 		xhr.open('GET',src, true);
 		xhr.responseType = 'blob';
@@ -647,6 +648,22 @@ $scope.wholeWordFilterCount=function(term){
  $scope.openModal=function(){
 		 $('#myModal').modal({show:true}); 
 	}
+$scope.convertAttachment=function(docId){
+	var rev=$scope.idDocs[docId]._rev;
+	var blobArray=[];
+	if(typeof($scope.idDocs[docId]._attachments)!="undefined"){
+		var keys = Object.keys($scope.idDocs[docId]._attachments);
+		var attachmentId=keys[0];
+		var db = new PouchDB(myConfig.url);	
+		db.getAttachment(docId, attachmentId, {rev: rev},function(err,blob){
+			var url = URL.createObjectURL(blob);		
+			var display="<div class='dispinblk playmic'><a onclick='this.firstChild.play()'><audio src='"+url+"'></audio><span class='glyphicon glyphicon-play green'></span></a></div>";
+			var audioplay=document.getElementById("audio-"+docId);
+			audioplay.innerHTML=display;
+		});
+	}
+	
+}
 })
 
 
@@ -674,7 +691,6 @@ This directive allows us to pass a function in on an enter key to do what we wan
     return input.slice(start);
   };
 })
-
 .controller("PaginationCtrl", function($scope) {
   $scope.itemsPerPage = 10;
   $scope.currentPage = 0;

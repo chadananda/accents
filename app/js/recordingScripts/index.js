@@ -13,11 +13,12 @@ document.addEventListener("DOMContentLoaded", function() {
 	setTimeout(function(){
   start = document.getElementById('start');
   stop = document.getElementById('stop');
-  recordingslist = document.getElementById('recordingslist');
+  recordingslist = document.getElementById('allrecords');
   audio_context = new AudioContext;
   navigator.getUserMedia({audio: true}, function(audioStream) {
       input = audio_context.createMediaStreamSource(audioStream);
       start.removeAttribute('disabled');
+      start.setAttribute("class", "green recordButton");
   }, function(e){ console.log('error occoured= '+e)});
 
   start.setAttribute('disabled',true);
@@ -32,12 +33,16 @@ document.addEventListener("DOMContentLoaded", function() {
     recorder = new Recorder(input);
     recorder.record();
     start.setAttribute('disabled',true);
+    start.setAttribute("class", "recordButton");
     stop.removeAttribute('disabled');
+    stop.setAttribute("class", "red playButton");
   }
 
   function stopRecording() {
     start.removeAttribute('disabled');
-    stop.setAttribute('disabled',true);    
+    start.setAttribute("class", "green recordButton");
+    stop.setAttribute('disabled',true);   
+    stop.setAttribute("class", "playButton");
 	recorder.stop(stopCallback);
   }
   
@@ -50,11 +55,12 @@ document.addEventListener("DOMContentLoaded", function() {
           au.controls = true;
           au.src = url;
           hf.href = url;
-          hf.download = new Date().toISOString() + '.mp3';
+          hf.download = 'test.mp3';
           hf.innerHTML = hf.download;
-          li.appendChild(au);
-          li.appendChild(hf);
-          recordingslist.appendChild(li);   
+          var audioText="<a onclick='this.firstChild.play()'><audio src='"+url+"'></audio><span class='glyphicon glyphicon-play green'></span></a>";
+         //var audioText= "<audio controls='controls' autobuffer='autobuffer' autoplay='autoplay'><source src='"+url+"'/></audio>";
+        // $("#allrecords").text( audioText );
+         recordingslist.innerHTML=audioText;   
     }
    function deleteAttachment(attachmentId,docId)
    {

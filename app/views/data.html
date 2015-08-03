@@ -65,8 +65,8 @@
 				<div class="checkbox mt20 dispinblk">
 					<label style="padding-left:13px;"><input type="checkbox" ng-model="verified" id="verifiedCheckbox" ng-checked="editdata.verify==1  || editdata.verified==true"/> Verified</label>
 				</div>
-				<div class="dispinblk playmic">
-					<a ng-click="openModal();" id="playButton"><span class="glyphicon glyphicon-play"></span></a>
+				<div class="dispinblk playmic" id="allrecords">
+					<a id="playButton"><span class="glyphicon glyphicon-play"></span></a>
 				</div>
 				<div class="dispinblk playmic">
 					<button id='start' class="recordButton"><span class="glyphicon glyphicon-record"></button>
@@ -113,6 +113,7 @@
 							</button>
 							&nbsp;
 							<div class="otherData">
+								<div class="notesClass" ng-show="t._attachments!=''" id="audio-{{t._id}}">{{convertAttachment(t._id)}}</div>
 								<div class="notesClass" ng-show="t.original!=''">{{t.original}}&nbsp;</div>
 								<div class="notesClass" ng-show="t.ref!=''"> {{t.ref}}&nbsp;</div>
 								<div class="notesClass" ng-show="t.definition!=''"> {{t.definition}}&nbsp;</div>

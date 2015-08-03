@@ -10,26 +10,64 @@
 	}
 </script>
 <div ng-controller="getdataCtrl">
+<!--
 	<div class="col-lg-12 clearfix mb10 p0 pt10 addtext mt30">
-		<div class="col-lg-12 text-center mb10 mt10 ">
-					<!--h2 ng-bind-html="i2html(customi2html(search.doc.term))" style="color:#ffffff"></h2-->
+		<div class="row">
+			<div class="col-lg-12 text-center mb10 mt10 ">
+					<!--h2 ng-bind-html="i2html(customi2html(search.doc.term))" style="color:#ffffff"></h2>
+			</div>
 		</div>
-		<div  class="divFirst  mb10 mt10 ">
+		<div class="row">
+			<div  class="col-sm-1 col-md-1">
+				<h3 id="toptextnew" class="nb">
+					<label for="inputEmail3">Filter: </label>
+				</h3>
+			</div>
+			<div class="col-sm-2 col-md-9">
+				<input type="text" size="150"  placeholder="Search Transliterated Term" id="term" ng-model-options="{debounce: 200}"  ng-model="search.doc.term" name="term" value="" class="form-control chkval ng-pristine ng-untouched ng-valid">
+			</div>
+			<div  class="col-sm-3 col-md-2">
+				<label for="unverified">Unverified Only:</label>
+				<input type="checkbox" name="unverified" ng-checked="doc.checked" ng-model="search.doc.verify.checked" id="verifiedCheckbox" name="verifiedCheckbox"/><br>
+				<label for="noaudio">No Audio Only:</label>
+				<input type="checkbox" name="noaudio" ng-checked="doc.na_checked" ng-model="audio.checked" id="noaudioCheckbox" name="noaudioCheckbox"/>
+			</div>
+			<input type="hidden" id="keyid">
+			<input type="hidden" id="keyrev">
+		</div>
+	</div>
+-->
+	<div class="row addtext pt20">
+		<div class="col-xs-3 col-sm-2 col-md-1">
 			<h3 id="toptextnew" class="nb">
-				<label for="inputEmail3">Filter : </label>
+				<label for="inputEmail3">Filter: </label>
 			</h3>
 		</div>
-		<div class="divSecond">
+		<div class="col-xs-6 col-sm-6 col-md-8">
 			<input type="text" size="150"  placeholder="Search Transliterated Term" id="term" ng-model-options="{debounce: 200}"  ng-model="search.doc.term" name="term" value="" class="form-control chkval ng-pristine ng-untouched ng-valid">
 		</div>
-		<div  class="divThird">
-			<label for="unverified">Unverified Only:</label>
+		<div class="col-xs-3 col-sm-4 col-md-3">
+			<label for="unverified">
+				<div class="hidden-xs">
+					Unverified Only:
+				</div>
+				<div class="visible-xs-block">
+					<span class="glyphicon glyphicon-question-sign"></span>
+				</div>
+			</label>
 			<input type="checkbox" name="unverified" ng-checked="doc.checked" ng-model="search.doc.verify.checked" id="verifiedCheckbox" name="verifiedCheckbox"/><br>
-			<label for="noaudio">No Audio Only:</label>
+			<label for="noaudio">
+				<div class="hidden-xs">
+					No Audio Only:
+				</div>
+				<div class="visible-xs-block">
+					<span class="glyphicon glyphicon-volume-off"></span>
+				</div>
+			</label>
 			<input type="checkbox" name="noaudio" ng-checked="doc.na_checked" ng-model="audio.checked" id="noaudioCheckbox" name="noaudioCheckbox"/>
 		</div>
 		<input type="hidden" id="keyid">
-		<input type="hidden" id="keyrev">
+			<input type="hidden" id="keyrev">
 	</div>
 	<div class="col-lg-12 clearfix  mb10 p0 mt10" ngCloak><!--mt30-->
 		<div role="tabpanel">
