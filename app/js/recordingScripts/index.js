@@ -11,24 +11,52 @@ var  audio_context
     
 document.addEventListener("DOMContentLoaded", function() {
 	setTimeout(function(){
-  start = document.getElementById('start');
-  stop = document.getElementById('stop');
-  recordingslist = document.getElementById('allrecords');
-  audio_context = new AudioContext;
-  navigator.getUserMedia({audio: true}, function(audioStream) {
-      input = audio_context.createMediaStreamSource(audioStream);
-      start.removeAttribute('disabled');
-      start.setAttribute("class", "green recordButton");
-  }, function(e){ console.log('error occoured= '+e)});
+		if(document.getElementById('start')!=null){
+		  start = document.getElementById('start');
+		  stop = document.getElementById('stop');
+		  recordingslist = document.getElementById('allrecords');
+		  audio_context = new AudioContext;
+		  navigator.getUserMedia({audio: true}, function(audioStream) {
+			  input = audio_context.createMediaStreamSource(audioStream);
+			  start.removeAttribute('disabled');
+			  start.setAttribute("class", "green recordButton");
+		  }, function(e){ console.log('error occoured= '+e)});
 
-  start.setAttribute('disabled',true);
-  stop.setAttribute('disabled',true);
-  start.onclick = startRecording;
-  stop.onclick = stopRecording;
+		  start.setAttribute('disabled',true);
+		  stop.setAttribute('disabled',true);
+		  start.onclick = startRecording;
+		  stop.onclick = stopRecording;
+	}
+	else{
+		audio_context = new AudioContext;
+		  navigator.getUserMedia({audio: true}, function(audioStream) {
+			  input = audio_context.createMediaStreamSource(audioStream);
+		  }, function(e){ console.log('error occoured= '+e)});
+
+	}
   },2000);
+  
 });
 
-
+	function startRecord(callingElement)
+	{
+		recorder = new Recorder(input);
+		recorder.record();
+	}
+	function stopRecord(callingElement)
+	{
+		var pauseButton=callingElement.id;
+		var idArr=pauseButton.split("_");
+		docId=idArr[1];
+		recorder.stop(stopCallbackAll);
+	}
+	function stopCallbackAll(blob){
+		 var url = URL.createObjectURL(blob);
+          var scope = angular.element($("#main-container")).scope(); 
+          var audioText="<div class='dispinblk playmic'><a onclick='playPause(this);'><audio src='"+url+"' onended='endaudio(this);'></audio><span class='glyphicon glyphicon-play green'></span></a></div>"; 
+			document.getElementById("audio-"+docId).innerHTML=audioText;
+		scope.saveAudioAll(docId);
+	}
   function startRecording() {
     recorder = new Recorder(input);
     recorder.record();
@@ -60,6 +88,7 @@ document.addEventListener("DOMContentLoaded", function() {
           var audioText="<a onclick='this.firstChild.play()'><audio src='"+url+"'></audio><span class='glyphicon glyphicon-play green'></span></a>";
          //var audioText= "<audio controls='controls' autobuffer='autobuffer' autoplay='autoplay'><source src='"+url+"'/></audio>";
         // $("#allrecords").text( audioText );
+        
          recordingslist.innerHTML=audioText;   
     }
    function deleteAttachment(attachmentId,docId)

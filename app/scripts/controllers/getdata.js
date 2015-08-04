@@ -357,7 +357,7 @@ console.log(base);
 				var url = URL.createObjectURL(blob);
 				var display=document.getElementById("allrecords");
 				//display.innerHTML="";
-				display.innerHTML="<a onclick='this.firstChild.play()'><audio src='"+url+"'></audio><span class='glyphicon glyphicon-play green'></span></a>";
+				display.innerHTML="<a onclick='playPause(this);'><audio src='"+url+"' onended='endaudio(this);' ></audio><span class='glyphicon glyphicon-play green'></span></a>";
 			});
 		});
 	});
@@ -594,7 +594,37 @@ $scope.saveAudio=function(termId,callback){
 	crudFunctions.refreshOldDocsList($scope);
 	if (callback) callback();
 };
-
+$scope.saveAudioAll=function(termId,callback){
+	var docId=termId;
+	$('#audio-'+docId).find('audio').each(function() {
+		var attachmentId= $scope.idDocs[docId].wordfamily;
+		var type="audio/mp3";
+		var rev=$scope.idDocs[docId]._rev;	
+		var db = new PouchDB(myConfig.url);	
+		var display = document.getElementById('display');
+		var src=this.src;
+		var xhr = new XMLHttpRequest();
+		xhr.open('GET',src, true);
+		xhr.responseType = 'blob';
+		xhr.onload = function(e) {
+			if (this.status == 200) {
+				var myBlob = this.response;
+				// myBlob is now the blob that the object URL pointed to.
+				db.putAttachment(docId, attachmentId,rev, myBlob, type,function (err, res) {
+					if(!err)
+					{						
+						$scope.idDocs[docId]._rev=res.rev;
+					}
+				})	;		
+					 
+			}
+		};
+		xhr.send();
+	});
+	var termObj=$scope.idDocs[docId];
+	crudFunctions.refreshOldDocsList($scope);
+	if (callback) callback();
+};
   // Search data
   $scope.getnames=function(searchval){
     // Pull from the idDocs list instead of from the DB to speed this up
@@ -657,13 +687,19 @@ $scope.convertAttachment=function(docId){
 		var db = new PouchDB(myConfig.url);	
 		db.getAttachment(docId, attachmentId, {rev: rev},function(err,blob){
 			var url = URL.createObjectURL(blob);		
-			var display="<div class='dispinblk playmic'><a onclick='this.firstChild.play()'><audio src='"+url+"'></audio><span class='glyphicon glyphicon-play green'></span></a></div>";
+			var display="<div class='dispinblk playmic'><a onclick='playPause(this);'><audio src='"+url+"' onended='endaudio(this);' ></audio><span class='glyphicon glyphicon-play green'></span></a></div>";
 			var audioplay=document.getElementById("audio-"+docId);
 			audioplay.innerHTML=display;
 		});
 	}
+	else
+	{
+		var audioplay=document.getElementById("audio-"+docId);
+			audioplay.innerHTML="";;
+	}
 	
 }
+
 })
 
 

@@ -318,7 +318,7 @@ var remoteDb=myConfig.database;
 			{
 					filtered.push(item);
 			});
-		}		
+		}	
 		return filtered;
 	}
 })

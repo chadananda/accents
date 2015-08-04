@@ -8,6 +8,21 @@
 	{
 		window.location.href="/";
 	}
+	function playPause(callingElement)
+	{
+		 if(callingElement.firstChild.paused){			
+			callingElement.firstChild.play();
+			callingElement.firstChild.nextSibling.className="glyphicon glyphicon-stop red";			
+		}
+		else{
+			callingElement.firstChild.pause();
+			callingElement.firstChild.nextSibling.className="glyphicon glyphicon-play green";	
+		}
+	}
+	function endaudio(callingElement)
+	{
+		callingElement.nextSibling.className="glyphicon glyphicon-play green";	
+	}
 </script>
 <div ng-controller="getdataCtrl">
 	<!-- Modal -->
