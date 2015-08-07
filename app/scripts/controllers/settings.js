@@ -14,6 +14,7 @@ angular.module('accentsApp')
       'AngularJS',
       'Karma'
     ];
+  var db = new PouchDB(myConfig.url);	
   var domainRemoteDb=myConfig.remoteDbDomain;
   var remoteDb=myConfig.database;
   //===================Reload Page on route change===========================//
@@ -41,6 +42,54 @@ angular.module('accentsApp')
    var list=[{"id":docid},{"rev":rev}];
    docData.setFormData(list);
    window.location.href="http://localhost:9000/#/getdata";
+ };
+ //===========Replicate local db to remote db entered===============//
+ $scope.replicateToRemote=function(){
+	var remoteUrl =document.getElementById("remoteDbUrl").value;
+	//====check if already added====//
+	var ddoc = {
+		_id: '_design/my_list',
+		views: {
+				by_type: {
+				"map": "function(doc) {\n  if (doc.type==='dbData')\n  emit(doc);}"
+			}
+		}
+	};
+	// save it
+	db.put(ddoc).then(function () {
+			// success!
+		}).catch(function (err) {
+			// some error (maybe a 409, because it already exists?)
+		});		
+	db.query('my_list/by_type').then(function (res) {				
+			// got the query results
+			var result=res.total_rows;
+			if(result>0)
+			var response=res.rows[0];
+			else
+			var response=false;
+			var remoteDbid=response.id;
+			var fullResponse=response.key;
+			var termDb={
+				_id:fullResponse._id,
+				_rev:fullResponse._rev,
+				dbUrl:remoteUrl,
+				type:fullResponse.type,
+				username:fullResponse.username
+			};
+			// save it
+			db.put(termDb,fullResponse._id,fullResponse._rev).then(function () {
+					// success!
+			}).catch(function (err) {
+				// some error (maybe a 409, because it already exists?)
+			});
+			db.replicate.to(remoteUrl);
+			
+		}).catch(function (err) {
+		// some error
+		console.log(err);			 		   
+	});
+	
  };
   /******************************************************/
   // some helper functions to clean up CRUD operations

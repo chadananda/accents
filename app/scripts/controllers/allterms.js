@@ -152,31 +152,14 @@ var remoteDb=myConfig.database;
 	};
 	//////////////////////////Delete data/////////////////////////////////////        
 	$scope.deletedoc = function(id,rev) {
-		if($window.confirm('Are you SURE you want to delete?')){
-			$http.delete('http://'+domainRemoteDb+'/'+remoteDb+'/'+id+'?rev='+rev).
-			success(function(data, status, headers, config){
-				//  console.log(Status);
-				$("#spinner").show();
-				console.log(status);
-				$scope.message='Record Deleted Successfully';
-				$http.get('http://'+domainRemoteDb+'/'+remoteDb+'/_all_docs?include_docs=true')
-				.success(function(data) {
-					if(data.rows){
-						console.log(data.rows.doc);
-						$scope.docs=data.rows;
-						$scope.count=data.total_rows;
-						$("#spinner").hide();
-					}	
-				})
-				.error(function(error){
-					console.log(error);
-				});
-			}).
-			error(function(data, status, headers, config){
-				//console.log(Status);
-				$scope.message='Error Deleting Record';
-				//alert(status);
-			});   
+		if($window.confirm('Are you SURE you want to delete?')){			
+		db.remove(id,rev, function(err, response) {
+			if (err) { return console.log(err); }
+			// handle response
+			$("#spinner").show();
+			console.log(status);
+			$scope.message='Record Deleted Successfully';
+		  });   
 		}  
 	};  
 	//=================Sorting function=======================//

@@ -17,10 +17,110 @@ angular.module('accentsApp')
     'AngularJS',
     'Karma'
   ];
-
+  var db = new PouchDB(myConfig.url);	
   var domainRemoteDb=myConfig.remoteDbDomain;
   var remoteDb=myConfig.database;
+  $scope.init=function(){
 
+		//---check if session is made or not
+		if(localStorage.getItem('session-user')){
+			console.log(localStorage.getItem('session-user'));
+		}
+		else{	
+			$location.path("/about");			
+		}		
+	}
+	
+  //========Function to fetch the db data==========//
+  $scope.fetchDbData=function(db,callback){	
+	   var ddoc = {
+			  _id: '_design/my_list',
+			  views: {
+				by_type: {
+				  "map": "function(doc) {\n  if (doc.type==='dbData')\n  emit(doc);}"
+				}
+			  }
+			};
+			// save it
+			db.put(ddoc).then(function () {
+			  // success!
+			}).catch(function (err) {
+			  // some error (maybe a 409, because it already exists?)
+			});		
+			db.query('my_list/by_type').then(function (res) {				
+			  // got the query results
+			  var result=res.total_rows;
+			  if(result>0)
+				var response=res.rows;
+			  else
+				var response=false;
+			  if(callback) callback(response);
+			}).catch(function (err) {
+			  // some error
+			  console.log(err);			 		   
+			});
+			
+  }
+ $scope.submitDbData = function() {	
+	if($scope.username){	
+		console.log($scope.username);
+	}
+	else{
+		alert("Please Enter Username!");
+		 var element = document.getElementById('username');
+		 element.focus();
+		return false;
+	 }
+	 if($scope.dbUrl){	
+		console.log($scope.dbUrl);
+	}
+	else{
+		alert("Please Enter DB Url!");
+		var element = document.getElementById('dbUrl');
+		 element.focus();
+		return false;
+	 }
+	var db = new PouchDB(myConfig.url,{
+				auth:{
+					username:$scope.username,
+					password:$scope.password
+				}
+			}
+	);
+	$scope.fetchDbData(db,function(data){
+		console.log(data);
+		if(data){
+			//-----if we have db Details then session can be made-----//
+			$scope.todoText ={username: data[0].key.username, loggedIn: true, startDate: new Date()};           
+			localStorage.setItem('session-user', JSON.stringify($scope.todoText));
+			console.log('here');
+			$location.path("/getdata");
+		}
+		else{
+			//-----if we don't have db Details then save the entered data in db-----//
+			var dbDoc={
+		  "username": $scope.username,
+		  "dbUrl": $scope.dbUrl,
+		  "type": "dbData",
+		};
+		// save it
+		db.post(dbDoc).then(function () {
+		  // success!
+		  //-----if we have db Details then session can be made-----//
+			$scope.todoText ={username: $scope.username, loggedIn: true, startDate: new Date()};           
+			localStorage.setItem('session-user', JSON.stringify($scope.todoText))
+			$location.path("/getdata");
+		}).catch(function (err) {
+		  // some error (maybe a 409, because it already exists?)
+		  if(err)
+			console.log(err.status);
+		});
+		}
+	});
+	
+	
+ }  
+	
 
   //===========Calling Utility Functions============//
   $scope.i2html = function(text) {
@@ -122,9 +222,14 @@ angular.module('accentsApp')
       delete $scope.idDocs[termObj._id]; // remove item from cache
         crudFunctions.refreshOldDocsList($scope);
       // now delete from the database
-      $http.delete(crudFunctions.db_url() + termObj._id +'?rev='+ termObj._rev)
-        .success(function(data, status, headers, config){ if (callback) callback(); })
-        .error(function(data, status, headers, config) { console.log(status); });
+      //~ $http.delete(crudFunctions.db_url() + termObj._id +'?rev='+ termObj._rev)
+        //~ .success(function(data, status, headers, config){ if (callback) callback(); })
+        //~ .error(function(data, status, headers, config) { console.log(status); });
+         db.remove(termObj._id,termObj._rev, function(err, response) {
+			if (err) { return console.log(err); }
+			// handle response
+			if (callback) callback();
+		  });
 
     // update (put) requires object with _id and _rev, term, wordfamily
     } else if (termObj['_rev']) {
@@ -133,15 +238,22 @@ angular.module('accentsApp')
       }
       termObj.wordfamily = crudFunctions.genWordFamily(termObj.term);
       termObj.type = 'term';
-      $http.put(crudFunctions.db_url() +termObj._id+'?rev='+termObj._rev,JSON.stringify(termObj))
-        .success(function(newdata, status, headers, config) {
-          termObj._rev = newdata.rev; // update object with new _rev
-          $scope.idDocs[termObj._id] = termObj; // update cache (not sure if this is needed -- ref or copy?)
-            crudFunctions.refreshOldDocsList($scope);
-          if (callback) callback();
-        })
-        .error(function(data, status, headers, config) { console.log(status); });
-
+      //~ $http.put(crudFunctions.db_url() +termObj._id+'?rev='+termObj._rev,JSON.stringify(termObj))
+        //~ .success(function(newdata, status, headers, config) {
+          //~ termObj._rev = newdata.rev; // update object with new _rev
+          //~ $scope.idDocs[termObj._id] = termObj; // update cache (not sure if this is needed -- ref or copy?)
+            //~ crudFunctions.refreshOldDocsList($scope);
+          //~ if (callback) callback();
+        //~ })
+        //~ .error(function(data, status, headers, config) { console.log(status); });
+		db.put(termObj,termObj._id,termObj._rev,function(err,response){
+			if(err){ console.log(err); }
+			console.log(response);
+				termObj._rev = response.rev;
+				$scope.idDocs[termObj._id] = termObj; // add to cache now that we have an id
+				crudFunctions.refreshOldDocsList($scope);
+				if (callback) callback();
+		});
 
     // add (post) requires object with term, wordfamily
     } else if (!termObj['_rev']) {
@@ -155,12 +267,11 @@ angular.module('accentsApp')
         .success(function(newdata, status, headers, config) {
           termObj._rev = newdata.rev;
           termObj._id = newdata.id;
-        //  console.log('newly added termObj', termObj);
           $scope.idDocs[termObj._id] = termObj; // add to cache now that we have an id
             crudFunctions.refreshOldDocsList($scope);
           if (callback) callback(termObj);
         })
-        .error(function(data, status, headers, config) { console.log(status); });
+        .error(function(data, status, headers, config) { console.log(status); });        
     }
   };
 
@@ -180,7 +291,7 @@ angular.module('accentsApp')
               termObj.ref = crudFunctions.scrubField(termObj.ref, true);
               termObj.verified = termObj.verified || false;
               termObj = crudFunctions.pruneUnallowedFields(termObj); // remove any extraneous fields
-              $scope.idDocs[termObj['_id']] = termObj; // add to termObj cache
+			  $scope.idDocs[termObj['_id']] = termObj; // add to termObj cache				
             }
           });
 

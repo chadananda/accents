@@ -236,18 +236,26 @@ background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
 		width: auto !important;
 	}
 }
-@media only screen and (min-width : 0px) and (max-width:320px)
-{
-	.navbar-nav > li {
-		text-align: center;
-		width: 88px !important;
-	}
-}
 @media only screen and (min-width : 320px) and (max-width:360px)
 {
 	.navbar-nav > li {
+		width: 98px !important;
+	}
+	.navbar.navbar-default{
+		float:none !important;
+	}
+	.panel-box{
+		margin:0px !important;
+	}
+	.panel-box .btn.btn-primary.btn-block {
+		font-size: 10px !important;
+	}
+}
+@media only screen and (min-width : 360px) and (max-width:480px)
+{
+	.navbar-nav > li {
 		text-align: center;
-		width: 102px !important;
+		width: 112px !important;
 	}
 }
 @media only screen and (min-width : 768px) and (max-width:1024px)
@@ -339,6 +347,13 @@ background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
 	}
 
 
+}
+/*=======================LARGE DEVICES WIDE SCREENS=========================================*/
+@media only screen and (min-width : 1200px)
+{
+	.addtext {
+		margin-top: 119px;
+	}
 }
 /*=======================LARGE DEVICES WIDE SCREENS=========================================
 @media only screen and (min-width : 1200px)
@@ -529,6 +544,7 @@ background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
 	}
 }
 */
+
 /*====================FOR ALL WIDTH=====================================*/
 @media all /*and (max-width : 1200px)*/
 {
