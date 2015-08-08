@@ -744,6 +744,17 @@ background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
   	margin-left: 5px !important;
   }
 
+  td.user.audio {
+  	padding: 0;
+  	vertical-align: middle;
+  }
+  td.user.audio button {
+  	margin: 0; padding:0;
+  }
 
+  div.allfilters div {
+  	display: inline-block;
+  	padding-right: 5px;
+  }
 
 }

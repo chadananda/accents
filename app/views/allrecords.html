@@ -10,20 +10,20 @@
 	}
 	function playPause(callingElement)
 	{
-		 if(callingElement.firstChild.paused){			
+		 if(callingElement.firstChild.paused){
 			callingElement.firstChild.play();
-			callingElement.firstChild.nextSibling.className="glyphicon glyphicon-stop red";			
+			callingElement.firstChild.nextSibling.className="glyphicon glyphicon-stop red";
 		}
 		else{
 			callingElement.firstChild.pause();
-			callingElement.firstChild.nextSibling.className="glyphicon glyphicon-play green";	
+			callingElement.firstChild.nextSibling.className="glyphicon glyphicon-play green";
 		}
 	}
 	function endaudio(callingElement)
 	{
-		callingElement.nextSibling.className="glyphicon glyphicon-play green";	
+		callingElement.nextSibling.className="glyphicon glyphicon-play green";
 	}
-	
+
 </script>
 <div ng-controller="getdataCtrl">
 <!--
@@ -62,7 +62,7 @@
 		<div class="col-xs-6 col-sm-6 col-md-8">
 			<input type="text" size="150"  placeholder="Search Transliterated Term" id="term" ng-model-options="{debounce: 200}"  ng-model="search.doc.term" name="term" value="" class="form-control chkval ng-pristine ng-untouched ng-valid">
 		</div>
-		<div class="col-xs-3 col-sm-4 col-md-3">
+		<div class="col-xs-3 col-sm-4 col-md-3 allfilters">
 			<label for="unverified">
 				<div class="hidden-xs">
 					Unverified Only:
@@ -74,7 +74,7 @@
 			<input type="checkbox" name="unverified" ng-checked="doc.checked" ng-model="search.doc.verify.checked" id="verifiedCheckbox" name="verifiedCheckbox"/><br>
 			<label for="noaudio">
 				<div class="hidden-xs">
-					No Audio Only:
+					&nbsp; No Audio Only:
 				</div>
 				<div class="visible-xs-block">
 					<span class="glyphicon glyphicon-volume-off"></span>
@@ -89,11 +89,11 @@
 		<div role="tabpanel">
 			<div class="tab-content">
 				<div role="tabpanel" class="tab-pane active" id="home">
-					<img id="spinnernew" ng-src="images/loading.gif" style="margin-left: 28%;text-align: center;width:29%;">	
+					<img id="spinnernew" ng-src="images/loading.gif" style="margin-left: 28%;text-align: center;width:29%;">
 					<h3 ng-if="showAllData">Matching Terms: {{(docs |newfilter:customi2html(search.doc.term)|checkfilter:this).length}}</h3>
-					<input type="hidden" value="{{(docs | filter:search).length}}" name="totalRows" ng-model="rowxount" id="totalRows"/>					
+					<input type="hidden" value="{{(docs | filter:search).length}}" name="totalRows" ng-model="rowxount" id="totalRows"/>
 					<!----------------TABLE---------------------->
-					<div class="table-responsive tablecontainer mt10" ng-if="showAllData">										
+					<div class="table-responsive tablecontainer mt10" ng-if="showAllData">
 						<table class="table  table-bordered ">
 							<thead>
 								<tr>
@@ -112,12 +112,10 @@
 									<td class="term" ng-model="terms" style="overflow: hidden;" >{{doc.ref}}</td>
 									<td class="ref" style="font-size: 16px;" >{{doc.original}}</td>
 									<td class="user"><div  style=" max-height: 62px;overflow-x: hidden;overflow-y:auto;text-align: justify;">{{doc.definition}}</div></td>
-									<td class="user">
-										<div  id="audio-{{doc._id}}">{{convertAttachment(doc._id)}}</div>
-										<button class="recordButton" id="start_{{doc._id}}" onclick="startRecord(this);">
+									<td class="user audio">
+										<div  id="audio-{{doc._id}}">{{convertAttachment(doc._id)}}</div><button class="recordButton" id="start_{{doc._id}}" onclick="startRecord(this);">
 											<span class="glyphicon glyphicon-record green"></span>
-										</button>
-										<button class="playButton" id="stop_{{doc._id}}" onclick="stopRecord(this);">
+										</button>&nbsp;<button class="playButton" id="stop_{{doc._id}}" onclick="stopRecord(this);">
 											<span class="glyphicon glyphicon-stop red"></span>
 										</button>
 									</td>
@@ -150,8 +148,8 @@
 								</ul>
 							</div>
 						</div>
-					</div>	
-				</div>	
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
