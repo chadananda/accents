@@ -15,7 +15,7 @@ angular.module('accentsApp')
       'AngularJS',
       'Karma'
     ];
-  
+var db = new PouchDB(myConfig.database);  
 var domainRemoteDb=myConfig.remoteDbDomain;
 var remoteDb=myConfig.database;
  
@@ -61,54 +61,56 @@ var remoteDb=myConfig.database;
 	 window.location.href="/#/getdata";
  };
  //===============All docs function======================//
-	 $scope.allDocsFunc=function()
+	 $scope.allDocsFunc=function(callback)
 	 {
-		 $scope.attachments={};
-		 $http.get('http://'+domainRemoteDb+'/'+remoteDb+'/_all_docs?include_docs=true&attachments=true')
-		.success(function(data) 
-		{
-			if(data.rows)
-			{
-				$scope.docs=data.rows;
-				$scope.count=data.total_rows;
-			}	
-		})
-		.error(function(error) 
-		{
-			console.log(error);
-		});
+		 $scope.attachments={};				 
+		db.allDocs({
+			  include_docs: true,
+			  attachments: true
+			}, function(err, response) {
+			  if (err) { return console.log(err); }
+			  // handle result
+			  if(response.rows)
+				{
+					$scope.docs=response.rows;
+					$scope.count=response.total_rows;
+				}	
+				if(callback) callback($scope.count);
+			});
+			
+		
 	 };
 	 //////////////////////////Fetch  data/////////////////////////////////////
 	// $scope.getAllData = function() {
-	$("#spinner").show();
-	getRecords.getAllData()
-	.success(function(data){			
-		if(data.rows)
-		{		
-			$scope.docs=data.rows;
-			$scope.count=data.total_rows;
-			$("#spinner").hide();
-			$(".pagination").css("display","block");
-			angular.forEach(data.rows,function(row){
-				if (!$scope.attachments[row.doc._id]) $scope.attachments[row.doc._id] = [];
-				if(row.doc._attachments)
-					$scope.attachments[row.doc._id]=row.doc._attachments;
-			});
-			if(sessionStorage.getItem('term')!="undefined")
-			{
-				document.getElementById('term').value=sessionStorage.getItem('term') ;
-				setTimeout(function(){
-					$("#term").trigger("change");
-				},100);
-			}
-			else
-			{
-				document.getElementById('term').value=	"";
-			}
-		}	
-          
-	})
-    .error(function(error) {  /*  console.log(error);*/    });
+	//~ $("#spinner").show();
+	//~ getRecords.getAllData()
+	//~ .success(function(data){			
+		//~ if(data.rows)
+		//~ {		
+			//~ $scope.docs=data.rows;
+			//~ $scope.count=data.total_rows;
+			//~ $("#spinner").hide();
+			//~ $(".pagination").css("display","block");
+			//~ angular.forEach(data.rows,function(row){
+				//~ if (!$scope.attachments[row.doc._id]) $scope.attachments[row.doc._id] = [];
+				//~ if(row.doc._attachments)
+					//~ $scope.attachments[row.doc._id]=row.doc._attachments;
+			//~ });
+			//~ if(sessionStorage.getItem('term')!="undefined")
+			//~ {
+				//~ document.getElementById('term').value=sessionStorage.getItem('term') ;
+				//~ setTimeout(function(){
+					//~ $("#term").trigger("change");
+				//~ },100);
+			//~ }
+			//~ else
+			//~ {
+				//~ document.getElementById('term').value=	"";
+			//~ }
+		//~ }	
+          //~ 
+	//~ })
+    //~ .error(function(error) {  /*  console.log(error);*/    });
      
    $scope.$watch("search.doc.term",function(v)
 	{
@@ -125,8 +127,14 @@ var remoteDb=myConfig.database;
 			{
 				var count=2989;
 			}
-			 $scope.allDocsFunc();
-			 console.log($scope.count);
+			 $("#spinnernew").show();
+			 $scope.showAllData=false;
+			 $scope.allDocsFunc(function(data){
+					console.log("xount"+data);				 
+					$scope.showAllData=true;  
+					$("#spinnernew").hide();
+				});
+			 
 			$scope.paginationFunc(count);
 		}	
 	});

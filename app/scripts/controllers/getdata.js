@@ -17,18 +17,18 @@ angular.module('accentsApp')
     'AngularJS',
     'Karma'
   ];
-  var db = new PouchDB(myConfig.url);	
+  var db = new PouchDB(myConfig.database);
   var domainRemoteDb=myConfig.remoteDbDomain;
   var remoteDb=myConfig.database;
   $scope.init=function(){
-
-		//---check if session is made or not
+		console.log("init");
+		//---check if session is made or not		
 		if(localStorage.getItem('session-user')){
 			console.log(localStorage.getItem('session-user'));
 		}
 		else{	
 			$location.path("/about");			
-		}		
+		}
 	}
 	
   //========Function to fetch the db data==========//
@@ -42,10 +42,11 @@ angular.module('accentsApp')
 			  }
 			};
 			// save it
-			db.put(ddoc).then(function () {
+			db.put(ddoc).then(function (res) {
 			  // success!
 			}).catch(function (err) {
-			  // some error (maybe a 409, because it already exists?)
+			  // some error (maybe a 409, because it already exists?)	
+			  console.log(err);	
 			});		
 			db.query('my_list/by_type').then(function (res) {				
 			  // got the query results
@@ -54,25 +55,59 @@ angular.module('accentsApp')
 				var response=res.rows;
 			  else
 				var response=false;
-			  if(callback) callback(response);
+			  if(callback) callback(response);			  
 			}).catch(function (err) {
 			  // some error
 			  console.log(err);			 		   
-			});
-			
+			});			
   }
  $scope.submitDbData = function() {	
-	if($scope.username){	
-		console.log($scope.username);
-	}
-	else{
-		alert("Please Enter Username!");
-		 var element = document.getElementById('username');
-		 element.focus();
-		return false;
-	 }
+	 //==check if field empty or not==//
 	 if($scope.dbUrl){	
 		console.log($scope.dbUrl);
+		var remoteDb=$scope.dbUrl;
+		var db=new PouchDB(myConfig.database);
+		var dbDoc={
+			"username": $scope.username,
+			"dbUrl": $scope.dbUrl,
+			"type": "dbData",
+		};
+		//FIRST CHECK IF THERE IS ALREADY ANY RECORD PRESENT FOR DBURL
+		 $scope.fetchDbData(db,function(data){
+			 if(data){
+				 //IF RECORD IS ALREADY PRESENT NO NEED TO CREATE NEW JUST UPDATE EXISTING
+				 var id=data[0].key._id;
+				 var rev=data[0].key._rev;
+				 db.put(dbDoc,id,rev,function(err,response){
+				 });
+			 }
+			 else{
+				 //ELSE CREATE NEW
+				 //FIRST CREATE A RECORD FOR DBDETAILS ENTERED BY THE USER VERY FIRST TIME
+				db.post(dbDoc, function(err, response) {
+					  if (err) { return console.log(err); }
+					  // handle response
+					  console.log(response);
+					});	
+				//REPLICATE FROM THE REMOTE DB ENTERED
+				db.replicate.from(remoteDb, function (err, result) {
+				  if (err) { return console.log(err); }
+				  // handle 'completed' result
+				  console.log(result);
+				  $scope.fetchDbData(db,function(data){
+					if(data){
+						//-----if we have db Details then session can be made-----//
+						$scope.todoText ={username: data[0].key.username, loggedIn: true, startDate: new Date()};           
+						localStorage.setItem('session-user', JSON.stringify($scope.todoText));
+						console.log(localStorage.getItem('session-user'));
+						window.location.href="/#/getdata";          
+						}
+					});
+				});	
+			 }
+		 });
+			
+		
 	}
 	else{
 		alert("Please Enter DB Url!");
@@ -80,43 +115,6 @@ angular.module('accentsApp')
 		 element.focus();
 		return false;
 	 }
-	var db = new PouchDB(myConfig.url,{
-				auth:{
-					username:$scope.username,
-					password:$scope.password
-				}
-			}
-	);
-	$scope.fetchDbData(db,function(data){
-		console.log(data);
-		if(data){
-			//-----if we have db Details then session can be made-----//
-			$scope.todoText ={username: data[0].key.username, loggedIn: true, startDate: new Date()};           
-			localStorage.setItem('session-user', JSON.stringify($scope.todoText));
-			console.log('here');
-			$location.path("/getdata");
-		}
-		else{
-			//-----if we don't have db Details then save the entered data in db-----//
-			var dbDoc={
-		  "username": $scope.username,
-		  "dbUrl": $scope.dbUrl,
-		  "type": "dbData",
-		};
-		// save it
-		db.post(dbDoc).then(function () {
-		  // success!
-		  //-----if we have db Details then session can be made-----//
-			$scope.todoText ={username: $scope.username, loggedIn: true, startDate: new Date()};           
-			localStorage.setItem('session-user', JSON.stringify($scope.todoText))
-			$location.path("/getdata");
-		}).catch(function (err) {
-		  // some error (maybe a 409, because it already exists?)
-		  if(err)
-			console.log(err.status);
-		});
-		}
-	});
 	
 	
  }  
@@ -278,38 +276,33 @@ angular.module('accentsApp')
   // DATABASE read all fields into hash cache ($scope.idDocs[id]) instant access by _id
   $scope.refreshAllDocList = function(callback) {
     var termObj;
-    $http.get(crudFunctions.db_url() + '_all_docs?include_docs=true&attachments=true')
-      .success(function(data)  {
-        if(data.rows) {
-          $scope.idDocs = {}; // clear termObj cache
-          data.rows.forEach(function(doc){
-            termObj = doc.doc;
-            if (termObj.type === 'term') {
-              termObj.wordfamily = crudFunctions.genWordFamily(termObj.term); // in case it is not there already
-              termObj.original = termObj.original || ''; // default blank string
-              termObj.definition = termObj.definition || ''; // default blank
-              termObj.ref = crudFunctions.scrubField(termObj.ref, true);
-              termObj.verified = termObj.verified || false;
-              termObj = crudFunctions.pruneUnallowedFields(termObj); // remove any extraneous fields
-			  $scope.idDocs[termObj['_id']] = termObj; // add to termObj cache				
-            }
-          });
-
-          // for the time being, we can use this to refresh $scope.docs
-         crudFunctions.refreshOldDocsList($scope);
-		//$scope.allAttachmentsFunc();
-          if (callback) callback();
-        }
-      })
-      .error(function(error) { console.log(error); });
+		db.allDocs({
+			  include_docs: true,
+			  attachments: true
+			}, function(err, response) {
+			  if (err) { return console.log(err); }
+			  // handle result
+			  if(response.rows){
+				  $scope.idDocs = {}; // clear termObj cache
+				  response.rows.forEach(function(doc){
+					termObj = doc.doc;
+					if (termObj.type === 'term') {
+					  termObj.wordfamily = crudFunctions.genWordFamily(termObj.term); // in case it is not there already
+					  termObj.original = termObj.original || ''; // default blank string
+					  termObj.definition = termObj.definition || ''; // default blank
+					  termObj.ref = crudFunctions.scrubField(termObj.ref, true);
+					  termObj.verified = termObj.verified || false;
+					  termObj = crudFunctions.pruneUnallowedFields(termObj); // remove any extraneous fields
+					  $scope.idDocs[termObj['_id']] = termObj; // add to termObj cache				
+					}
+				  });
+					// for the time being, we can use this to refresh $scope.docs
+					crudFunctions.refreshOldDocsList($scope);
+					//$scope.allAttachmentsFunc();
+					if (callback) callback();
+			  }
+			});
   };
-
-  
-
-  
-
-  
-
   
   // compresses array of matching terms into one, returns termObj
   // this is not a whole word-family but just a sub-branch with exactly matching terms
@@ -547,12 +540,9 @@ $scope.deleteAttachment=function(attachmentId,docId){
 
   // Inititlization Code
 //setTimeout(function(){$("#spinnernew").show()},1000);
-  $("#spinnernew").show();
-  $scope.showAllData=false;
+ 
   // load data cache
   $scope.refreshAllDocList(function(){
-	$scope.showAllData=true;  
-    $("#spinnernew").hide();
     $(".pagination").css("display","block");
 
     // wahat does this do?

@@ -8,6 +8,7 @@
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
     <!-- build:css(.) styles/vendor.css -->
     <!-- bower:css -->
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" />
     <!-- endbower -->
     <!-- endbuild -->
     <!-- build:css(.tmp) styles/main.css -->
@@ -30,7 +31,7 @@
     <!-- endbuild -->
   </head>
   <body ng-app="accentsApp">
-    <div class="container"  ng-controller="getdataCtrl" >
+    <div class="container"  ng-controller="getdataCtrl"   ng-init="init()">
 		<div class="container  clearfix"  id="main-container" >
 			<div class="col-lg-12 clearfix  mb10 p0 pt10 pb10"  ng-show="activePath != '/' && activePath != '/about'" >
                 <div class="col-sm-6 logo p0 valignmiddle mt10">
@@ -96,6 +97,7 @@
     <script src="bower_components/angular-route/angular-route.js"></script>
     <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
     <script src="bower_components/angular-touch/angular-touch.js"></script>
+    <script src="bower_components/blob-util/dist/blob-util.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
 
