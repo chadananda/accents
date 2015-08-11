@@ -18,7 +18,6 @@ angular.module('accentsApp')
   var domainRemoteDb=myConfig.remoteDbDomain;
   var remoteDb=myConfig.database;
   $scope.settingsInit=function(){
-	  console.log("test it");
 	  db.query('my_list/by_type').then(function (res) {				
 			// got the query results
 			var result=res.total_rows;
@@ -33,15 +32,6 @@ angular.module('accentsApp')
 		console.log(err);			 		   
 	});
   };
-  //===================Reload Page on route change===========================//
-//~ $rootScope.$on('$locationChangeStart', function($event, changeTo, changeFrom) {
-      //~ if (changeTo == changeFrom) {
-        //~ return;
-      //~ }
- //~
-      //~ window.location.assign(changeTo);
-      //~ window.location.reload(true);
-    //~ });
   //===========Calling Utility Functions============//
  $scope.i2html = function(text)
  {

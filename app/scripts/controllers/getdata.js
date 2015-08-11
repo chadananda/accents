@@ -9,7 +9,7 @@
  */
 angular.module('accentsApp')
   .controller('getdataCtrl',
-    function($rootScope,$scope,$http,getRecords,$window,$filter,myConfig,Utils,$sce,docData,$modal,$log,crudFunctions,$location) {
+    function($rootScope,$scope,$http,getRecords,$window,$filter,myConfig,Utils,$sce,docData,$modal,$log,crudFunctions,$location,$timeout) {
   $scope.docs={};
   $scope.filterresult={};
   $scope.awesomeThings = [
@@ -21,13 +21,24 @@ angular.module('accentsApp')
   var domainRemoteDb=myConfig.remoteDbDomain;
   var remoteDb=myConfig.database;
   $scope.init=function(){
-		console.log("init");
+		//console.log("init");
 		//---check if session is made or not		
 		if(localStorage.getItem('session-user')){
-			console.log(localStorage.getItem('session-user'));
+			//console.log(localStorage.getItem('session-user'));
 		}
-		else{	
-			$location.path("/about");			
+		else{
+			//check if db has dbdetails record or not
+			 $scope.fetchDbData(db,function(data){
+			 if(data){
+					//-----if we have db Details then session can be made-----//
+					$scope.todoText ={username: data[0].key.username, loggedIn: true, startDate: new Date()};           
+					localStorage.setItem('session-user', JSON.stringify($scope.todoText));
+					//console.log(localStorage.getItem('session-user'));
+			 }
+			 else{
+				 $location.path("/about");	
+			 }
+			});						
 		}
 	}
 	
@@ -220,9 +231,6 @@ angular.module('accentsApp')
       delete $scope.idDocs[termObj._id]; // remove item from cache
         crudFunctions.refreshOldDocsList($scope);
       // now delete from the database
-      //~ $http.delete(crudFunctions.db_url() + termObj._id +'?rev='+ termObj._rev)
-        //~ .success(function(data, status, headers, config){ if (callback) callback(); })
-        //~ .error(function(data, status, headers, config) { console.log(status); });
          db.remove(termObj._id,termObj._rev, function(err, response) {
 			if (err) { return console.log(err); }
 			// handle response
@@ -236,14 +244,6 @@ angular.module('accentsApp')
       }
       termObj.wordfamily = crudFunctions.genWordFamily(termObj.term);
       termObj.type = 'term';
-      //~ $http.put(crudFunctions.db_url() +termObj._id+'?rev='+termObj._rev,JSON.stringify(termObj))
-        //~ .success(function(newdata, status, headers, config) {
-          //~ termObj._rev = newdata.rev; // update object with new _rev
-          //~ $scope.idDocs[termObj._id] = termObj; // update cache (not sure if this is needed -- ref or copy?)
-            //~ crudFunctions.refreshOldDocsList($scope);
-          //~ if (callback) callback();
-        //~ })
-        //~ .error(function(data, status, headers, config) { console.log(status); });
 		db.put(termObj,termObj._id,termObj._rev,function(err,response){
 			if(err){ console.log(err); }
 			console.log(response);
@@ -261,20 +261,21 @@ angular.module('accentsApp')
       }
       termObj.wordfamily = crudFunctions.genWordFamily(termObj.term);
       termObj.type = 'term';
-      $http.post(crudFunctions.db_url(), JSON.stringify(termObj))
-        .success(function(newdata, status, headers, config) {
-          termObj._rev = newdata.rev;
-          termObj._id = newdata.id;
-          $scope.idDocs[termObj._id] = termObj; // add to cache now that we have an id
-            crudFunctions.refreshOldDocsList($scope);
-          if (callback) callback(termObj);
-        })
-        .error(function(data, status, headers, config) { console.log(status); });        
+      db.post(termObj,function(err,response){
+		  if(err){ console.log(err); }
+			console.log(response);
+			termObj._rev = response.rev;
+			termObj._id = response.id;
+			$scope.idDocs[termObj._id] = termObj; // add to cache now that we have an id
+			crudFunctions.refreshOldDocsList($scope);
+			if (callback) callback(termObj);
+	  });     
     }
   };
 
   // DATABASE read all fields into hash cache ($scope.idDocs[id]) instant access by _id
   $scope.refreshAllDocList = function(callback) {
+	  console.log("called");
     var termObj;
 		db.allDocs({
 			  include_docs: true,
@@ -293,12 +294,16 @@ angular.module('accentsApp')
 					  termObj.ref = crudFunctions.scrubField(termObj.ref, true);
 					  termObj.verified = termObj.verified || false;
 					  termObj = crudFunctions.pruneUnallowedFields(termObj); // remove any extraneous fields
-					  $scope.idDocs[termObj['_id']] = termObj; // add to termObj cache				
+					  $scope.idDocs[termObj['_id']] = termObj; // add to termObj cache
 					}
 				  });
+				  
 					// for the time being, we can use this to refresh $scope.docs
 					crudFunctions.refreshOldDocsList($scope);
-					//$scope.allAttachmentsFunc();
+					//$scope.allAttachmentsFunc();.
+					console.log("completed");					
+					$(".tab-content").show();
+					$("#main-container").loader('hide');
 					if (callback) callback();
 			  }
 			});
@@ -451,10 +456,12 @@ console.log(base);
 	var docId=termObj['_id'];
 	var blobArray=[];
 	var rev=termObj['_id']._rev;
+	if(termObj._attachments){
 	db.get(docId, {attachments: true}).then(function (doc) {	
 		angular.forEach(doc._attachments,function(attach,key){
 			blobArray.push(key);
 		});
+		
 		angular.forEach(blobArray,function(blob){
 			var attachmentId=blob;
 			db.getAttachment(docId, attachmentId, {rev: rev},function(err,blob){
@@ -465,7 +472,7 @@ console.log(base);
 			});
 		});
 	});
-	
+	}
     // set edit mode
     $('#addword').css({ "display":"none" });
     $('#Button2').css({ "display":"block" });
@@ -533,29 +540,24 @@ $scope.deleteAttachment=function(attachmentId,docId){
     });
     return {whole: whole, partial: partial};
   };
-
-
   /********* end of CRUD DRY Utils *************/
-
-
-  // Inititlization Code
-//setTimeout(function(){$("#spinnernew").show()},1000);
- 
-  // load data cache
-  $scope.refreshAllDocList(function(){
-    $(".pagination").css("display","block");
-
-    // wahat does this do?
-    if(sessionStorage.length>0  && sessionStorage.data) {
-      // get previous term id
-      var arrayDoc=JSON.parse(docData.getFormData());
-      var id=JSON.stringify(arrayDoc[0]['id']);
-      id=id.replace(/"/g,'');
-      // load form with previous term
-      var termObj = $scope.getTermObj(id);
-      $scope.setFormTerm(termObj);
-    }
-  });
+	//~ // Inititlization Code
+	//~ setTimeout(function(){$("#spinnernew").show()},1000);
+	
+	// load data cache
+	$scope.refreshAllDocList(function(){
+		$(".pagination").css("display","block");
+		$("#spinnernew").hide();
+		if(sessionStorage.length>0  && sessionStorage.data) {
+			// get previous term id
+			var arrayDoc=JSON.parse(docData.getFormData());
+			var id=JSON.stringify(arrayDoc[0]['id']);
+			id=id.replace(/"/g,'');
+			// load form with previous term
+			var termObj = $scope.getTermObj(id);
+			$scope.setFormTerm(termObj);
+		}
+	});
 
   //==Delete Record from the partial or whole word searches========//
   $scope.deletedoc = function(id) {
@@ -637,7 +639,6 @@ $scope.deleteAttachment=function(attachmentId,docId){
 				
 			}
 		 }
-	
 	// clean up word family
 	setTimeout(function(){		
 		  crudFunctions.cleanWordFamily(termObj,$scope);		
@@ -691,7 +692,8 @@ $scope.saveAudio=function(termId,callback){
 		};
 		xhr.send();
 	});
-	var termObj=$scope.idDocs[docId];
+	var termObj=$scope.idDocs[docId];	
+	console.log(termObj);
 	crudFunctions.refreshOldDocsList($scope);
 	if (callback) callback();
 };
@@ -790,7 +792,8 @@ $scope.convertAttachment=function(docId){
 			var url = URL.createObjectURL(blob);		
 			var display="<div class='dispinblk playmic'><a onclick='playPause(this);'><audio src='"+url+"' onended='endaudio(this);' ></audio><span class='glyphicon glyphicon-play green'></span></a></div>";
 			var audioplay=document.getElementById("audio-"+docId);
-			audioplay.innerHTML=display;
+			if(audioplay)
+				audioplay.innerHTML=display;
 		});
 	}
 	else

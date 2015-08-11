@@ -4,10 +4,10 @@
 		localStorage.removeItem('session-user');
 		window.location.href="/";
 	}
-	if(localStorage.getItem("session-user") === null)
-	{
-		window.location.href="/";
-	}
+	//~ if(localStorage.getItem("session-user") === null)
+	//~ {
+		//~ window.location.href="/";
+	//~ }
 	function playPause(callingElement)
 	{
 		 if(callingElement.firstChild.paused){			
@@ -23,6 +23,7 @@
 	{
 		callingElement.nextSibling.className="glyphicon glyphicon-play green";	
 	}
+	$("#main-container").loader('show','<img src="images/loading-x.gif">');
 </script>
 <div ng-controller="getdataCtrl">
 	<!-- Modal -->

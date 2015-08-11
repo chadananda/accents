@@ -8,7 +8,7 @@
  * Controller of the accentsApp
  */
 angular.module('accentsApp')
-  .controller('AlltermsCtrl', function ($rootScope,$scope,$http,getRecords,$window,$filter,myConfig,Utils,$sce,docData) {
+  .controller('AlltermsCtrl', function ($rootScope,$scope,$http,getRecords,$window,$filter,myConfig,Utils,$sce,docData,$timeout) {
     $scope.docs={};
     $scope.awesomeThings = [
       'HTML5 Boilerplate',
@@ -248,6 +248,7 @@ var remoteDb=myConfig.database;
 .filter('newfilter',['Utils',function(Utils){
 	return function(items,search)
 	{
+		//console.log(items);
 		var filtered = [];
 		if(search)
 		{
@@ -277,6 +278,7 @@ var remoteDb=myConfig.database;
 		
 		return filtered;
 	}
+	 
 }])
 .filter("checkfilter",function(){
 	return function(items,scope)
