@@ -14,23 +14,23 @@ angular.module('accentsApp')
       'AngularJS',
       'Karma'
     ];
-  var db = new PouchDB(myConfig.database, { cache: true,stub:true,ajax: {cache:true}});	
+  var db = new PouchDB(myConfig.database, { cache: true,stub:true,ajax: {cache:true}});
   var domainRemoteDb=myConfig.remoteDbDomain;
   var remoteDb=myConfig.database;
   $scope.settingsInit=function(){
-	  db.query('my_list/by_type').then(function (res) {				
-			// got the query results
-			var result=res.total_rows;
-			if(result>0)
-			var response=res.rows[0];
-			else
-			var response=false;
-			document.getElementById('remoteDbUrl').value=response.key.dbUrl;
-			
-		}).catch(function (err) {
-		// some error
-		console.log(err);			 		   
-	});
+    db.query('my_list/by_type').then(function (res) {
+      // got the query results
+      var result=res.total_rows;
+      if(result>0)
+      var response=res.rows[0];
+      else
+      var response=false;
+      document.getElementById('remoteDbUrl').value=response.key.dbUrl;
+
+    }).catch(function (err) {
+    // some error
+    console.log(err);
+  });
   };
   //===========Calling Utility Functions============//
  $scope.i2html = function(text)
@@ -51,50 +51,50 @@ angular.module('accentsApp')
  };
  //===========Replicate local db to remote db entered===============//
  $scope.replicateToRemote=function(){
-	var remoteUrl =document.getElementById("remoteDbUrl").value;
-	db.query('my_list/by_type').then(function (res) {				
-			// got the query results
-			var result=res.total_rows;
-			if(result>0)
-			var response=res.rows[0];
-			else
-			var response=false;
-			var remoteDbid=response.id;
-			var fullResponse=response.key;
-			var termDb={
-				_id:fullResponse._id,
-				_rev:fullResponse._rev,
-				dbUrl:remoteUrl,
-				type:fullResponse.type,
-				username:fullResponse.username
-			};
-			// save it
-			db.put(termDb,fullResponse._id,fullResponse._rev).then(function (response) {
-					// success!
-				//	console.log(response);
-			}).catch(function (err) {
-				// some error (maybe a 409, because it already exists?)
-			});
-			  //~ PouchDB.replicate(db,remoteUrl, function(err,resp){
-				//~ if(err){
-					//~ alert("Push failed!")
-				//~ }
-			//~ });
-			db.replicate.to(remoteUrl,{retry: true}).on('complete', function () {
-			  // yay, we're done!
-			  console.log("replication complete");
-			}).on('error', function (err) {
-			  // boo, something went wrong!
-			  console.log("replication has some error"+err);
-			});
-			
-		}).catch(function (err) {
-		// some error
-		console.log(err);			 		   
-	});
-	
+  var remoteUrl =document.getElementById("remoteDbUrl").value;
+  db.query('my_list/by_type').then(function (res) {
+      // got the query results
+      var result=res.total_rows;
+      if(result>0)
+      var response=res.rows[0];
+      else
+      var response=false;
+      var remoteDbid=response.id;
+      var fullResponse=response.key;
+      var termDb={
+        _id:fullResponse._id,
+        _rev:fullResponse._rev,
+        dbUrl:remoteUrl,
+        type:fullResponse.type,
+        username:fullResponse.username
+      };
+      // save it
+      db.put(termDb,fullResponse._id,fullResponse._rev).then(function (response) {
+          // success!
+        //  console.log(response);
+      }).catch(function (err) {
+        // some error (maybe a 409, because it already exists?)
+      });
+        //~ PouchDB.replicate(db,remoteUrl, function(err,resp){
+        //~ if(err){
+          //~ alert("Push failed!")
+        //~ }
+      //~ });
+      db.replicate.to(remoteUrl,{retry: true}).on('complete', function () {
+        // yay, we're done!
+        console.log("replication complete");
+      }).on('error', function (err) {
+        // boo, something went wrong!
+        console.log("replication has some error"+err);
+      });
+
+    }).catch(function (err) {
+    // some error
+    console.log(err);
+  });
+
  };
-  
+
   //==================For slide toggle of help divs====================//
   $scope.slideShow=function(calledId)
   {
@@ -102,17 +102,20 @@ angular.module('accentsApp')
   }
   //=======================cleanup and compress two step function=================//
   $scope.cleanupAndCompress=function(){
-	  //=======step 1 set verified to true for all docs having original field=======//
-	  angular.forEach($scope.idDocs, function(termObj) {
-       if(termObj.original && termObj.original!="")
-       {
-			var term = {};
-			var allowedTerms = crudFunctions.termAllowedFields();
-			for(var i=0;i<allowedTerms.length;i++){
-				if(allowedTerms[i]=="verified") term[allowedTerms[i]]=true;
-				else  term[allowedTerms[i]]=termObj[allowedTerms[i]];
-			}
-			$scope.termCRUD('update', term);
+    //=======step 1 set verified to true for all docs having original field=======//
+    angular.forEach($scope.idDocs, function(termObj) {
+       if(termObj.original && termObj.original!="" && !termObj.verified) {
+         // no need to purge non-allowed fields at this point, it will be done during crud update
+         termObj.verified = true;
+         $scope.termCRUD('update', termObj);
+         /*
+      var term = {};
+      var allowedTerms = crudFunctions.termAllowedFields();
+      for(var i=0;i<allowedTerms.length;i++){
+        if(allowedTerms[i]=="verified") term[allowedTerms[i]]=true;
+        else  term[allowedTerms[i]]=termObj[allowedTerms[i]];
+      }
+      $scope.termCRUD('update', term); */
        }
      });
      //======step 2 call cleanAllwordfamilies=======//
