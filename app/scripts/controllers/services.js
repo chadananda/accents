@@ -54,11 +54,12 @@ angular.module('accentsApp')
     var wordFamilies = this.getAllWordFamilies(scope);
     console.log('Cleaning up '+wordFamilies.length+' word families. '+
       ' Total records: '+ Object.keys(scope.idDocs).length);
-    wordFamilies.forEach(function(wordFamily){
-      console.log('Cleaning up word family: '+wordFamily +
+    angular.forEach(wordFamilies,function(wordFamily){
+		console.log('Cleaning up word family: '+wordFamily +
         ' Total records: '+ Object.keys(scope.idDocs).length);
-      scope.cleanWordFamily(wordFamily);
-    });
+		this.cleanWordFamily(wordFamily,scope);		
+	},this);
+	//this.testfunc();
     console.log("Done cleaning word families. "+
       ' Total records: '+ Object.keys(scope.idDocs).length);
   },
@@ -66,19 +67,18 @@ angular.module('accentsApp')
   // also sets ambiguous if there is more than one remaining verfied member
   // this function should be run after any CRUD operation to reset and clean word family
   // parameter can be a wordfamily, termObj, HTML or glyph
-  cleanWordFamily : function(wordfamily,scope) {
+  cleanWordFamily:function(wordfamily,scope) {
     if (!wordfamily) return;
     wordfamily = this.genWordFamily(wordfamily); // cleanup just in case
     var terms = this.getWordFamilyTerms(wordfamily,scope);
     var family = {};
     // split into object of one termArray for each spelling
     // eg. { "_Shiráz" => [termObj, termObj, termObj],
-    //       "_Shíráz" => [termObj, termObj, termObj] }
+    //       "_Shíráz" => [termObj, termObj, termObj] }     
     terms.forEach(function(termObj) {
       if (!family[termObj.term]) family[termObj.term] = []; // initialize if neccesary
       family[termObj.term].push(termObj);
-    });
-    //console.log('cleanWordFamily: '+ wordfamily, family);
+    });    
     // now compress each list down to just one record each
     var verified_count = 0;
     var termscount=0;

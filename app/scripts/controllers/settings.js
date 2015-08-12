@@ -14,7 +14,7 @@ angular.module('accentsApp')
       'AngularJS',
       'Karma'
     ];
-  var db = new PouchDB(myConfig.database);	
+  var db = new PouchDB(myConfig.database, { cache: true,stub:true,ajax: {cache:true}});	
   var domainRemoteDb=myConfig.remoteDbDomain;
   var remoteDb=myConfig.database;
   $scope.settingsInit=function(){
@@ -71,11 +71,22 @@ angular.module('accentsApp')
 			// save it
 			db.put(termDb,fullResponse._id,fullResponse._rev).then(function (response) {
 					// success!
-					console.log(response);
+				//	console.log(response);
 			}).catch(function (err) {
 				// some error (maybe a 409, because it already exists?)
 			});
-			db.replicate.to(remoteUrl);
+			  //~ PouchDB.replicate(db,remoteUrl, function(err,resp){
+				//~ if(err){
+					//~ alert("Push failed!")
+				//~ }
+			//~ });
+			db.replicate.to(remoteUrl,{retry: true}).on('complete', function () {
+			  // yay, we're done!
+			  console.log("replication complete");
+			}).on('error', function (err) {
+			  // boo, something went wrong!
+			  console.log("replication has some error"+err);
+			});
 			
 		}).catch(function (err) {
 		// some error
@@ -88,6 +99,24 @@ angular.module('accentsApp')
   $scope.slideShow=function(calledId)
   {
     $( "#"+calledId ).slideToggle( "3000" );
+  }
+  //=======================cleanup and compress two step function=================//
+  $scope.cleanupAndCompress=function(){
+	  //=======step 1 set verified to true for all docs having original field=======//
+	  angular.forEach($scope.idDocs, function(termObj) {
+       if(termObj.original && termObj.original!="")
+       {
+			var term = {};
+			var allowedTerms = crudFunctions.termAllowedFields();
+			for(var i=0;i<allowedTerms.length;i++){
+				if(allowedTerms[i]=="verified") term[allowedTerms[i]]=true;
+				else  term[allowedTerms[i]]=termObj[allowedTerms[i]];
+			}
+			$scope.termCRUD('update', term);
+       }
+     });
+     //======step 2 call cleanAllwordfamilies=======//
+     crudFunctions.cleanAllWordFamilies($scope);
   }
 
    //==========Change the verified field to 1 for all the records with original field value==========//

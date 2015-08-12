@@ -15,19 +15,10 @@ angular.module('accentsApp')
       'AngularJS',
       'Karma'
     ];
-var db = new PouchDB(myConfig.database);  
+var db = new PouchDB(myConfig.database, { cache: true,ajax: {cache:true}});  
 var domainRemoteDb=myConfig.remoteDbDomain;
 var remoteDb=myConfig.database;
  
-//===================Reload Page on route change===========================//
-//~ $rootScope.$on('$locationChangeStart', function($event, changeTo, changeFrom) {
-      //~ if (changeTo == changeFrom) {
-        //~ return;
-      //~ }
- //~ 
-      //~ window.location.assign(changeTo);
-      //~ window.location.reload(true);
-    //~ });
 //===========Calling Utility Functions============//
  $scope.i2html = function(text)
  {
@@ -80,38 +71,6 @@ var remoteDb=myConfig.database;
 			
 		
 	 };
-	 //////////////////////////Fetch  data/////////////////////////////////////
-	// $scope.getAllData = function() {
-	//~ $("#spinner").show();
-	//~ getRecords.getAllData()
-	//~ .success(function(data){			
-		//~ if(data.rows)
-		//~ {		
-			//~ $scope.docs=data.rows;
-			//~ $scope.count=data.total_rows;
-			//~ $("#spinner").hide();
-			//~ $(".pagination").css("display","block");
-			//~ angular.forEach(data.rows,function(row){
-				//~ if (!$scope.attachments[row.doc._id]) $scope.attachments[row.doc._id] = [];
-				//~ if(row.doc._attachments)
-					//~ $scope.attachments[row.doc._id]=row.doc._attachments;
-			//~ });
-			//~ if(sessionStorage.getItem('term')!="undefined")
-			//~ {
-				//~ document.getElementById('term').value=sessionStorage.getItem('term') ;
-				//~ setTimeout(function(){
-					//~ $("#term").trigger("change");
-				//~ },100);
-			//~ }
-			//~ else
-			//~ {
-				//~ document.getElementById('term').value=	"";
-			//~ }
-		//~ }	
-          //~ 
-	//~ })
-    //~ .error(function(error) {  /*  console.log(error);*/    });
-     
    $scope.$watch("search.doc.term",function(v)
 	{
 		$scope.searchterm=v;

@@ -17,12 +17,12 @@ angular.module('accentsApp')
     'AngularJS',
     'Karma'
   ];
-  var db = new PouchDB(myConfig.database);
+  var db = new PouchDB(myConfig.database, { cache: true,ajax: {cache:true}});
   var domainRemoteDb=myConfig.remoteDbDomain;
   var remoteDb=myConfig.database;
   $scope.init=function(){
 		//console.log("init");
-		//---check if session is made or not		
+		//---check if session is made or not	
 		if(localStorage.getItem('session-user')){
 			//console.log(localStorage.getItem('session-user'));
 		}
@@ -37,6 +37,7 @@ angular.module('accentsApp')
 			 }
 			 else{
 				 $location.path("/about");	
+				 window.location.href="/#/about";     
 			 }
 			});						
 		}
@@ -66,6 +67,7 @@ angular.module('accentsApp')
 				var response=res.rows;
 			  else
 				var response=false;
+				 console.log(response);
 			  if(callback) callback(response);			  
 			}).catch(function (err) {
 			  // some error
@@ -90,6 +92,7 @@ angular.module('accentsApp')
 				 var id=data[0].key._id;
 				 var rev=data[0].key._rev;
 				 db.put(dbDoc,id,rev,function(err,response){
+					 window.location.href="/#/getdata"; 
 				 });
 			 }
 			 else{
@@ -246,7 +249,6 @@ angular.module('accentsApp')
       termObj.type = 'term';
 		db.put(termObj,termObj._id,termObj._rev,function(err,response){
 			if(err){ console.log(err); }
-			console.log(response);
 				termObj._rev = response.rev;
 				$scope.idDocs[termObj._id] = termObj; // add to cache now that we have an id
 				crudFunctions.refreshOldDocsList($scope);
@@ -304,6 +306,7 @@ angular.module('accentsApp')
 					console.log("completed");					
 					$(".tab-content").show();
 					$("#main-container").loader('hide');
+					   $scope.$apply();
 					if (callback) callback();
 			  }
 			});
@@ -327,7 +330,7 @@ angular.module('accentsApp')
     // now merge records #1-n into termObj #0 and then discard each merged record
     for (var i = 1; i < termsArray.length; i++) {
 	var docId=termsArray[i]._id;
-	var db = new PouchDB(myConfig.url);	
+	//var db = new PouchDB(myConfig.url);	
 	db.get(docId).then(function (doc) {
 	  var term=doc;
 	
@@ -433,7 +436,7 @@ console.log(base);
   $scope.setFormTerm = function(termObj) {
     // clear form -- (it will set to "add" mode temporarily but that does not matter)
     $scope.clearEditForm();
-	var db = new PouchDB(myConfig.url);	
+	//var db = new PouchDB(myConfig.url);	
     // what is this?
     $scope.editdata=termObj;
 
@@ -487,7 +490,7 @@ console.log(base);
   };
 
 $scope.deleteAttachment=function(attachmentId,docId){
-	var db = new PouchDB(myConfig.url);
+	//var db = new PouchDB(myConfig.url);
 	var rev = $scope.idDocs[docId]._rev;
 	db.removeAttachment(docId,attachmentId, rev, function(err, res) {
 	  if (err) { return console.log(err); }
@@ -645,6 +648,7 @@ $scope.deleteAttachment=function(attachmentId,docId){
 		},2000);
         // clear form
         $scope.clearEditForm();
+        $scope.$apply();
      });
   };
 
@@ -659,7 +663,7 @@ $scope.deleteAttachment=function(attachmentId,docId){
 			$scope.saveAudio(termObj._id);		
 		 }
 		 // clean up word family
-	setTimeout(function(){crudFunctions.cleanWordFamily(termObj,$scope);},2000);
+		setTimeout(function(){crudFunctions.cleanWordFamily(termObj,$scope);},2000);	
       // clear form
       $scope.clearEditForm();
 	});
@@ -670,8 +674,7 @@ $scope.saveAudio=function(termId,callback){
 	$('#allrecords').find('audio').each(function() {
 		var attachmentId= $scope.idDocs[docId].wordfamily;
 		var type="audio/mp3";
-		var rev=$scope.idDocs[docId]._rev;	
-		var db = new PouchDB(myConfig.url);	
+		var rev=$scope.idDocs[docId]._rev;
 		var display = document.getElementById('display');
 		var src=this.src;
 		var xhr = new XMLHttpRequest();
@@ -692,8 +695,6 @@ $scope.saveAudio=function(termId,callback){
 		};
 		xhr.send();
 	});
-	var termObj=$scope.idDocs[docId];	
-	console.log(termObj);
 	crudFunctions.refreshOldDocsList($scope);
 	if (callback) callback();
 };
@@ -703,7 +704,7 @@ $scope.saveAudioAll=function(termId,callback){
 		var attachmentId= $scope.idDocs[docId].wordfamily;
 		var type="audio/mp3";
 		var rev=$scope.idDocs[docId]._rev;	
-		var db = new PouchDB(myConfig.url);	
+		//var db = new PouchDB(myConfig.url);	
 		var display = document.getElementById('display');
 		var src=this.src;
 		var xhr = new XMLHttpRequest();
@@ -726,6 +727,7 @@ $scope.saveAudioAll=function(termId,callback){
 	});
 	var termObj=$scope.idDocs[docId];
 	crudFunctions.refreshOldDocsList($scope);
+	$scope.$apply();
 	if (callback) callback();
 };
   // Search data
@@ -787,7 +789,7 @@ $scope.convertAttachment=function(docId){
 	if(typeof($scope.idDocs[docId]._attachments)!="undefined"){
 		var keys = Object.keys($scope.idDocs[docId]._attachments);
 		var attachmentId=keys[0];
-		var db = new PouchDB(myConfig.url);	
+		//var db = new PouchDB(myConfig.url);	
 		db.getAttachment(docId, attachmentId, {rev: rev},function(err,blob){
 			var url = URL.createObjectURL(blob);		
 			var display="<div class='dispinblk playmic'><a onclick='playPause(this);'><audio src='"+url+"' onended='endaudio(this);' ></audio><span class='glyphicon glyphicon-play green'></span></a></div>";

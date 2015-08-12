@@ -58,6 +58,7 @@ document.addEventListener("DOMContentLoaded", function() {
 		scope.saveAudioAll(docId);
 	}
   function startRecording() {
+	  console.log('start');
     recorder = new Recorder(input);
     recorder.record();
     start.setAttribute('disabled',true);
@@ -67,6 +68,7 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 
   function stopRecording() {
+	  console.log('stop');
     start.removeAttribute('disabled');
     start.setAttribute("class", "green recordButton");
     stop.setAttribute('disabled',true);   
