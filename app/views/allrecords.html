@@ -86,11 +86,13 @@
 									<td class="ref" style="font-size: 16px;" >{{doc.original}}</td>
 									<td class="user"><div  style=" max-height: 62px;overflow-x: hidden;overflow-y:auto;text-align: justify;">{{doc.definition}}</div></td>
 									<td class="user audio">
-										<div  id="audio-{{doc._id}}">{{convertAttachment(doc._id)}}</div><button class="recordButton" id="start_{{doc._id}}" onclick="startRecord(this);">
-											<span class="glyphicon glyphicon-record green"></span>
-										</button>&nbsp;<button class="playButton" id="stop_{{doc._id}}" onclick="stopRecord(this);">
-											<span class="glyphicon glyphicon-stop red"></span>
-										</button>
+										<div  id="audio-{{doc._id}}">{{convertAttachment(doc._id)}}</div>
+											<button class="recordButton" id="start_{{doc._id}}" >
+												<span class="glyphicon glyphicon-record green"></span>
+											</button>&nbsp;
+											<button class="playButton disabled" id="stop_{{doc._id}}">
+												<span class="glyphicon glyphicon-stop red"></span>
+											</button>
 									</td>
 									<td class="user">
 										<div  ng-show="doc.verified || doc.doc.ambiguous">

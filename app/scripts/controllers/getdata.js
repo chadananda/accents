@@ -21,8 +21,6 @@ angular.module('accentsApp')
   var domainRemoteDb=myConfig.remoteDbDomain;
   var remoteDb=myConfig.database;
   $scope.init=function(){
-    //console.log("init");
-    //---check if session is made or not
     if(localStorage.getItem('session-user')){
       //console.log(localStorage.getItem('session-user'));
     }
@@ -58,7 +56,7 @@ angular.module('accentsApp')
         // success!
     }).catch(function (err) {
         // some error (maybe a 409, because it already exists?)
-        console.log(err);
+       // console.log(err);
     });
     db.query('my_list/by_type').then(function (res) {
       // got the query results
@@ -81,16 +79,16 @@ angular.module('accentsApp')
         "type": "dbData",
       };
       //FIRST CHECK IF THERE IS ALREADY ANY RECORD PRESENT FOR DBURL
-      $scope.fetchDbData(db,function(data){
-        if(data){
-          //IF RECORD IS ALREADY PRESENT NO NEED TO CREATE NEW JUST UPDATE EXISTING
-          var id=data[0].key._id;
-          var rev=data[0].key._rev;
-          db.put(dbDoc,id,rev,function(err,response){
-            window.location.href="/#/getdata";
-          });
-        }
-       else {
+      //~ $scope.fetchDbData(db,function(data){
+        //~ if(data){
+          //~ //IF RECORD IS ALREADY PRESENT NO NEED TO CREATE NEW JUST UPDATE EXISTING
+          //~ var id=data[0].key._id;
+          //~ var rev=data[0].key._rev;
+          //~ db.put(dbDoc,id,rev,function(err,response){
+            //~ window.location.href="/#/getdata";
+          //~ });
+        //~ }
+       //~ else {
          //ELSE CREATE NEW
          //FIRST CREATE A RECORD FOR DBDETAILS ENTERED BY THE USER VERY FIRST TIME
         db.post(dbDoc, function(err, response) {
@@ -113,8 +111,8 @@ angular.module('accentsApp')
             }
           });
         });
-       }
-     });
+      // }
+    // });
   }
   else{
     alert("Please Enter DB Url!");
@@ -140,29 +138,6 @@ angular.module('accentsApp')
   $scope.$on('$routeChangeSuccess', function(){
     $scope.activePath = $location.path();
   });
-//////////////////////////Fetch  data/////////////////////////////////////
-  // $scope.getAllData = function() {
-   $scope.attachments={};
-   $scope.allAttachmentsFunc=function()
-   {
-     $scope.attachments={};
-     $http.get('http://'+domainRemoteDb+'/'+remoteDb+'/_all_docs?include_docs=true&attachments=true')
-    .success(function(data)
-    {
-      if(data.rows)
-      {
-        angular.forEach(data.rows,function(row){
-          if(!$scope.attachments[row.doc._id])$scope.attachments[row.doc._id]=[];
-           $scope.attachments[row.doc._id]=row.doc._attachments;
-        });
-      }
-    })
-
-    .error(function(error)
-    {
-      console.log(error);
-    });
-   };
   //=======Called on ng-keyup of term======//
   $scope.changeTerm=function(){
     var term = $('#term').val();
@@ -177,8 +152,6 @@ angular.module('accentsApp')
     }
     else $("#heading-term").html("");
   };
-
-
   // Every checkboxes in the page
   // Why?
   $('.checkbox input:checkbox').click(function() {
@@ -703,14 +676,12 @@ $scope.saveAudio=function(termId,callback){
   if (callback) callback();
 };
 $scope.saveAudioAll=function(termId,callback){
-  var docId=termId;
-  $('#audio-'+docId).find('audio').each(function() {
-    var attachmentId= $scope.idDocs[docId].wordfamily;
-    var type="audio/mp3";
-    var rev=$scope.idDocs[docId]._rev;
-    //var db = new PouchDB(myConfig.url);
-    var display = document.getElementById('display');
-    var src=this.src;
+	var docId=termId;
+	var element=$('#audioPlay_'+docId);
+	var attachmentId= $scope.idDocs[docId].wordfamily;
+	var type="audio/mp3";
+	var rev=$scope.idDocs[docId]._rev;
+    var src=element.attr('src');
     var xhr = new XMLHttpRequest();
     xhr.open('GET',src, true);
     xhr.responseType = 'blob';
@@ -722,17 +693,16 @@ $scope.saveAudioAll=function(termId,callback){
           if(!err)
           {
             $scope.idDocs[docId]._rev=res.rev;
+            console.log(res.rev);
           }
+          //console.log(err);
         })  ;
 
       }
     };
     xhr.send();
-  });
-  var termObj=$scope.idDocs[docId];
-  crudFunctions.refreshOldDocsList($scope);
-  $scope.$apply();
-  if (callback) callback();
+    crudFunctions.refreshOldDocsList($scope);
+	if(callback) callback();
 };
   // Search data
   $scope.getnames=function(searchval){
