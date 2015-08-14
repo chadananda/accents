@@ -21,7 +21,7 @@ angular.module('accentsApp')
   var domainRemoteDb = myConfig.remoteDbDomain;
   var remoteDb = myConfig.database;
 
-  $scope.init = function(){
+  $scope.init = function(){;
     if(localStorage.getItem('session-user')){
       //console.log(localStorage.getItem('session-user'));
     }
@@ -52,15 +52,32 @@ angular.module('accentsApp')
           }
         }
       };
-    // save it
-    db.put(ddoc).then(function (res) {   }).catch(function (err) { console.log(err);  });
-    // load a list of all docs matching the type 'dbData'
-    db.query('my_list/by_type').then(function (res) {
-      // got the query results
-      var response;
-      if(res.total_rows>0) response = res.rows;
-      if(callback) callback(response);
-    }).catch(function (err) { console.log(err); });
+      //first check if ddoc exists or not
+      db.get("_design/my_list",function(err,doc){
+		   if(err){
+				//if no such doc exists then put one such doc and fetch results
+				db.put(ddoc).then(function (res) {   }).catch(function (err) { console.log(err);  });
+				// load a list of all docs matching the type 'dbData'
+				db.query('my_list/by_type').then(function (res) {
+				  // got the query results
+				  var response;
+				  if(res.total_rows>0) response = res.rows;
+				  if(callback) callback(response);
+				}).catch(function (err) { console.log(err); });
+			}
+		  else{
+			  //fetch the records with query
+			   // load a list of all docs matching the type 'dbData'
+				db.query('my_list/by_type').then(function (res) {
+				  // got the query results
+				  var response;
+				  if(res.total_rows>0) response = res.rows;
+				  if(callback) callback(response);
+				}).catch(function (err) { console.log(err); });
+			}
+	  });
+    
+   
   };
 
   $scope.submitDbData = function() {
@@ -349,9 +366,9 @@ angular.module('accentsApp')
     document.getElementById("keyid").value="";
     //document.getElementById("keyrev").value="";
     if(typeof($scope.addform)!="undefined") $scope.addform.$setPristine();
-    //$scope.search.doc.term='';
     document.getElementById("term").value="";
     document.getElementById("original").value="";
+    document.getElementById("definition").value="";
     // if multi value reference, keep only the first one
     var ref = document.getElementById("reference").value.split(',').shift().trim();
     $scope.editdata = {ref: ref};
@@ -366,7 +383,8 @@ angular.module('accentsApp')
     $('#editRecording').empty();
     document.getElementById("allrecords").innerHTML="<a id='playButton'><span class='glyphicon glyphicon-play'>"+
       "</span></a>";
-    // what does sessionstorage handle?
+    // when we come from allterms page the term is placed in the session 
+    // after clear the session must be cleared
     if(sessionStorage.length != 0)   {
       var sessionTerm=sessionStorage.term;
       sessionStorage.clear();
@@ -426,21 +444,14 @@ angular.module('accentsApp')
     var blobArray = [];
     var rev = termObj['_id']._rev;
     if(termObj._attachments) {
-      db.get(docId, {attachments: true}).then(function (doc) {
-        angular.forEach(doc._attachments,function(attach,key){
-          blobArray.push(key);
-        });
-        angular.forEach(blobArray,function(blob){
-          var attachmentId=blob;
-          db.getAttachment(docId, attachmentId, {rev: rev},function(err,blob){
+		var attachmentId=Object.keys(termObj._attachments)[0];
+       db.getAttachment(docId, attachmentId, {rev: rev},function(err,blob){
             var url = URL.createObjectURL(blob);
             var display=document.getElementById("allrecords");
             //display.innerHTML="";
             display.innerHTML="<a onclick='playPause(this);'><audio src='"+url+"' onended='endaudio(this);'"+
-              " ></audio><span class='glyphicon glyphicon-play green'></span></a>";
+              " ></audio><span class='glyphicon glyphicon-play'></span></a>";
           });
-        });
-      });
     }
     // set edit mode
     $('#addword').css({ "display":"none" });
@@ -598,6 +609,7 @@ angular.module('accentsApp')
           //if the records are recorded
           $scope.saveAudio(termId);
         }
+	}
         else setTimeout(function() {
           var familyTerms = crudFunctions.getWordFamilyTerms(WordFamily, $scope);
           angular.forEach(familyTerms, function(fam) {
@@ -605,14 +617,16 @@ angular.module('accentsApp')
           });
           console.log(familyTerms);
         },1000);
+        
+        
          // clean up word family
         setTimeout(function(){
           crudFunctions.cleanWordFamily(termObj,$scope);
-        },2000);
+        },1000);
         // clear form
         $scope.clearEditForm();
         $scope.$apply();
-      }
+      
     });
   };
 
@@ -631,37 +645,20 @@ angular.module('accentsApp')
       $scope.clearEditForm();
     });
   };
-
+	// Saving audio function for edit page
   $scope.saveAudio = function(termId, callback) {
-    var docId=termId;
-    $('#allrecords').find('audio').each(function() {
-      var attachmentId= $scope.idDocs[docId].wordfamily;
-      var type = "audio/mp3";
-      var rev = $scope.idDocs[docId]._rev;
-      var display = document.getElementById('display');
-      var src = this.src;
-      // why not use angular http.get here for consistency
-      var xhr = new XMLHttpRequest();
-      xhr.open('GET', src, true);
-      xhr.responseType = 'blob';
-      xhr.onload = function(e) {
-        if (this.status == 200) {
-          var myBlob = this.response;
-          // myBlob is now the blob that the object URL pointed to.
-          db.putAttachment(docId, attachmentId, rev, myBlob, type, function (err, res) {
-            if(!err) {
-              $scope.idDocs[docId]._rev=res.rev;
-            }
-          });
-        }
-      };
-      xhr.send();
-    });
-    crudFunctions.refreshOldDocsList($scope);
+    var docId=termId;    
+	var element=$('#audio');
+    var attachmentId= $scope.idDocs[docId].wordfamily;
+    var type = "audio/mp3";
+    var rev = $scope.idDocs[docId]._rev;
+	var display = document.getElementById('display');
+    var src = element.attr('src'); 
+    $scope.getAudioBlob(src,docId, attachmentId,rev,type);
+	crudFunctions.refreshOldDocsList($scope);
     if (callback) callback();
   };
-
-
+  // Saving audio function for all terms page
   $scope.saveAudioAll = function(termId, callback) {
     var docId=termId;
     var element=$('#audioPlay_'+docId);
@@ -669,26 +666,28 @@ angular.module('accentsApp')
     var type="audio/mp3";
     var rev=$scope.idDocs[docId]._rev;
     var src=element.attr('src');
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', src, true);
-    xhr.responseType = 'blob';
-    xhr.onload = function(e) {
-      if (this.status == 200) {
-        var myBlob = this.response;
-        // myBlob is now the blob that the object URL pointed to.
-        db.putAttachment(docId, attachmentId,rev, myBlob, type,function (err, res) {
-          if(!err) {
-            $scope.idDocs[docId]._rev=res.rev;
-            console.log(res.rev);
-          }
-        });
-      }
-    };
-    xhr.send();
+    $scope.getAudioBlob(src,docId, attachmentId,rev,type);
     crudFunctions.refreshOldDocsList($scope);
     if(callback) callback();
   };
-
+	// Get the audio blob from audio url
+	$scope.getAudioBlob=function(blobUrl,docId, attachmentId,rev,type){
+		var xhr = new XMLHttpRequest();
+		xhr.open('GET', blobUrl, true);
+		xhr.responseType = 'blob';
+		xhr.onload = function(e) {
+		  if (this.status == 200) {
+			var myBlob = this.response;
+			// myBlob is now the blob that the object URL pointed to.
+			db.putAttachment(docId, attachmentId,rev, myBlob, type,function (err, res) {
+			  if(!err) {
+				$scope.idDocs[docId]._rev=res.rev;
+			  }
+			});
+		  }
+		};
+		xhr.send();
+	};
   // Search data
   $scope.getnames = function(searchval) {
     var rows = [];
@@ -757,9 +756,9 @@ angular.module('accentsApp')
       //var db = new PouchDB(myConfig.url);
       db.getAttachment(docId, attachmentId, {rev: rev}, function(err,blob) {
         var url = URL.createObjectURL(blob);
-        var display="<div class='dispinblk playmic'><a onclick='playPause(this);'>"+
+        var display="<button onclick='playPause(this);' class='btn btn-danger btn-xs remove' style='margin-left: 10px;padding-right:3px;'>"+
           "<audio src='"+url+"' onended='endaudio(this);' ></audio>"+
-          "<span class='glyphicon glyphicon-play green'></span></a></div>";
+          "<span class='glyphicon glyphicon-play'></span></button>";
         var el = document.getElementById("audio-"+docId);
         if (el) el.innerHTML = display;
       });
@@ -797,48 +796,3 @@ This directive allows us to pass a function in on an enter key to do what we wan
     return input.slice(start);
   };
 })
-.controller("PaginationCtrl", function($scope) {
-  $scope.itemsPerPage = 10;
-  $scope.currentPage = 0;
-  $scope.items = [];
-  $scope.totalRows=5334; // ????
-
-  for (var i=0; i<$scope.totalRows; i++) {
-    $scope.items.push({ id: i, name: "name "+ i, description: "description " + i });
-  }
-
-  $scope.range = function() {
-    var rangeSize = 5;
-    var ret = [];
-    var start;
-    start = $scope.currentPage;
-    if ( start > $scope.pageCount()-rangeSize ) {
-      start = $scope.pageCount()-rangeSize+1;
-    }
-    for (var i=start; i<start+rangeSize; i++) {
-      ret.push(i);
-    }
-    return ret;
-  };
-  $scope.prevPage = function() {
-    if ($scope.currentPage > 0) $scope.currentPage--;
-  };
-  $scope.prevPageDisabled = function() {
-    return $scope.currentPage === 0 ? "disabled" : "";
-  };
-  $scope.pageCount = function() {
-    return Math.ceil($scope.items.length/$scope.itemsPerPage)-1;
-  };
-  $scope.nextPage = function() {
-    if ($scope.currentPage < $scope.pageCount()) {
-      $scope.currentPage++;
-    }
-  };
-  $scope.nextPageDisabled = function() {
-    return $scope.currentPage === $scope.pageCount() ? "disabled" : "";
-  };
-  $scope.setPage = function(n) {
-    $scope.currentPage = n;
-  };
-
-});

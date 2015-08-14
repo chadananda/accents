@@ -221,7 +221,6 @@ var remoteDb=myConfig.database;
 					search=search.toLowerCase();
 					search= search.replace("_","");
 					search=Utils.dotUndersRevert(search);
-					//if( ((string.toLowerCase().indexOf(search.toLowerCase())) !=-1) && item.doc.verify==1) 
 					if( ((string.toLowerCase().indexOf(search.toLowerCase())) !=-1))					
 					{          
 						filtered.push(item);

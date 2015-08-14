@@ -1,6 +1,7 @@
 function restore()
 {
-	$("#record, #live").removeClass("disabled");$(".one").addClass("disabled");Fr.voice.stop();
+	$("#start, #live").removeClass("disabled");
+	$(".one").addClass("disabled");Fr.voice.stop();
 }
 $(document).ready(function(){
 	//mycode for edit page
@@ -14,7 +15,7 @@ $(document).ready(function(){
   });
   $(document).on("click", "#stop:not(.disabled)", function(){
     Fr.voice.export(function(url){
-		var audioText="<a onclick='playPause(this);'><audio id='audio' src="+url+"></audio><span class='glyphicon glyphicon-play green'></span></a>";
+		var audioText="<a onclick='playPause(this);'><audio id='audio' src="+url+" onended='endaudio(this);'></audio><span class='glyphicon glyphicon-play'></span></a>";
 		document.getElementById("allrecords").innerHTML=audioText;
     }, "URL");
     restore();
@@ -40,8 +41,9 @@ $(document).ready(function(){
 		docId=idArr[1];
 		 
     Fr.voice.export(function(url){
-		var audioText="<a onclick='playPause(this);'><audio id='audioPlay_"+docId+"' src="+url+"></audio><span class='glyphicon glyphicon-play green'></span></a>";		
+		var audioText="<button onclick='playPause(this);' class='btn btn-danger btn-xs remove'><audio id='audioPlay_"+docId+"' src="+url+"  onended='endaudio(this);'></audio><span class='glyphicon glyphicon-play'></span></button>";		
 		 document.getElementById("audio-"+docId).innerHTML=audioText;
+		 $("#start_"+docId).removeClass("disabled");
     var scope = angular.element($("#main-container")).scope(); 
    setTimeout(function(){ scope.saveAudioAll(docId);},1200);
 		

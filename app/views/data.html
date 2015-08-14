@@ -12,16 +12,17 @@
 	{
 		 if(callingElement.firstChild.paused){			
 			callingElement.firstChild.play();
-			callingElement.firstChild.nextSibling.className="glyphicon glyphicon-stop red";			
+			callingElement.firstChild.nextSibling.className="glyphicon glyphicon-stop";			
 		}
 		else{
 			callingElement.firstChild.pause();
-			callingElement.firstChild.nextSibling.className="glyphicon glyphicon-play green";	
+			callingElement.firstChild.nextSibling.className="glyphicon glyphicon-play";	
 		}
 	}
 	function endaudio(callingElement)
 	{
-		callingElement.nextSibling.className="glyphicon glyphicon-play green";	
+		console.log("called");
+		callingElement.nextSibling.className="glyphicon glyphicon-play";	
 	}
 	$("#main-container").loader('show','<img src="images/loading-x.gif">');
 </script>
@@ -42,6 +43,8 @@
 	  </div>
 	</div>
 	<!-- Modal end -->
+	<div class="row">
+	
 	<div class="col-lg-12 clearfix mb10 p0 pt10 pb30 addtext mt30">
 		<div class="col-lg-12 mobile-margin">
 			<div class="row">
@@ -55,7 +58,7 @@
 			<form class="form-inline clearfix" id="addform" name="addform" >
 				<div class="col-md-12">
 					<div class="form-group col-sm-6 ">
-						<input type="text" class="form-control chkval" ng-keyup="changeTerm()" ng-enter="adddata(docs)" name="term" id="term" style="font-size:20px !important;" ng-model-options="{ debounce: 1000 }" ng-minlength="3" ng-model="search.doc.term" />
+						<input type="text" class="form-control chkval"  ng-enter="adddata(docs)" name="term" id="term" style="font-size:20px !important;" ng-model-options="{ debounce: 1000 }" ng-minlength="3" ng-model="search.doc.term" />
 						<input type="hidden" id="keyid"  />
 						<span class="inputexm">Term</span>
 					</div>
@@ -109,21 +112,6 @@
 				</div>  
 			</div>
 		</div>
-<!--
-		<audio controls src="" id="audio"></audio>
-		<div style="margin:10px;">
-			<a class="button" id="record">Record</a>
-						
-			<a class="button disabled one" id="stop">Reset</a>
-			<a class="button disabled one" id="play">Play</a>
-			<a class="button disabled one" id="download">Download</a>
-      <a class="button disabled one" id="base64">Base64 URL</a>
-      <a class="button disabled one" id="mp3">MP3 URL</a>
-		</div>
-
-		<input class="button" type="checkbox" id="live"/>
-		<label for="live">Live Output</label>
-	-->
 		<!--=========================SIMPLE EDIT AND SEARCH=============================-->
 		<div class="col-lg-12 clearfix mt30" >
 			<div class="col-lg-12 clearfix  pt20 pb20">
@@ -136,6 +124,7 @@
 							<span ng-bind-html="i2html(customi2html(t.term))"></span>
 							<span class="glyphicon glyphicon-ok-circle ml10" ng-if="t.verified==true"  style="margin-left: 5px;"></span>
 							<span class="glyphicon glyphicon-question-sign" ng-if="t.ambiguous==true"  style="margin-left: 5px;"></span>
+							<div class="notesClass" ng-show="t._attachments!=''" id="audio-{{t._id}}">{{convertAttachment(t._id)}}</div>
 							<button  ng-click="editdoc(t._id,t._rev);" class="btn btn-primary btn-xs editbtn mb10" type="button" style="margin-left: 10px;">
 								<span class="glyphicon glyphicon-edit"></span>
 							</button>
@@ -143,8 +132,7 @@
 								<span class="glyphicon glyphicon-remove"></span>
 							</button>
 							&nbsp;
-							<div class="otherData">
-								<div class="notesClass" ng-show="t._attachments!=''" id="audio-{{t._id}}">{{convertAttachment(t._id)}}</div>
+							<div class="otherData">								
 								<div class="notesClass" ng-show="t.original!=''">{{t.original}}&nbsp;</div>
 								<div class="notesClass" ng-show="t.ref!=''"> {{t.ref}}&nbsp;</div>
 								<div class="notesClass" ng-show="t.definition!=''"> {{t.definition}}&nbsp;</div>
@@ -190,4 +178,4 @@
 	</div>
     <div>{{message}}</div>
 </div>
-
+</div>
