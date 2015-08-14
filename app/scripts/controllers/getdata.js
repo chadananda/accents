@@ -8,8 +8,8 @@
  * Controller of the accentsApp
  */
 angular.module('accentsApp')
-  .controller('getdataCtrl',
-    function($rootScope,$scope,$http,getRecords,$window,$filter,myConfig,Utils,$sce,docData,$modal,$log,crudFunctions,$location,$timeout) {
+  .controller('getdataCtrl', function($rootScope,$scope,$http,getRecords,$window,
+    $filter,myConfig,Utils,$sce,docData,$modal,$log,crudFunctions,$location,$timeout) {
   $scope.docs={};
   $scope.filterresult={};
   $scope.awesomeThings = [
@@ -18,15 +18,16 @@ angular.module('accentsApp')
     'Karma'
   ];
   var db = new PouchDB(myConfig.database, { cache: true,ajax: {cache:true}});
-  var domainRemoteDb=myConfig.remoteDbDomain;
-  var remoteDb=myConfig.database;
-  $scope.init=function(){
+  var domainRemoteDb = myConfig.remoteDbDomain;
+  var remoteDb = myConfig.database;
+
+  $scope.init = function(){
     if(localStorage.getItem('session-user')){
       //console.log(localStorage.getItem('session-user'));
     }
     else {
       //check if db has dbdetails record or not
-      $scope.fetchDbData(db,function(data) {
+      $scope.fetchDbData(db, function(data) {
         if(data){
           //-----if we have db Details then session can be made-----//
           $scope.todoText ={username: data[0].key.username, loggedIn: true, startDate: new Date()};
@@ -42,37 +43,32 @@ angular.module('accentsApp')
   }
 
   //========Function to fetch the db data==========//
-  $scope.fetchDbData = function(db,callback) {
+  $scope.fetchDbData = function(db, callback) {
     var ddoc = {
-        _id: '_design/my_list',
+        _id:   '_design/my_list',
         views: {
-        by_type: {
-          "map": "function(doc) {\n  if (doc.type==='dbData')\n  emit(doc);}"
+          by_type: {
+            "map": "function(doc) {\n  if (doc.type==='dbData')\n  emit(doc);}"
+          }
         }
-      }
-    };
+      };
     // save it
-    db.put(ddoc).then(function (res) {
-        // success!
-    }).catch(function (err) {
-        // some error (maybe a 409, because it already exists?)
-       // console.log(err);
-    });
+    db.put(ddoc).then(function (res) {   }).catch(function (err) { console.log(err);  });
+    // load a list of all docs matching the type 'dbData'
     db.query('my_list/by_type').then(function (res) {
       // got the query results
-      var response = false;
-      if(res.total_rows>0) response=res.rows;
+      var response;
+      if(res.total_rows>0) response = res.rows;
       if(callback) callback(response);
-    }).catch(function (err) {
-        console.log(err);
-    });
-  }
+    }).catch(function (err) { console.log(err); });
+  };
+
   $scope.submitDbData = function() {
     //==check if field empty or not==//
-    if($scope.dbUrl){
+    if($scope.dbUrl) {
       console.log($scope.dbUrl);
       var remoteDb=$scope.dbUrl;
-      var db=new PouchDB(myConfig.database);
+      var db = new PouchDB(myConfig.database);
       var dbDoc={
         "username": $scope.username,
         "dbUrl": $scope.dbUrl,
@@ -89,55 +85,57 @@ angular.module('accentsApp')
           //~ });
         //~ }
        //~ else {
-         //ELSE CREATE NEW
-         //FIRST CREATE A RECORD FOR DBDETAILS ENTERED BY THE USER VERY FIRST TIME
-        db.post(dbDoc, function(err, response) {
-          if (err) { return console.log(err); }
-            // handle response
-            console.log(response);
-          });
-          //REPLICATE FROM THE REMOTE DB ENTERED
-        db.replicate.from(remoteDb, function (err, result) {
-          if (err) { return console.log(err); }
-          // handle 'completed' result
-          console.log(result);
-          $scope.fetchDbData(db,function(data){
+
+       //ELSE CREATE NEW
+       //FIRST CREATE A RECORD FOR DBDETAILS ENTERED BY THE USER VERY FIRST TIME
+      db.post(dbDoc, function(err, response) {
+        if (err) { return console.log(err); }
+          // handle response
+          console.log(response);
+      });
+
+      //REPLICATE FROM THE REMOTE DB ENTERED
+      db.replicate.from(remoteDb, function (err, result) {
+        if (err) { return console.log(err); }
+        // handle 'completed' result
+        console.log(result);
+        $scope.fetchDbData(db, function(data){
           if(data){
             //-----if we have db Details then session can be made-----//
             $scope.todoText ={username: data[0].key.username, loggedIn: true, startDate: new Date()};
             localStorage.setItem('session-user', JSON.stringify($scope.todoText));
             console.log(localStorage.getItem('session-user'));
             window.location.href="/#/getdata";
-            }
-          });
+          }
         });
-      // }
-    // });
-  }
-  else{
-    alert("Please Enter DB Url!");
-    var element = document.getElementById('dbUrl');
-    element.focus();
-    return false;
-  }
-}
+      });
+    }
+    else {
+      alert("Please Enter DB Url!");
+      var element = document.getElementById('dbUrl');
+      element.focus();
+      return false;
+    }
+  };
 
 
   //===========Calling Utility Functions============//
   $scope.i2html = function(text) {
     return $sce.trustAsHtml(Utils.ilm2HTML(text));
-  }
+  };
   $scope.customi2html=function(text) {
     return Utils.renderGlyph2UTF(text);
-  }
+  };
   $scope.dotUnderRevert=function(text) {
     return Utils.dotUndersRevert(text);
-  }
+  };
+
   //========get active path========//
   $scope.activePath = null;
   $scope.$on('$routeChangeSuccess', function(){
     $scope.activePath = $location.path();
   });
+
   //=======Called on ng-keyup of term======//
   $scope.changeTerm=function(){
     var term = $('#term').val();
@@ -152,6 +150,7 @@ angular.module('accentsApp')
     }
     else $("#heading-term").html("");
   };
+
   // Every checkboxes in the page
   // Why?
   $('.checkbox input:checkbox').click(function() {
@@ -184,58 +183,57 @@ angular.module('accentsApp')
 
   // DATABASE term WRITE functions in one place for easy override
   $scope.termCRUD = function(action, termObj, callback) {
-    if (['put', 'update', 'post', 'add', 'delete'].indexOf(action) < 0) {
-      console.log('No db action: '+action);
-      return false;
-    }
+    if (action==='update') action = 'put';
+    if (action==='add') action = 'post';
+    if (['put','post', 'delete'].indexOf(action) < 0) return console.log('Invalid CRUD: '+action);
+
     console.log('termCRUD', action, termObj);
-    // prune unallowed fields
+
+    // general field fixes:
+    if (!termObj.term) return console.log('Error: Requires term field: ', termObj);
+    // others
+    if (termObj.original && termObj.original.length) termObj.verified = true;
+    termObj.wordfamily = crudFunctions.genWordFamily(termObj.term);
+    termObj.type = 'term';
+    // remove unknown fields
     termObj = crudFunctions.pruneUnallowedFields(termObj);
 
     // delete action requires _id and _rev
-    if (action == 'delete') {
+    if (action==='delete' && termObj._id && termObj._rev) {
       // we update global cache first so our cache is valid synchronously
       delete $scope.idDocs[termObj._id]; // remove item from cache
         crudFunctions.refreshOldDocsList($scope);
       // now delete from the database
-         db.remove(termObj._id,termObj._rev, function(err, response) {
-      if (err) { return console.log(err); }
-      // handle response
-      if (callback) callback();
+      db.remove(termObj._id, termObj._rev, function(err, response) {
+        if (err) return console.log(err);
+        // handle response
+        if (callback) callback();
       });
 
-    // update (put) requires object with _id and _rev, term, wordfamily
-    } else if (termObj['_rev']) {
-      if (!termObj.term || !termObj._id || !termObj._rev) {
-        console.log('Error: put (update) requires term, _id and _rev');
+    // update (put) requires object with _id and _rev
+    } else if (action==='put' && termObj['_rev']) {
+      if (!termObj._id || !termObj._rev) {
+        console.log('Error: put (update) requires _id and _rev');
       }
-      termObj.wordfamily = crudFunctions.genWordFamily(termObj.term);
-      termObj.type = 'term';
-    db.put(termObj,termObj._id,termObj._rev,function(err,response){
-      if(err){ console.log(err); }
+      db.put(termObj, termObj._id, termObj._rev, function(err,response){
+        if(err) return console.log(err);
         termObj._rev = response.rev;
-        $scope.idDocs[termObj._id] = termObj; // add to cache now that we have an id
-        crudFunctions.refreshOldDocsList($scope);
+        $scope.idDocs[termObj._id] = termObj; // update cache
+         crudFunctions.refreshOldDocsList($scope);
         if (callback) callback();
-    });
+      });
 
-    // add (post) requires object with term, wordfamily
-    } else if (!termObj['_rev']) {
-      if (!termObj.term) {
-        console.log('Error: post (add) requires term');
-        return;
-      }
-      termObj.wordfamily = crudFunctions.genWordFamily(termObj.term);
-      termObj.type = 'term';
-      db.post(termObj,function(err,response){
-      if(err){ console.log(err); }
-      console.log(response);
-      termObj._rev = response.rev;
-      termObj._id = response.id;
-      $scope.idDocs[termObj._id] = termObj; // add to cache now that we have an id
-      crudFunctions.refreshOldDocsList($scope);
-      if (callback) callback(termObj);
-    });
+    // add (post) does not require _id or _rev
+    } else if (action==='post' && !termObj['_rev']) {
+      db.post(termObj, function(err, response){
+        if(err) return console.log(err);
+        //console.log(response);
+        termObj._rev = response.rev;
+        termObj._id = response.id;
+        $scope.idDocs[termObj._id] = termObj; // add to cache now that we have an id
+         crudFunctions.refreshOldDocsList($scope);
+        if (callback) callback(termObj);
+      });
     }
   };
 
@@ -243,15 +241,12 @@ angular.module('accentsApp')
   $scope.refreshAllDocList = function(callback) {
     //console.log("called");
     var termObj;
-    db.allDocs({
-        include_docs: true,
-        attachments: true
-      }, function(err, response) {
-        if (err) { return console.log(err); }
-        // handle result
-        if(response.rows){
-          $scope.idDocs = {}; // clear termObj cache
-          response.rows.forEach(function(doc){
+    db.allDocs({include_docs: true, attachments: true}, function(err, response) {
+      if (err) return console.log(err);
+      // handle result
+      if(response.rows) {
+        $scope.idDocs = {}; // clear termObj cache
+        response.rows.forEach(function(doc) {
           termObj = doc.doc;
           if (termObj.type === 'term') {
             termObj.wordfamily = crudFunctions.genWordFamily(termObj.term); // in case it is not there already
@@ -260,20 +255,27 @@ angular.module('accentsApp')
             termObj.ref = crudFunctions.scrubField(termObj.ref, true);
             termObj.verified = termObj.verified || false;
             termObj = crudFunctions.pruneUnallowedFields(termObj); // remove any extraneous fields
+
+            // shim to fix items that should be verified
+            // normally, this will never fire
+            if (!termObj.verified && termObj.original.length) {
+              termObj.verified = true;
+              $scope.termCRUD('update', termObj);
+            }
+
             $scope.idDocs[termObj['_id']] = termObj; // add to termObj cache
           }
-          });
-
-          // for the time being, we can use this to refresh $scope.docs
-          crudFunctions.refreshOldDocsList($scope);
-          //$scope.allAttachmentsFunc();.
-          //console.log("completed");
-          $(".tab-content").show();
-          $("#main-container").loader('hide');
-             $scope.$apply();
-          if (callback) callback();
-        }
-      });
+        });
+        // for the time being, we can use this to refresh $scope.docs
+        crudFunctions.refreshOldDocsList($scope);
+        //$scope.allAttachmentsFunc();.
+        //console.log("completed");
+        $(".tab-content").show();
+        $("#main-container").loader('hide');
+        $scope.$apply();
+        if (callback) callback();
+      }
+    });
   };
 
   // compresses array of matching terms into one, returns termObj
@@ -283,68 +285,50 @@ angular.module('accentsApp')
     var i, key, keys, term, verified;
 
     // sanity check, make sure all terms match
-    var first = termsArray[0].term;
     for (i = 1; i < termsArray.length; i++) {
-      if (first != termsArray[i].term) {
-        console.log('Error: compressTerms received non-matching terms list');
-        return false;
-      }
+      if (termsArray[0].term != termsArray[i].term) return console.log('Error: non-matching terms list');
     }
 
     // we select a 'base' term into which we will merge everything else
-    // to select the term, we will iterate through all of them and select one
-    // which has an attachment
-    // otherwise, we'll use the first one
-    var baseIndex = 0;
-    angular.forEach(termsArray, function(termObj, index) {
-      if(termObj._attachments) baseIndex = index;
+    // iterate through and select one which has an attachment
+    var baseIndex = 0; // default first item
+    termsArray.forEach(function(term, index) {
+      // is this a correct way of checking for an attachment?
+      if(term._attachments) baseIndex = index;
     });
-    var base = termsArray[baseIndex];
-    base.verified = (base.verified || (base.original && base.original.length));
-    //termsArray.delete(baseIndex);
-    termsArray.splice (baseIndex, 1); // remove the base item from the array
+    var base = crudFunctions.pruneUnallowedFields(termsArray[baseIndex]);
+    // fix verified just in case
+    base.verified = base.verified || (base.original && base.original.length);
+    // remove base item from the array
+    termsArray.splice(baseIndex, 1);
 
     // list of allowed fields, we'll ignore all others
     var allowedTerms = crudFunctions.termAllowedFields();
-
-    // merge remaining records int "base" record and discard merged record
-    for (var i = 0; i < termsArray.length; i++) {
-      //var docId=termsArray[i]._id;
-      //var db = new PouchDB(myConfig.url);
-      //db.get(docId).then(function(doc) {
-      //  var term=doc;
-      var term = termsArray[i];
-      keys = Object.keys(term); // iterate through each field of termObj to be discarded
-      for (var j = 1; j < keys.length; j++) {
-        key = keys[j];
+    // merge remaining records into "base" record and discard merged record
+    termsArray.forEach(function(term) {
+      //var term = termsArray[i];
+      Object.keys(term).forEach(function(key) {
         if (allowedTerms.indexOf(key)!=-1) { // ignore properties not on our allowed list
           if (key == 'verified') {
             // base is verified if already verified or matching term verified
-            verified = term.verified || (term.original && term.original.length)
-            base[key] = (base['verified'] || verified);
+            base.verified = base.verified || term.verified || (term.original && term.original.length);
           } else if (key == 'ref') {
             // merge with TRUE causes cleanup of PG and PAR
             base[key] = crudFunctions.scrubField(base[key]+','+term[key], true);
           } else if (['_id','_rev','type','term','ambiguous','wordfamily','_attachments'].indexOf(key)>-1) {
-            // skip these, we do not need to merge them
-             // we no longer need to merge attachement fields because we select a base
-             // that has an attachment if any exist
+             // skip these, we do not need to merge them
+             // we no longer need to merge attachement fields because base has an attachment if any exists
           } else {
             // default merge style for all other fields
             base[key] = crudFunctions.scrubField(base[key]+','+term[key]);
           }
         }
-      };
+      });
       // discard merged record
       $scope.termCRUD('delete', term);
-      // });
-    }
+    });
     // update base record
     $scope.termCRUD('update', base);
-
-    // $scope.refreshAllDocList();  -- we don't need to do this because CRUD updats idDocs list
-         // rather we need to make sure everything uses the idDocs list
-    //console.log(base);
     return base;
   };
 
@@ -366,7 +350,8 @@ angular.module('accentsApp')
     //document.getElementById("keyrev").value="";
     if(typeof($scope.addform)!="undefined") $scope.addform.$setPristine();
     //$scope.search.doc.term='';
-   document.getElementById("term").value="";
+    document.getElementById("term").value="";
+    document.getElementById("original").value="";
     // if multi value reference, keep only the first one
     var ref = document.getElementById("reference").value.split(',').shift().trim();
     $scope.editdata = {ref: ref};
@@ -378,10 +363,11 @@ angular.module('accentsApp')
     $('#Button3').css({ "display":"none" });
     $('#updateword').css({ "display":"none" });
     $('#addword').css({ "display":"block" });
-  $('#editRecording').empty();
-  document.getElementById("allrecords").innerHTML="<a id='playButton'><span class='glyphicon glyphicon-play'></span></a>";
+    $('#editRecording').empty();
+    document.getElementById("allrecords").innerHTML="<a id='playButton'><span class='glyphicon glyphicon-play'>"+
+      "</span></a>";
     // what does sessionstorage handle?
-    if(sessionStorage.length!=0)   {
+    if(sessionStorage.length != 0)   {
       var sessionTerm=sessionStorage.term;
       sessionStorage.clear();
       sessionStorage.term=sessionTerm;
@@ -406,6 +392,9 @@ angular.module('accentsApp')
     term.verified = document.getElementById("verifiedCheckbox").checked;
     if (term.term) term.wordfamily = crudFunctions.genWordFamily(term.term);
     if (!term.user) term.user = $scope.getSessionUser();
+
+    // what about new attachement field?
+
     return term;
   };
 
@@ -432,27 +421,27 @@ angular.module('accentsApp')
     document.getElementById("verifiedCheckbox").checked = termObj.verified;
 
     // why do we need this?
-    $scope.editdata.original =termObj.original.trim();
-  var docId=termObj['_id'];
-  var blobArray=[];
-  var rev=termObj['_id']._rev;
-  if(termObj._attachments){
-  db.get(docId, {attachments: true}).then(function (doc) {
-    angular.forEach(doc._attachments,function(attach,key){
-      blobArray.push(key);
-    });
-
-    angular.forEach(blobArray,function(blob){
-      var attachmentId=blob;
-      db.getAttachment(docId, attachmentId, {rev: rev},function(err,blob){
-        var url = URL.createObjectURL(blob);
-        var display=document.getElementById("allrecords");
-        //display.innerHTML="";
-        display.innerHTML="<a onclick='playPause(this);'><audio src='"+url+"' onended='endaudio(this);' ></audio><span class='glyphicon glyphicon-play green'></span></a>";
+    $scope.editdata.original = termObj.original.trim();
+    var docId = termObj['_id'];
+    var blobArray = [];
+    var rev = termObj['_id']._rev;
+    if(termObj._attachments) {
+      db.get(docId, {attachments: true}).then(function (doc) {
+        angular.forEach(doc._attachments,function(attach,key){
+          blobArray.push(key);
+        });
+        angular.forEach(blobArray,function(blob){
+          var attachmentId=blob;
+          db.getAttachment(docId, attachmentId, {rev: rev},function(err,blob){
+            var url = URL.createObjectURL(blob);
+            var display=document.getElementById("allrecords");
+            //display.innerHTML="";
+            display.innerHTML="<a onclick='playPause(this);'><audio src='"+url+"' onended='endaudio(this);'"+
+              " ></audio><span class='glyphicon glyphicon-play green'></span></a>";
+          });
+        });
       });
-    });
-  });
-  }
+    }
     // set edit mode
     $('#addword').css({ "display":"none" });
     $('#Button2').css({ "display":"block" });
@@ -466,27 +455,27 @@ angular.module('accentsApp')
     // TODO: add audio state
   };
 
-$scope.deleteAttachment=function(attachmentId,docId){
-  //var db = new PouchDB(myConfig.url);
-  var rev = $scope.idDocs[docId]._rev;
-  db.removeAttachment(docId,attachmentId, rev, function(err, res) {
-    if (err) { return console.log(err); }
-    // handle result
-    if(res){
-      $scope.idDocs[docId]._rev = res.rev;
-      var display=document.getElementById(attachmentId);
-      display.innerHTML="";
-      db.get(docId, {attachments: true}).then(function (doc) {
-        $scope.idDocs[docId]=doc;
-      });
-      //~ var attachments=$scope.idDocs[docId]._attachments;
-      //~ delete attachments[attachmentId];
-      //~ console.log(attachments[attachmentId]);
-      //~ $scope.idDocs[docId]._attachments=attachments;
-      console.log($scope.idDocs[docId]);
-    }
-  });
-};
+  $scope.deleteAttachment = function(attachmentId, docId) {
+    //var db = new PouchDB(myConfig.url);
+    var rev = $scope.idDocs[docId]._rev;
+    db.removeAttachment(docId,attachmentId, rev, function(err, res) {
+      if (err) { return console.log(err); }
+      // handle result
+      if(res){
+        $scope.idDocs[docId]._rev = res.rev;
+        var display=document.getElementById(attachmentId);
+        display.innerHTML="";
+        db.get(docId, {attachments: true}).then(function (doc) {
+          $scope.idDocs[docId]=doc;
+        });
+        //~ var attachments=$scope.idDocs[docId]._attachments;
+        //~ delete attachments[attachmentId];
+        //~ console.log(attachments[attachmentId]);
+        //~ $scope.idDocs[docId]._attachments=attachments;
+        console.log($scope.idDocs[docId]);
+      }
+    });
+  };
 
   // Generate an object of word families
   $scope.getMatchLists = function(search) {
@@ -566,7 +555,6 @@ $scope.deleteAttachment=function(attachmentId,docId){
     }, 500);
   };
 
-
   // Delete from Form itself
   $scope.deletedata = function() {
     if($window.confirm('Are you SURE you want to delete this term?')) {
@@ -579,14 +567,17 @@ $scope.deleteAttachment=function(attachmentId,docId){
       });
     }
   };
+
   // Cancel Add or Update Event
   $scope.cancelUpdate = function() {
     $scope.clearEditForm();
   };
+
   // Cancel Add or Update Event
   $scope.cancelUpdateAdd = function() {
     $scope.clearEditForm();
   };
+
   // Edit item
   $scope.editdoc = function(id) {
     var termObj = $scope.getTermObj(id);
@@ -595,119 +586,111 @@ $scope.deleteAttachment=function(attachmentId,docId){
   };
 
   // Form Add
-  $scope.adddata=function() {
+  $scope.adddata = function() {
     var termObj = $scope.getFormTerm();
     if (!termObj.term.trim()) alert('Warning: term field required.');
-      else $scope.termCRUD('add', termObj, function(){
-    var WordFamily= crudFunctions.genWordFamily(termObj);
-        var termId=termObj._id;
-        //call to save the recording if any
-          if($("#allrecords a audio").length)
-         {
-       if(typeof($scope.idDocs[termId])!="undefined"){
-        //if the records are recorded
-        $scope.saveAudio(termId);
-      }
-      else{
-        setTimeout(function(){
-          var familyTerms=crudFunctions.getWordFamilyTerms(WordFamily,$scope);
-          angular.forEach(familyTerms,function(fam){
-          $scope.saveAudio(fam._id);
+    else $scope.termCRUD('add', termObj, function() {
+      var WordFamily= crudFunctions.genWordFamily(termObj);
+      var termId=termObj._id;
+      //call to save the recording if any
+      if($("#allrecords a audio").length) {
+        if(typeof($scope.idDocs[termId])!="undefined"){
+          //if the records are recorded
+          $scope.saveAudio(termId);
+        }
+        else setTimeout(function() {
+          var familyTerms = crudFunctions.getWordFamilyTerms(WordFamily, $scope);
+          angular.forEach(familyTerms, function(fam) {
+            $scope.saveAudio(fam._id);
           });
           console.log(familyTerms);
         },1000);
-
-      }
-     }
-  // clean up word family
-  setTimeout(function(){
-      crudFunctions.cleanWordFamily(termObj,$scope);
-    },2000);
+         // clean up word family
+        setTimeout(function(){
+          crudFunctions.cleanWordFamily(termObj,$scope);
+        },2000);
         // clear form
         $scope.clearEditForm();
         $scope.$apply();
-     });
+      }
+    });
   };
 
   // Form Update
-  $scope.updatedata=function() {
+  $scope.updatedata = function() {
     var termObj = $scope.getFormTerm();
     $scope.termCRUD("update", termObj, function() {
        //call to save the recording if any
-     if($("#allrecords a audio").length)
-         {
-      //if the records are recorded
-      $scope.saveAudio(termObj._id);
-     }
-     // clean up word family
-    setTimeout(function(){crudFunctions.cleanWordFamily(termObj,$scope);},2000);
+      if($("#allrecords a audio").length) {
+        //if the records are recorded
+        $scope.saveAudio(termObj._id);
+      }
+      // clean up word family
+      setTimeout(function() {crudFunctions.cleanWordFamily(termObj,$scope);}, 2000);
       // clear form
       $scope.clearEditForm();
-  });
+    });
   };
-$scope.saveAudio=function(termId,callback){
-  //termId="01A2C771-D09B-3DEA-A651-7DAB69C8E468";
-  var docId=termId;
-  $('#allrecords').find('audio').each(function() {
+
+  $scope.saveAudio = function(termId, callback) {
+    var docId=termId;
+    $('#allrecords').find('audio').each(function() {
+      var attachmentId= $scope.idDocs[docId].wordfamily;
+      var type = "audio/mp3";
+      var rev = $scope.idDocs[docId]._rev;
+      var display = document.getElementById('display');
+      var src = this.src;
+      // why not use angular http.get here for consistency
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', src, true);
+      xhr.responseType = 'blob';
+      xhr.onload = function(e) {
+        if (this.status == 200) {
+          var myBlob = this.response;
+          // myBlob is now the blob that the object URL pointed to.
+          db.putAttachment(docId, attachmentId, rev, myBlob, type, function (err, res) {
+            if(!err) {
+              $scope.idDocs[docId]._rev=res.rev;
+            }
+          });
+        }
+      };
+      xhr.send();
+    });
+    crudFunctions.refreshOldDocsList($scope);
+    if (callback) callback();
+  };
+
+
+  $scope.saveAudioAll = function(termId, callback) {
+    var docId=termId;
+    var element=$('#audioPlay_'+docId);
     var attachmentId= $scope.idDocs[docId].wordfamily;
     var type="audio/mp3";
     var rev=$scope.idDocs[docId]._rev;
-    var display = document.getElementById('display');
-    var src=this.src;
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET',src, true);
-    xhr.responseType = 'blob';
-    xhr.onload = function(e) {
-      if (this.status == 200) {
-        var myBlob = this.response;
-        // myBlob is now the blob that the object URL pointed to.
-        db.putAttachment(docId, attachmentId,rev, myBlob, type,function (err, res) {
-          if(!err)
-          {
-            $scope.idDocs[docId]._rev=res.rev;
-          }
-        })  ;
-
-      }
-    };
-    xhr.send();
-  });
-  crudFunctions.refreshOldDocsList($scope);
-  if (callback) callback();
-};
-$scope.saveAudioAll=function(termId,callback){
-	var docId=termId;
-	var element=$('#audioPlay_'+docId);
-	var attachmentId= $scope.idDocs[docId].wordfamily;
-	var type="audio/mp3";
-	var rev=$scope.idDocs[docId]._rev;
     var src=element.attr('src');
     var xhr = new XMLHttpRequest();
-    xhr.open('GET',src, true);
+    xhr.open('GET', src, true);
     xhr.responseType = 'blob';
     xhr.onload = function(e) {
       if (this.status == 200) {
         var myBlob = this.response;
         // myBlob is now the blob that the object URL pointed to.
         db.putAttachment(docId, attachmentId,rev, myBlob, type,function (err, res) {
-          if(!err)
-          {
+          if(!err) {
             $scope.idDocs[docId]._rev=res.rev;
             console.log(res.rev);
           }
-          //console.log(err);
-        })  ;
-
+        });
       }
     };
     xhr.send();
     crudFunctions.refreshOldDocsList($scope);
-	if(callback) callback();
-};
+    if(callback) callback();
+  };
+
   // Search data
-  $scope.getnames=function(searchval){
-    // Pull from the idDocs list instead of from the DB to speed this up
-    // something like:
+  $scope.getnames = function(searchval) {
     var rows = [];
     Object.keys($scope.idDocs).forEach(function(id) {
       var termObj = $scope.idDocs[id];
@@ -718,67 +701,74 @@ $scope.saveAudioAll=function(termId,callback){
       $scope.count=rows.length;
     }
   };
+
   // is this for the filtered list?
   $scope.getAllRecords = function(key){
     document.getElementById("sideIcon-"+key).className = "glyphicon glyphicon-chevron-down mr5 openPanel";
     document.getElementById("showDiv-"+key).style.display='block';
   };
+
   $scope.objectKeys = function(obj){
-  return Object.keys(obj);
-}
-$scope.groupfilter=function(term){
-  var search=$scope.customi2html(term);
-  var matchlist = $scope.getMatchLists(search);
+    return Object.keys(obj);
+  };
+
+  $scope.groupfilter=function(term){
+    var search=$scope.customi2html(term);
+    var matchlist = $scope.getMatchLists(search);
     return  matchlist.partial;
-};
-$scope.groupfiltercount=function(term){
-  var search=$scope.customi2html(term);
-  var matchlist = $scope.getMatchLists(search);
+  };
+
+  $scope.groupfiltercount=function(term){
+    var search=$scope.customi2html(term);
+    var matchlist = $scope.getMatchLists(search);
     var sum=0;
     angular.forEach(matchlist.partial,function(item){
       sum+=item.length;
     });
-      return  sum;
-};
-$scope.wholeWordFilter=function(term){
-  var search=$scope.customi2html(term);
-  var matchlist = $scope.getMatchLists(search);
-    return  matchlist.whole;
-}
-$scope.wholeWordFilterCount=function(term){
-  var search=$scope.customi2html(term);
-  var matchlist = $scope.getMatchLists(search);
-  var sum=0;
-    angular.forEach(matchlist.whole,function(item){
-      sum+=item.length;
-    });
-      return  sum;
-}
- $scope.openModal=function(){
-     $('#myModal').modal({show:true});
-  }
-$scope.convertAttachment=function(docId){
-  var rev=$scope.idDocs[docId]._rev;
-  var blobArray=[];
-  if(typeof($scope.idDocs[docId]._attachments)!="undefined"){
-    var keys = Object.keys($scope.idDocs[docId]._attachments);
-    var attachmentId=keys[0];
-    //var db = new PouchDB(myConfig.url);
-    db.getAttachment(docId, attachmentId, {rev: rev},function(err,blob){
-      var url = URL.createObjectURL(blob);
-      var display="<div class='dispinblk playmic'><a onclick='playPause(this);'><audio src='"+url+"' onended='endaudio(this);' ></audio><span class='glyphicon glyphicon-play green'></span></a></div>";
-      var audioplay=document.getElementById("audio-"+docId);
-      if(audioplay)
-        audioplay.innerHTML=display;
-    });
-  }
-  else
-  {
-    var audioplay=document.getElementById("audio-"+docId);
-      audioplay.innerHTML="";;
-  }
+    return  sum;
+  };
 
-}
+  $scope.wholeWordFilter=function(term){
+    var search=$scope.customi2html(term);
+    var matchlist = $scope.getMatchLists(search);
+    return  matchlist.whole;
+  };
+
+  $scope.wholeWordFilterCount=function(term){
+    var search=$scope.customi2html(term);
+    var matchlist = $scope.getMatchLists(search);
+    var sum=0;
+    angular.forEach(matchlist.whole,function(item) {
+      sum += item.length;
+    });
+    return  sum;
+  };
+
+  $scope.openModal=function(){
+    $('#myModal').modal({show:true});
+  };
+
+  $scope.convertAttachment=function(docId){
+    var rev=$scope.idDocs[docId]._rev;
+    var blobArray=[];
+    if(typeof($scope.idDocs[docId]._attachments)!="undefined") {
+      var keys = Object.keys($scope.idDocs[docId]._attachments);
+      var attachmentId = keys[0];
+      //var db = new PouchDB(myConfig.url);
+      db.getAttachment(docId, attachmentId, {rev: rev}, function(err,blob) {
+        var url = URL.createObjectURL(blob);
+        var display="<div class='dispinblk playmic'><a onclick='playPause(this);'>"+
+          "<audio src='"+url+"' onended='endaudio(this);' ></audio>"+
+          "<span class='glyphicon glyphicon-play green'></span></a></div>";
+        var el = document.getElementById("audio-"+docId);
+        if (el) el.innerHTML = display;
+      });
+    }
+    else {
+      var el = document.getElementById("audio-"+docId);
+      if (el) el.innerHTML = "";
+    }
+  };
 
 })
 
@@ -791,7 +781,7 @@ This directive allows us to pass a function in on an enter key to do what we wan
     element.bind("keydown keypress", function (event) {
       if(event.which === 13) {
         scope.$apply(function () {
-            scope.$eval(attrs.ngEnter);
+          scope.$eval(attrs.ngEnter);
         });
         event.preventDefault();
       }
