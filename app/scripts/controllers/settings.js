@@ -55,14 +55,15 @@ angular.module('accentsApp')
       username:fullResponse.username
     };
     // save it
-    db.put(termDb,fullResponse._id,fullResponse._rev).then(function (response) {
+    db.put(termDb, fullResponse._id, fullResponse._rev).then(function (response) {
         // success!
-      //  console.log(response);
+      //console.log(response);
     }).catch(function (err) {
       // some error (maybe a 409, because it already exists?)
     });
 
-    db.replicate.to(remoteUrl,{retry: true}).on('complete', function () {
+    db.sync(remoteUrl, {retry: true}).on('complete', function () {
+    //db.replicate.to(remoteUrl, {retry: true}).on('complete', function () {
       // yay, we're done!
       console.log("replication complete");
     }).on('error', function (err) {
