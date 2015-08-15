@@ -79,11 +79,11 @@ angular.module('accentsApp')
     var userpass = localStorage['userpass'];
     if (!remoteDbUrl || !username || !userpass) return;
     // if remoteDBUrl has a protocol then cut it off
-    if (remoteDBUrl.indexOf('://')>-1) {
-      var protocol = remoteDBUrl.substr(0, remoteDBUrl.indexof('://')+3);
-      remoteDBUrl = remoteDBUrl.substr(remoteDBUrl.indexof('://')+3);
+    if (remoteDbUrl.indexOf('://')>-1) {
+      protocol = remoteDbUrl.substr(0, remoteDbUrl.indexof('://')+3);
+      remoteDbUrl = remoteDbUrl.substr(remoteDbUrl.indexof('://')+3);
     }
-    var remote = protocol + username +':'+ userpass +'@'+ remoteDBUrl;
+    var remote = protocol + username +':'+ userpass +'@'+ remoteDbUrl;
 
     // pull down all changes
     console.log ('Replicating from remote');
