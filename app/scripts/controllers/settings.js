@@ -54,6 +54,7 @@ angular.module('accentsApp')
       type:  fullResponse.type,
       username:fullResponse.username
     };
+
     // save it
     db.put(termDb, fullResponse._id, fullResponse._rev).then(function (response) {
         // success!
@@ -62,14 +63,51 @@ angular.module('accentsApp')
       // some error (maybe a 409, because it already exists?)
     });
 
-    db.sync(remoteUrl, {retry: true}).on('complete', function () {
-    //db.replicate.to(remoteUrl, {retry: true}).on('complete', function () {
-      // yay, we're done!
-      console.log("replication complete");
-    }).on('error', function (err) {
-      // boo, something went wrong!
-      console.log("replication has some error"+err);
-    });
+
+    // not sure the best way to query user for username/password
+    // maybe we should do this on first sync and save them (not in pouch/accents pls)
+    var local = 'accents';
+    var remote = 'http://'+termDb.username+':'+'vanilla'+'@'+  termDb.dbUrl;
+    console.log ('Replicating from remote');
+    db.replicate.from(remote)
+      .on('change', function (info) {
+       console.log("Sync progress: ", info);
+      })
+      .on('complete', function (info) {
+       console.log("Sync complete: ", info);
+      })
+      .on('denied', function (info) {
+       console.log("Sync denied: ", info);
+      })
+      .on('error', function (err) {
+       console.log("Sync failed: ", err);
+      })
+      .then(function(){
+
+        console.log ('Cleaning up and compressing all word families...');
+        crudFunctions.cleanAllWordFamilies($scope);
+
+        console.log ('Replicating to remote');
+        db.replicate.to(remote)
+          .on('change', function (info) {
+           console.log("Sync progress: ", info);
+          })
+          .on('complete', function (info) {
+           console.log("Sync complete: ", info);
+          })
+          .on('denied', function (info) {
+           console.log("Sync denied: ", info);
+          })
+          .on('error', function (err) {
+           console.log("Sync failed: ", err);
+          });
+
+
+
+      });
+
+
+
 
   }).catch(function (err) {
     // some error

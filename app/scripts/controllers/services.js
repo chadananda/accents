@@ -56,15 +56,16 @@ angular.module('accentsApp')
     cleanAllWordFamilies: function(scope) {
       // gather and clean up every single word family:
       var wordFamilies = this.getAllWordFamilies(scope);
+      var original_count = Object.keys(scope.idDocs).length;
       console.log('Cleaning up '+wordFamilies.length+' word families. '+
-        ' Total records: '+ Object.keys(scope.idDocs).length);
+        ' Total records: '+ original_count);
       angular.forEach(wordFamilies,function(wordFamily) {
-        console.log('Cleaning up word family: '+wordFamily +
-            ' Total records: '+ Object.keys(scope.idDocs).length);
+       // console.log('Cleaning up word family: '+wordFamily +
+         //   ' Total records: '+ Object.keys(scope.idDocs).length);
         this.cleanWordFamily(wordFamily, scope);
       }, this);
       console.log("Done cleaning word families. "+
-        ' Total records: '+ Object.keys(scope.idDocs).length);
+        ' Total records removed: '+  (original_count - Object.keys(scope.idDocs).length));
     },
 
     // compresses family down to one record per unique term, merging fields as appropriate

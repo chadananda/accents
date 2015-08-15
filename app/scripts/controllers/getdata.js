@@ -76,8 +76,8 @@ angular.module('accentsApp')
 				}).catch(function (err) { console.log(err); });
 			}
 	  });
-    
-   
+
+
   };
 
   $scope.submitDbData = function() {
@@ -256,7 +256,6 @@ angular.module('accentsApp')
 
   // DATABASE read all fields into hash cache ($scope.idDocs[id]) instant access by _id
   $scope.refreshAllDocList = function(callback) {
-    //console.log("called");
     var termObj;
     db.allDocs({include_docs: true, attachments: true}, function(err, response) {
       if (err) return console.log(err);
@@ -264,29 +263,28 @@ angular.module('accentsApp')
       if(response.rows) {
         $scope.idDocs = {}; // clear termObj cache
         response.rows.forEach(function(doc) {
-          termObj = doc.doc;
-          if (termObj.type === 'term') {
+          if (doc.doc.type === 'term') {
+            // make a copy of the object rather than reference so we can compare later
+            termObj = JSON.parse(JSON.stringify(doc.doc));
+            // clean up fields
             termObj.wordfamily = crudFunctions.genWordFamily(termObj.term); // in case it is not there already
             termObj.original = termObj.original || ''; // default blank string
             termObj.definition = termObj.definition || ''; // default blank
             termObj.ref = crudFunctions.scrubField(termObj.ref, true);
-            termObj.verified = termObj.verified || false;
-            termObj = crudFunctions.pruneUnallowedFields(termObj); // remove any extraneous fields
-
-            // shim to fix items that should be verified
-            // normally, this will never fire
-            if (!termObj.verified && termObj.original.length) {
-              termObj.verified = true;
-              $scope.termCRUD('update', termObj);
+            termObj.verified = termObj.verified || termObj.original.length;
+            // remove any extra fields
+            termObj = crudFunctions.pruneUnallowedFields(termObj);
+            // if object has been modified by these load rules, save modifications
+            if (JSON.stringify(termObj) != JSON.stringify(doc.doc)) {
+              console.log('Updating record: ', doc.doc,termObj);
+              $scope.termCRUD('update',  termObj);
             }
-
-            $scope.idDocs[termObj['_id']] = termObj; // add to termObj cache
+            // add to termObj cach
+            $scope.idDocs[termObj['_id']] = termObj;
           }
         });
         // for the time being, we can use this to refresh $scope.docs
         crudFunctions.refreshOldDocsList($scope);
-        //$scope.allAttachmentsFunc();.
-        //console.log("completed");
         $(".tab-content").show();
         $("#main-container").loader('hide');
         $scope.$apply();
@@ -383,7 +381,7 @@ angular.module('accentsApp')
     $('#editRecording').empty();
     document.getElementById("allrecords").innerHTML="<a id='playButton'><span class='glyphicon glyphicon-play'>"+
       "</span></a>";
-    // when we come from allterms page the term is placed in the session 
+    // when we come from allterms page the term is placed in the session
     // after clear the session must be cleared
     if(sessionStorage.length != 0)   {
       var sessionTerm=sessionStorage.term;
@@ -617,8 +615,8 @@ angular.module('accentsApp')
           });
           console.log(familyTerms);
         },1000);
-        
-        
+
+
          // clean up word family
         setTimeout(function(){
           crudFunctions.cleanWordFamily(termObj,$scope);
@@ -626,7 +624,7 @@ angular.module('accentsApp')
         // clear form
         $scope.clearEditForm();
         $scope.$apply();
-      
+
     });
   };
 
@@ -647,13 +645,13 @@ angular.module('accentsApp')
   };
 	// Saving audio function for edit page
   $scope.saveAudio = function(termId, callback) {
-    var docId=termId;    
+    var docId=termId;
 	var element=$('#audio');
     var attachmentId= $scope.idDocs[docId].wordfamily;
     var type = "audio/mp3";
     var rev = $scope.idDocs[docId]._rev;
 	var display = document.getElementById('display');
-    var src = element.attr('src'); 
+    var src = element.attr('src');
     $scope.getAudioBlob(src,docId, attachmentId,rev,type);
 	crudFunctions.refreshOldDocsList($scope);
     if (callback) callback();
