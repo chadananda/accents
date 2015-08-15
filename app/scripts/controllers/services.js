@@ -21,10 +21,10 @@ angular.module('accentsApp')
   return {
 
     // single point for DB path in case we want to change it later (including http)
-    db_url: function() {
+   // db_url: function() {
       // detect page https?
       //return 'http://'+domainRemoteDb+'/'+remoteDb + '/';
-    },
+   // },
 
     // remove fields that are not allowed -- we use this on loading records and before saving
     pruneUnallowedFields: function(termObj) {
@@ -120,7 +120,7 @@ angular.module('accentsApp')
 
     // returns array of termObjects matching this family
     // loads entire db and generates correct wordfamily for each so should be backwards compatible
-    getWordFamilyTerms : function(wordfamily,scope) {
+    getWordFamilyTerms : function(wordfamily, scope) {
       if (!wordfamily) return [];
       var result = [];
       wordfamily = this.genWordFamily(wordfamily); // just to make sure
@@ -160,7 +160,6 @@ angular.module('accentsApp')
       var obj3 = $.extend(baseData, termData);
       console.log("scrubAttachmentField(): ", obj3);
       return obj3;
-
     },
 
     // refresh $scope.docs from idDocs without having to query DB
@@ -169,11 +168,11 @@ angular.module('accentsApp')
       scope.count = scope.docs.length;
     },
 
-    //
+    /*
     all: function() {
       return users;
     }
-
+    */
 
   };
 })

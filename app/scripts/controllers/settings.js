@@ -38,7 +38,8 @@ angular.module('accentsApp')
   $scope.editdocPage = function(docid,rev) {
     var list=[{"id":docid},{"rev":rev}];
     docData.setFormData(list);
-    window.location.href="http://localhost:9000/#/getdata";
+    //window.location.href="http://localhost:9000/#/getdata";
+    //$location.path('getdata');
   };
 
   //===========Replicate local db to remote db entered===============//

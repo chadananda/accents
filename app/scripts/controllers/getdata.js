@@ -17,9 +17,9 @@ angular.module('accentsApp')
     'AngularJS',
     'Karma'
   ];
-  var db = new PouchDB(myConfig.database, { cache: true,ajax: {cache:true}});
-  var domainRemoteDb = myConfig.remoteDbDomain;
-  var remoteDb = myConfig.database;
+  var db = new PouchDB(myConfig.database, {auto_compaction: true});
+  //var domainRemoteDb = myConfig.remoteDbDomain;
+  //var remoteDb = myConfig.database;
 
   $scope.init = function(){;
     if(localStorage.getItem('session-user')){
