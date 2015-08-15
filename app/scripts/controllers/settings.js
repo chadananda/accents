@@ -15,30 +15,35 @@ angular.module('accentsApp')
       'AngularJS',
       'Karma'
     ];
-  var db = new PouchDB(myConfig.database, { cache: true,stub:true,ajax: {cache:true}});
-  var domainRemoteDb = myConfig.remoteDbDomain;
-  var remoteDb = myConfig.database;
+  var db = new PouchDB(myConfig.database, {auto_compaction: true});
+  //var domainRemoteDb = myConfig.remoteDbDomain;
+  //var remoteDb = myConfig.database;
   $scope.settingsInit = function() {
-    db.query('my_list/by_type').then(function (res) {
-      if(res.total_rows>0) document.getElementById('remoteDbUrl').value = res.rows[0].key.dbUrl;
-    }).catch(function (err) { console.log('$scope.settingsInit(): ', err); });
+    //db.query('my_list/by_type').then(function (res) {
+    var remoteDbUrl = localStorage['remoteDbUrl'];
+    if(remoteDbUrl) document.getElementById('remoteDbUrl').value = remoteDbUrl;
+    //}).catch(function (err) { console.log('$scope.settingsInit(): ', err); });
   };
+
   //===========Calling Utility Functions============//
- $scope.i2html = function(text) {
-  return $sce.trustAsHtml(Utils.ilm2HTML(text));
- }
- $scope.customi2html = function(text) {
+  $scope.i2html = function(text) {
+    return $sce.trustAsHtml(Utils.ilm2HTML(text));
+  };
+
+  $scope.customi2html = function(text) {
    return Utils.renderGlyph2UTF(text);
- }
- //=========Pass document data to edit page=================//
- $scope.editdocPage = function(docid,rev) {
-   var list=[{"id":docid},{"rev":rev}];
-   docData.setFormData(list);
-   window.location.href="http://localhost:9000/#/getdata";
- };
- //===========Replicate local db to remote db entered===============//
- $scope.replicateToRemote=function(){
-  var remoteUrl = document.getElementById("remoteDbUrl").value;
+  };
+
+  //=========Pass document data to edit page=================//
+  $scope.editdocPage = function(docid,rev) {
+    var list=[{"id":docid},{"rev":rev}];
+    docData.setFormData(list);
+    window.location.href="http://localhost:9000/#/getdata";
+  };
+
+  //===========Replicate local db to remote db entered===============//
+  $scope.replicateToRemote=function(){
+  /*
   // what query is this? what are we expecting to get?
   db.query('my_list/by_type').then(function(res) {
     // got the query results
@@ -55,6 +60,7 @@ angular.module('accentsApp')
       username:fullResponse.username
     };
 
+
     // save it
     db.put(termDb, fullResponse._id, fullResponse._rev).then(function (response) {
         // success!
@@ -62,67 +68,59 @@ angular.module('accentsApp')
     }).catch(function (err) {
       // some error (maybe a 409, because it already exists?)
     });
+   */
 
+    // this works but needs replaced with cookie-based authentication
+    // so that we are not sending password out over the request
+    localStorage['remoteDbUrl'] = document.getElementById("remoteDbUrl").value;
+    var remoteDbUrl = localStorage['remoteDbUrl'];
+    var protocol = 'http://'; // default
+    var username = localStorage['username'];
+    var userpass = localStorage['userpass'];
+    if (!remoteDbUrl || !username || !userpass) return;
+    // if remoteDBUrl has a protocol then cut it off
+    if (remoteDBUrl.indexOf('://')>-1) {
+      var protocol = remoteDBUrl.substr(0, remoteDBUrl.indexof('://')+3);
+      remoteDBUrl = remoteDBUrl.substr(remoteDBUrl.indexof('://')+3);
+    }
+    var remote = protocol + username +':'+ userpass +'@'+ remoteDBUrl;
 
-    // not sure the best way to query user for username/password
-    // maybe we should do this on first sync and save them (not in pouch/accents pls)
-    var local = 'accents';
-    var remote = 'http://'+termDb.username+':'+'vanilla'+'@'+  termDb.dbUrl;
+    // pull down all changes
     console.log ('Replicating from remote');
     db.replicate.from(remote)
-      .on('change', function (info) {
-       console.log("Sync progress: ", info);
-      })
-      .on('complete', function (info) {
-       console.log("Sync complete: ", info);
-      })
-      .on('denied', function (info) {
-       console.log("Sync denied: ", info);
-      })
-      .on('error', function (err) {
-       console.log("Sync failed: ", err);
-      })
+      .on('change', function (info) { console.log("Sync progress: ", info);  })
+      .on('complete', function (info) { console.log("Sync complete: ", info); })
+      .on('denied', function (info) { console.log("Sync denied: ", info); })
+      .on('error', function (err) { console.log("Sync failed: ", err);  })
       .then(function(){
-
+        // clean up and compact
         console.log ('Cleaning up and compressing all word families...');
         crudFunctions.cleanAllWordFamilies($scope);
-
+        // push up all changes
         console.log ('Replicating to remote');
         db.replicate.to(remote)
-          .on('change', function (info) {
-           console.log("Sync progress: ", info);
-          })
-          .on('complete', function (info) {
-           console.log("Sync complete: ", info);
-          })
-          .on('denied', function (info) {
-           console.log("Sync denied: ", info);
-          })
-          .on('error', function (err) {
-           console.log("Sync failed: ", err);
-          });
-
-
-
+          .on('change', function (info) { console.log("Sync progress: ", info); })
+          .on('complete', function (info) { console.log("Sync complete: ", info); })
+          .on('denied', function (info) { console.log("Sync denied: ", info); })
+          .on('error', function (err) { console.log("Sync failed: ", err); });
       });
-
-
-
-
+  /*
   }).catch(function (err) {
     // some error
     console.log('$scope.replicateToRemote(): ', err);
   });
+*/
 
- };
+  };
 
   //==================For slide toggle of help divs====================//
   $scope.slideShow=function(calledId)  {
-    $( "#"+calledId ).slideToggle( "3000" );
+    $( "#"+calledId ).slideToggle("3000");
   };
 
   //=======================cleanup and compress two step function=================//
   $scope.cleanupAndCompress=function(){
+    /*
     //=======step 1 set verified to true for all docs having original field=======//
     angular.forEach($scope.idDocs, function(termObj) {
        if(termObj.original && termObj.original!="" && !termObj.verified) {
@@ -131,7 +129,10 @@ angular.module('accentsApp')
          $scope.termCRUD('update', termObj);
        }
      });
+     */
      //======step 2 call cleanAllwordfamilies=======//
      crudFunctions.cleanAllWordFamilies($scope);
-  }
+  };
+
+
  });

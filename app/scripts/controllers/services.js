@@ -3,7 +3,7 @@ angular.module('accentsApp')
   .factory('getRecords', function($http,myConfig) {
     return {
       getAllData: function(userId) {
-        return $http.get(myConfig.url+'_all_docs?include_docs=true');
+        //return $http.get(myConfig.url+'_all_docs?include_docs=true');
       },
     };
   })
@@ -11,19 +11,19 @@ angular.module('accentsApp')
 
 .factory('pouchdb', function() {
   Pouch.enableAllDbs = true;
-  return new Pouch('accents');
+  return new Pouch('accents', {auto_compaction: true});
 })
 
 //======Factory for crud functions=======//
 .factory('crudFunctions', function(myConfig, Utils){
-  var domainRemoteDb = myConfig.remoteDbDomain;
-  var remoteDb = myConfig.database;
+  // var domainRemoteDb = myConfig.remoteDbDomain;
+  // var remoteDb = myConfig.database;
   return {
 
     // single point for DB path in case we want to change it later (including http)
     db_url: function() {
       // detect page https?
-      return 'http://'+domainRemoteDb+'/'+remoteDb + '/';
+      //return 'http://'+domainRemoteDb+'/'+remoteDb + '/';
     },
 
     // remove fields that are not allowed -- we use this on loading records and before saving
@@ -182,6 +182,6 @@ angular.module('accentsApp')
     var data = this;
     return {
       getFormData: function () { return sessionStorage.data; },
-      setFormData: function (list) { sessionStorage.data =JSON.stringify(list); }
+      setFormData: function (list) { sessionStorage.data = JSON.stringify(list); }
     };
   });
