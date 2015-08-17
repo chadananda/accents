@@ -21,11 +21,11 @@ angular.module('accentsApp')
   //var domainRemoteDb = myConfig.remoteDbDomain;
   //var remoteDb = myConfig.database;
 
-  $scope.init = function(){;
-    if(localStorage.getItem('session-user')){
-      //console.log(localStorage.getItem('session-user'));
-    }
-    else {
+  $scope.init = function() {
+    var username = localStorage.getItem('username');
+
+    if(!username) {
+      /*
       //check if db has dbdetails record or not
       $scope.fetchDbData(db, function(data) {
         if(data){
@@ -35,15 +35,21 @@ angular.module('accentsApp')
           //console.log(localStorage.getItem('session-user'));
         }
         else{
+          */
           $location.path("/about");
-          window.location.href="/#/about";
-        }
-      });
+          //window.location.href="/#/about";
+       // }
+      //});
     }
   }
 
   //========Function to fetch the db data==========//
   $scope.fetchDbData = function(db, callback) {
+
+    // this is all just to store the remote DB URL?
+    // we don't want to store user credentials or remote url in the database
+
+    /*
     var ddoc = {
         _id:   '_design/my_list',
         views: {
@@ -54,37 +60,40 @@ angular.module('accentsApp')
       };
       //first check if ddoc exists or not
       db.get("_design/my_list",function(err,doc){
-		   if(err){
-				//if no such doc exists then put one such doc and fetch results
-				db.put(ddoc).then(function (res) {   }).catch(function (err) { console.log(err);  });
-				// load a list of all docs matching the type 'dbData'
-				db.query('my_list/by_type').then(function (res) {
-				  // got the query results
-				  var response;
-				  if(res.total_rows>0) response = res.rows;
-				  if(callback) callback(response);
-				}).catch(function (err) { console.log(err); });
-			}
-		  else{
-			  //fetch the records with query
-			   // load a list of all docs matching the type 'dbData'
-				db.query('my_list/by_type').then(function (res) {
-				  // got the query results
-				  var response;
-				  if(res.total_rows>0) response = res.rows;
-				  if(callback) callback(response);
-				}).catch(function (err) { console.log(err); });
-			}
-	  });
-
+       if(err){
+        //if no such doc exists then put one such doc and fetch results
+        db.put(ddoc).then(function (res) {   }).catch(function (err) { console.log(err);  });
+        // load a list of all docs matching the type 'dbData'
+        db.query('my_list/by_type').then(function (res) {
+          // got the query results
+          var response;
+          if(res.total_rows>0) response = res.rows;
+          if(callback) callback(response);
+        }).catch(function (err) { console.log(err); });
+      }
+      else{
+        //fetch the records with query
+         // load a list of all docs matching the type 'dbData'
+        db.query('my_list/by_type').then(function (res) {
+          // got the query results
+          var response;
+          if(res.total_rows>0) response = res.rows;
+          if(callback) callback(response);
+        }).catch(function (err) { console.log(err); });
+      }
+    });
+    */
 
   };
 
   $scope.submitDbData = function() {
+
+
+    /*
     //==check if field empty or not==//
     if($scope.dbUrl) {
       console.log($scope.dbUrl);
-      var remoteDb=$scope.dbUrl;
+      var remoteDb = $scope.dbUrl;
       var db = new PouchDB(myConfig.database);
       var dbDoc={
         "username": $scope.username,
@@ -111,7 +120,24 @@ angular.module('accentsApp')
           console.log(response);
       });
 
-      //REPLICATE FROM THE REMOTE DB ENTERED
+     */
+
+    if($scope.dbUrl) {
+
+      var remoteDbUrl = $scope.dbUrl || localStorage.getItem('remoteDbUrl');
+      localStorage.setItem('remoteDbUrl', remoteDbUrl);
+      var username =    $scope.username || localStorage.getItem('username');
+      localStorage.setItem('username', username);
+      var userpass =    $scope.userpass || localStorage.getItem('userpass');
+      localStorage.setItem('userpass', userpass);
+
+
+
+
+      return;
+
+      // pull down data from the remote database
+      var db = new PouchDB(myConfig.database);
       db.replicate.from(remoteDb, function (err, result) {
         if (err) { return console.log(err); }
         // handle 'completed' result
@@ -442,7 +468,7 @@ angular.module('accentsApp')
     var blobArray = [];
     var rev = termObj['_id']._rev;
     if(termObj._attachments) {
-		var attachmentId=Object.keys(termObj._attachments)[0];
+    var attachmentId=Object.keys(termObj._attachments)[0];
        db.getAttachment(docId, attachmentId, {rev: rev},function(err,blob){
             var url = URL.createObjectURL(blob);
             var display=document.getElementById("allrecords");
@@ -607,7 +633,7 @@ angular.module('accentsApp')
           //if the records are recorded
           $scope.saveAudio(termId);
         }
-	}
+  }
         else setTimeout(function() {
           var familyTerms = crudFunctions.getWordFamilyTerms(WordFamily, $scope);
           angular.forEach(familyTerms, function(fam) {
@@ -643,17 +669,17 @@ angular.module('accentsApp')
       $scope.clearEditForm();
     });
   };
-	// Saving audio function for edit page
+  // Saving audio function for edit page
   $scope.saveAudio = function(termId, callback) {
     var docId=termId;
-	var element=$('#audio');
+  var element=$('#audio');
     var attachmentId= $scope.idDocs[docId].wordfamily;
     var type = "audio/mp3";
     var rev = $scope.idDocs[docId]._rev;
-	var display = document.getElementById('display');
+  var display = document.getElementById('display');
     var src = element.attr('src');
     $scope.getAudioBlob(src,docId, attachmentId,rev,type);
-	crudFunctions.refreshOldDocsList($scope);
+  crudFunctions.refreshOldDocsList($scope);
     if (callback) callback();
   };
   // Saving audio function for all terms page
@@ -668,24 +694,24 @@ angular.module('accentsApp')
     crudFunctions.refreshOldDocsList($scope);
     if(callback) callback();
   };
-	// Get the audio blob from audio url
-	$scope.getAudioBlob=function(blobUrl,docId, attachmentId,rev,type){
-		var xhr = new XMLHttpRequest();
-		xhr.open('GET', blobUrl, true);
-		xhr.responseType = 'blob';
-		xhr.onload = function(e) {
-		  if (this.status == 200) {
-			var myBlob = this.response;
-			// myBlob is now the blob that the object URL pointed to.
-			db.putAttachment(docId, attachmentId,rev, myBlob, type,function (err, res) {
-			  if(!err) {
-				$scope.idDocs[docId]._rev=res.rev;
-			  }
-			});
-		  }
-		};
-		xhr.send();
-	};
+  // Get the audio blob from audio url
+  $scope.getAudioBlob=function(blobUrl,docId, attachmentId,rev,type){
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', blobUrl, true);
+    xhr.responseType = 'blob';
+    xhr.onload = function(e) {
+      if (this.status == 200) {
+      var myBlob = this.response;
+      // myBlob is now the blob that the object URL pointed to.
+      db.putAttachment(docId, attachmentId,rev, myBlob, type,function (err, res) {
+        if(!err) {
+        $scope.idDocs[docId]._rev=res.rev;
+        }
+      });
+      }
+    };
+    xhr.send();
+  };
   // Search data
   $scope.getnames = function(searchval) {
     var rows = [];

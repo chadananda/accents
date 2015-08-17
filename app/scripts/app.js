@@ -32,12 +32,10 @@ angular
        // controller: 'loginCtrl'
         redirectTo: '/getdata'
       })
-      /*
       .when('/about', {
         templateUrl: 'views/about.html',
         controller: 'AboutCtrl'
       })
-      */
       .when('/getdata', {
         templateUrl: 'views/data.html',
         controller: 'getdataCtrl'

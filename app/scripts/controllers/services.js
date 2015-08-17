@@ -168,6 +168,50 @@ angular.module('accentsApp')
       scope.count = scope.docs.length;
     },
 
+
+    // full replication
+    replicateDB: function() {
+      var remoteDbUrl = localStorage.getItem('remoteDbUrl');
+      var protocol = 'http://'; // default
+      var username = localStorage['username'];
+      var userpass = localStorage['userpass'];
+      if (!remoteDbUrl || !username || !userpass) {
+        alert('Warning, we need all fields');
+        return console.log('Could not replicate, missing some information: ');
+      }
+      // if remoteDBUrl has a protocol then cut it off
+      if (remoteDbUrl.indexOf('://')>-1) {
+        protocol = remoteDbUrl.substr(0, remoteDbUrl.indexof('://')+3);
+        remoteDbUrl = remoteDbUrl.substr(remoteDbUrl.indexof('://')+3);
+      }
+      var remote = protocol + username +':'+ userpass +'@'+ remoteDbUrl;
+
+      var db = new PouchDB(myConfig.database, {auto_compaction: true});
+
+      // pull down all changes
+      console.log ('Replicating data from remote', remoteDbUrl);
+
+
+      db.replicate.from(remote)
+        .on('change', function (info) { console.log("Sync progress: ", info);  })
+        .on('complete', function (info) { console.log("Sync complete: ", info); })
+        .on('denied', function (info) { console.log("Sync denied: ", info); })
+        .on('error', function (err) { console.log("Sync failed: ", err);  })
+        .then(function(){
+          // clean up and compact
+          console.log ('Cleaning up and compressing all word families...');
+          crudFunctions.cleanAllWordFamilies($scope);
+          // push up all changes
+          console.log ('Replicating to remote');
+          db.replicate.to(remote)
+            .on('change', function (info) { console.log("Sync progress: ", info); })
+            .on('complete', function (info) { console.log("Sync complete: ", info); })
+            .on('denied', function (info) { console.log("Sync denied: ", info); })
+            .on('error', function (err) { console.log("Sync failed: ", err); });
+        });
+
+    }
+
     /*
     all: function() {
       return users;

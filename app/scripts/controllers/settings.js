@@ -20,7 +20,7 @@ angular.module('accentsApp')
   //var remoteDb = myConfig.database;
   $scope.settingsInit = function() {
     //db.query('my_list/by_type').then(function (res) {
-    var remoteDbUrl = localStorage['remoteDbUrl'];
+    var remoteDbUrl = localStorage.gitItem('remoteDbUrl');
     if(remoteDbUrl) document.getElementById('remoteDbUrl').value = remoteDbUrl;
     //}).catch(function (err) { console.log('$scope.settingsInit(): ', err); });
   };
@@ -73,8 +73,9 @@ angular.module('accentsApp')
 
     // this works but needs replaced with cookie-based authentication
     // so that we are not sending password out over the request
-    localStorage['remoteDbUrl'] = document.getElementById("remoteDbUrl").value;
-    var remoteDbUrl = localStorage['remoteDbUrl'];
+
+    var remoteDbUrl = document.getElementById("remoteDbUrl").value
+     localStorage.setItem('remoteDbUrl', remoteDbUrl);
     var protocol = 'http://'; // default
     var username = localStorage['username'];
     var userpass = localStorage['userpass'];
