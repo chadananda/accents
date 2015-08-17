@@ -18,149 +18,59 @@ angular.module('accentsApp')
     'Karma'
   ];
   var db = new PouchDB(myConfig.database, {auto_compaction: true});
-  //var domainRemoteDb = myConfig.remoteDbDomain;
-  //var remoteDb = myConfig.database;
 
-  $scope.init = function() {
-    var username = localStorage.getItem('username');
-
-    if(!username) {
-      /*
-      //check if db has dbdetails record or not
-      $scope.fetchDbData(db, function(data) {
-        if(data){
-          //-----if we have db Details then session can be made-----//
-          $scope.todoText ={username: data[0].key.username, loggedIn: true, startDate: new Date()};
-          localStorage.setItem('session-user', JSON.stringify($scope.todoText));
-          //console.log(localStorage.getItem('session-user'));
+  $scope.open = function (page) {
+    var modalInstance = $modal.open({
+      animation: true,
+      templateUrl: page,
+      backdrop: 'static', 
+      controller: function dialogController($scope, $modalInstance) {
+			$scope.submitDbData = function () {
+				if($scope.dbUrl){
+				  localStorage.setItem('userpass', $scope.userpass);
+				  localStorage.setItem('username', $scope.username);
+				  localStorage.setItem('remoteDbUrl', $scope.dbUrl);
+				  crudFunctions.replicatefromDB($scope);						
+					$modalInstance.close();
+				}
+				else{	
+					alert("Please Enter DB Url!");
+					var element = document.getElementById('dbUrl');
+					element.focus();
+					return false;
+				}
+		  }
+		  $scope.replicateRemote=function(){
+			  if($scope.dbUrl){
+				  localStorage.setItem('userpass', $scope.userpass);
+				  localStorage.setItem('username', $scope.username);
+				  localStorage.setItem('remoteDbUrl', $scope.dbUrl);
+				  crudFunctions.replicateDB($scope);	
+			  }	 
+			  else{	
+					alert("Please Enter DB Url!");
+					var element = document.getElementById('dbUrl');
+					element.focus();
+					return false;
+				}
+		  }
+		  
+    },
+      resolve: {
+        items: function () {
+          return $scope.items;
         }
-        else{
-          */
-          $location.path("/about");
-          //window.location.href="/#/about";
-       // }
-      //});
-    }
-  }
-
-  //========Function to fetch the db data==========//
-  $scope.fetchDbData = function(db, callback) {
-
-    // this is all just to store the remote DB URL?
-    // we don't want to store user credentials or remote url in the database
-
-    /*
-    var ddoc = {
-        _id:   '_design/my_list',
-        views: {
-          by_type: {
-            "map": "function(doc) {\n  if (doc.type==='dbData')\n  emit(doc);}"
-          }
-        }
-      };
-      //first check if ddoc exists or not
-      db.get("_design/my_list",function(err,doc){
-       if(err){
-        //if no such doc exists then put one such doc and fetch results
-        db.put(ddoc).then(function (res) {   }).catch(function (err) { console.log(err);  });
-        // load a list of all docs matching the type 'dbData'
-        db.query('my_list/by_type').then(function (res) {
-          // got the query results
-          var response;
-          if(res.total_rows>0) response = res.rows;
-          if(callback) callback(response);
-        }).catch(function (err) { console.log(err); });
-      }
-      else{
-        //fetch the records with query
-         // load a list of all docs matching the type 'dbData'
-        db.query('my_list/by_type').then(function (res) {
-          // got the query results
-          var response;
-          if(res.total_rows>0) response = res.rows;
-          if(callback) callback(response);
-        }).catch(function (err) { console.log(err); });
       }
     });
-    */
 
   };
 
-  $scope.submitDbData = function() {
-
-
-    /*
-    //==check if field empty or not==//
-    if($scope.dbUrl) {
-      console.log($scope.dbUrl);
-      var remoteDb = $scope.dbUrl;
-      var db = new PouchDB(myConfig.database);
-      var dbDoc={
-        "username": $scope.username,
-        "dbUrl": $scope.dbUrl,
-        "type": "dbData",
-      };
-      //FIRST CHECK IF THERE IS ALREADY ANY RECORD PRESENT FOR DBURL
-      //~ $scope.fetchDbData(db,function(data){
-        //~ if(data){
-          //~ //IF RECORD IS ALREADY PRESENT NO NEED TO CREATE NEW JUST UPDATE EXISTING
-          //~ var id=data[0].key._id;
-          //~ var rev=data[0].key._rev;
-          //~ db.put(dbDoc,id,rev,function(err,response){
-            //~ window.location.href="/#/getdata";
-          //~ });
-        //~ }
-       //~ else {
-
-       //ELSE CREATE NEW
-       //FIRST CREATE A RECORD FOR DBDETAILS ENTERED BY THE USER VERY FIRST TIME
-      db.post(dbDoc, function(err, response) {
-        if (err) { return console.log(err); }
-          // handle response
-          console.log(response);
-      });
-
-     */
-
-    if($scope.dbUrl) {
-
-      var remoteDbUrl = $scope.dbUrl || localStorage.getItem('remoteDbUrl');
-      localStorage.setItem('remoteDbUrl', remoteDbUrl);
-      var username =    $scope.username || localStorage.getItem('username');
-      localStorage.setItem('username', username);
-      var userpass =    $scope.userpass || localStorage.getItem('userpass');
-      localStorage.setItem('userpass', userpass);
-
-
-
-
-      return;
-
-      // pull down data from the remote database
-      var db = new PouchDB(myConfig.database);
-      db.replicate.from(remoteDb, function (err, result) {
-        if (err) { return console.log(err); }
-        // handle 'completed' result
-        console.log(result);
-        $scope.fetchDbData(db, function(data){
-          if(data){
-            //-----if we have db Details then session can be made-----//
-            $scope.todoText ={username: data[0].key.username, loggedIn: true, startDate: new Date()};
-            localStorage.setItem('session-user', JSON.stringify($scope.todoText));
-            console.log(localStorage.getItem('session-user'));
-            window.location.href="/#/getdata";
-          }
-        });
-      });
-    }
-    else {
-      alert("Please Enter DB Url!");
-      var element = document.getElementById('dbUrl');
-      element.focus();
-      return false;
-    }
-  };
-
+  $scope.init = function() {
+		var username = localStorage.getItem('username');
+		if(!username) {        
+			$scope.open('myModalContent.html');
+		}
+  }
 
   //===========Calling Utility Functions============//
   $scope.i2html = function(text) {
@@ -545,11 +455,11 @@ angular.module('accentsApp')
     return {whole: whole, partial: partial};
   };
   /********* end of CRUD DRY Utils *************/
-  //~ // Inititlization Code
-  //~ setTimeout(function(){$("#spinnernew").show()},1000);
-
+var username = localStorage.getItem('username');
+		if(username) {  
   // load data cache
   $scope.refreshAllDocList(function(){
+	  console.log(username);
     $(".pagination").css("display","block");
     $("#spinnernew").hide();
     if(sessionStorage.length>0  && sessionStorage.data) {
@@ -562,7 +472,7 @@ angular.module('accentsApp')
       $scope.setFormTerm(termObj);
     }
   });
-
+}
   //==Delete Record from the partial or whole word searches========//
   $scope.deletedoc = function(id) {
     if(confirm('Are you SURE you want to delete this term?')) {

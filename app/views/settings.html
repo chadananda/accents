@@ -4,17 +4,17 @@
 		localStorage.removeItem('session-user');
 		window.location.href="/";
 	}
-	if(localStorage.getItem("session-user") === null)
-	{
-		window.location.href="/";
-	}                                                            
+	//~ if(localStorage.getItem("session-user") === null)
+	//~ {
+		//~ window.location.href="/";
+	//~ }                                                            
 </script>
 <div class="col-lg-12 clearfix mb10 p0 pt10 pb30 addtext mt30 mr10" ng-controller="getdataCtrl" ng-init="settingsInit()">
 	<h3 class="pl15 pr15">Utilities</h3>
 	<div class="panel-box">
 		<div class="row mb10">
 			<div class="col-sm-8 col-xs-8">
-				<input name="remoteDbUrl" id="remoteDbUrl" model="remoteDbUrl" class="form-control" placeholder="Enter the Remote Db Url" />
+				<input name="remoteDbUrl" id="remoteDbUrl" ng-model="remoteDbUrl" class="form-control" placeholder="Enter the Remote Db Url" ng-change="changeDb()" />
 			</div>
 			<div class="col-sm-4 col-xs-4" >
 				<button type="button" class="btn btn-primary" ng-click="replicateToRemote();" >Replicate</button>

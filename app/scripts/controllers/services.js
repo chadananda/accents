@@ -19,13 +19,6 @@ angular.module('accentsApp')
   // var domainRemoteDb = myConfig.remoteDbDomain;
   // var remoteDb = myConfig.database;
   return {
-
-    // single point for DB path in case we want to change it later (including http)
-   // db_url: function() {
-      // detect page https?
-      //return 'http://'+domainRemoteDb+'/'+remoteDb + '/';
-   // },
-
     // remove fields that are not allowed -- we use this on loading records and before saving
     pruneUnallowedFields: function(termObj) {
       var fields = Object.keys(termObj);
@@ -45,6 +38,7 @@ angular.module('accentsApp')
     // returns unique array of all word families
     getAllWordFamilies: function(scope) {
       var result = {};
+      console.log(scope.idDocs);
       // loop through entire cache and grab unique word families
       Object.keys(scope.idDocs).forEach(function(id) {
         result[scope.idDocs[id].wordfamily] = 1; // faster than removing duplicates with an array
@@ -170,28 +164,29 @@ angular.module('accentsApp')
 
 
     // full replication
-    replicateDB: function() {
+    replicateDB: function(scope) {
       var remoteDbUrl = localStorage.getItem('remoteDbUrl');
       var protocol = 'http://'; // default
-      var username = localStorage['username'];
-      var userpass = localStorage['userpass'];
+      var username = localStorage.getItem('username');
+      var userpass = localStorage.getItem('userpass');
       if (!remoteDbUrl || !username || !userpass) {
         alert('Warning, we need all fields');
         return console.log('Could not replicate, missing some information: ');
       }
       // if remoteDBUrl has a protocol then cut it off
-      if (remoteDbUrl.indexOf('://')>-1) {
-        protocol = remoteDbUrl.substr(0, remoteDbUrl.indexof('://')+3);
-        remoteDbUrl = remoteDbUrl.substr(remoteDbUrl.indexof('://')+3);
-      }
-      var remote = protocol + username +':'+ userpass +'@'+ remoteDbUrl;
-
+      //~ if (remoteDbUrl.indexOf('://')>-1) {
+        //~ protocol = remoteDbUrl.substr(0, remoteDbUrl.indexof('://')+3);
+        //~ remoteDbUrl = remoteDbUrl.substr(remoteDbUrl.indexof('://')+3);
+      //~ }
+     // var remote = protocol + username +':'+ userpass +'@'+ remoteDbUrl;
+	  var remote = remoteDbUrl;
+	   var remote = PouchDB(remote, 
+					{withCredentials:true, cookieAuth: {username:username, password:userpass}});
+					localStorage.setItem('remoteDbUrl', remoteDbUrl);
       var db = new PouchDB(myConfig.database, {auto_compaction: true});
 
       // pull down all changes
       console.log ('Replicating data from remote', remoteDbUrl);
-
-
       db.replicate.from(remote)
         .on('change', function (info) { console.log("Sync progress: ", info);  })
         .on('complete', function (info) { console.log("Sync complete: ", info); })
@@ -200,17 +195,42 @@ angular.module('accentsApp')
         .then(function(){
           // clean up and compact
           console.log ('Cleaning up and compressing all word families...');
-          crudFunctions.cleanAllWordFamilies($scope);
+          //this.cleanAllWordFamilies(scope);
           // push up all changes
           console.log ('Replicating to remote');
           db.replicate.to(remote)
             .on('change', function (info) { console.log("Sync progress: ", info); })
-            .on('complete', function (info) { console.log("Sync complete: ", info); })
+            .on('complete', function (info) { alert("Sync complete: ", info); })
             .on('denied', function (info) { console.log("Sync denied: ", info); })
             .on('error', function (err) { console.log("Sync failed: ", err); });
-        });
+        },this);
 
-    }
+    },
+    replicatefromDB:function(scope){
+		 var remoteDbUrl = localStorage.getItem('remoteDbUrl');
+      var protocol = 'http://'; // default
+      var username = localStorage.getItem('username');
+      var userpass = localStorage.getItem('userpass');
+      if (!remoteDbUrl || !username || !userpass) {
+        alert('Warning, we need all fields');
+        return console.log('Could not replicate, missing some information: ');
+      }
+	  var remote = remoteDbUrl;
+	   var remote = PouchDB(remote, 
+					{withCredentials:true, cookieAuth: {username:username, password:userpass}});
+					localStorage.setItem('remoteDbUrl', remoteDbUrl);
+      var db = new PouchDB(myConfig.database, {auto_compaction: true});
+
+      // pull down all changes
+      console.log ('Replicating data from remote', remoteDbUrl);
+      db.replicate.from(remote)
+        .on('change', function (info) { console.log("Sync progress: ", info);  })
+        .on('complete', function (info) { console.log("Sync complete: ", info); })
+        .on('denied', function (info) { console.log("Sync denied: ", info); })
+        .on('error', function (err) { console.log("Sync failed: ", err);  })
+        .then(function(){
+        },this);
+	}
 
     /*
     all: function() {
@@ -228,3 +248,4 @@ angular.module('accentsApp')
       setFormData: function (list) { sessionStorage.data = JSON.stringify(list); }
     };
   });
+

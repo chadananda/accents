@@ -28,8 +28,6 @@ angular
   .config(function ($routeProvider) {
     $routeProvider
       .when('/', {
-        //templateUrl: 'views/login.html',
-       // controller: 'loginCtrl'
         redirectTo: '/getdata'
       })
       .when('/about', {

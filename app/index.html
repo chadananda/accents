@@ -8,8 +8,7 @@
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
     <!-- build:css(.) styles/vendor.css -->
     <!-- bower:css -->
-    <link rel="stylesheet" href="bower_components/ngDialog/css/ngDialog.css" />
-    <link rel="stylesheet" href="bower_components/ngDialog/css/ngDialog-theme-default.css" />
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" />
     <!-- endbower -->
     <!-- endbuild -->
     <!-- build:css(.tmp) styles/main.css -->
@@ -33,6 +32,54 @@
   </head>
   <body ng-app="accentsApp">
     <div class="container"  ng-controller="getdataCtrl"   ng-init="init()">
+	<script type="text/ng-template" id="myModalContent.html">
+        <div class="modal-header">
+            <h3 class="modal-title">Authentication Details</h3>
+        </div>
+        <form ng-submit="submitDbData()">
+			<div class="modal-body">           
+					<div class="form-group posrleative">
+						<input type="text" class="form-control"  name="username" placeholder="User Name" ng-model="username" id="username">
+						<span class="glyphicon glyphicon-user loginIcon"></span>
+					</div>
+					 <div class="form-group posrleative">
+						<input type="password" class="form-control" placeholder="Password"  name="userpass" ng-model="userpass">
+						<span class=" glyphicon glyphicon-lock loginIcon"></span>
+					</div>
+					<div class="form-group posrleative">
+						<input type="textbox" class="form-control" placeholder="Remote DB URL"  name="dbUrl" ng-model="dbUrl" id="dbUrl">
+						<span class=" glyphicon glyphicon-hdd loginIcon"></span>
+					</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-info pull-right login-btn mt20" ng-click="submitDbData()">Submit</button>
+			</div>        
+		</form>
+    </script>
+    <script type="text/ng-template" id="settingsContent.html">
+        <div class="modal-header">
+            <h3 class="modal-title">Authentication Details</h3>
+        </div>
+        <form ng-submit="submitDbData()">
+			<div class="modal-body">           
+					<div class="form-group posrleative">
+						<input type="text" class="form-control"  name="username" placeholder="User Name" ng-model="username" id="username">
+						<span class="glyphicon glyphicon-user loginIcon"></span>
+					</div>
+					 <div class="form-group posrleative">
+						<input type="password" class="form-control" placeholder="Password"  name="userpass" ng-model="userpass">
+						<span class=" glyphicon glyphicon-lock loginIcon"></span>
+					</div>
+					<div class="form-group posrleative">
+						<input type="textbox" class="form-control" placeholder="Remote DB URL"  name="dbUrl" ng-model="dbUrl" id="dbUrl">
+						<span class=" glyphicon glyphicon-hdd loginIcon"></span>
+					</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-info pull-right login-btn mt20" ng-click="replicateRemote()">Replicate</button>
+			</div>        
+		</form>
+    </script>
 		<div class="container  clearfix"  id="main-container" >
 			<div class="col-lg-12 clearfix  mb10 p0 pt10 pb10"  ng-show="activePath != '/' && activePath != '/about'" >
         <div class="col-sm-6 logo p0 valignmiddle mt10">
@@ -97,7 +144,7 @@
     <script src="bower_components/angular-route/angular-route.js"></script>
     <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
     <script src="bower_components/angular-touch/angular-touch.js"></script>
-    <script src="bower_components/ngDialog/js/ngDialog.js"></script>
+    <script src="bower_components/blob-util/dist/blob-util.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
 
