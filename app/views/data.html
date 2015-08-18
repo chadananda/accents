@@ -1,13 +1,4 @@
 ﻿<script>
-	function logout()
-	{
-		localStorage.removeItem('session-user');
-		window.location.href="/";
-	}
-	//~ if(localStorage.getItem("session-user") === null)
-	//~ {
-		//~ window.location.href="/";
-	//~ }
 	function playPause(callingElement)
 	{
 		 if(callingElement.firstChild.paused){
@@ -88,11 +79,12 @@
 					<a id="playButton" class="disabled"><span class="glyphicon glyphicon-play"></span></a>
 				</div>
 				<div class="dispinblk playmic">
-					<button id='start' class="recordButton"><span class="glyphicon glyphicon-record"></button>
+					<button id="audioAttach" class="recordButton"><span class="glyphicon glyphicon-record"></button>
 				</div>
 				<div class="dispinblk playmic">
-					<button id='stop' class="playButton disabled one" ><span class="glyphicon glyphicon-stop"></span></button>
+					<button id="deleteAudio" class="playButton" style="display:none;" ><span class="glyphicon glyphicon-trash"></span></button>
 				</div>
+
 				<div id="display"></div>
 			</div>
 			<div class="col-sm-7 col-md-7 clearfix">

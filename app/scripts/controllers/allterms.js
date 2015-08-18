@@ -56,8 +56,7 @@ var remoteDb=myConfig.database;
 	 {
 		 $scope.attachments={};				 
 		db.allDocs({
-			  include_docs: true,
-			  attachments: true
+			  include_docs: true
 			}, function(err, response) {
 			  if (err) { return console.log(err); }
 			  // handle result

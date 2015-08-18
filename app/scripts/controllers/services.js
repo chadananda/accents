@@ -16,8 +16,6 @@ angular.module('accentsApp')
 
 //======Factory for crud functions=======//
 .factory('crudFunctions', function(myConfig, Utils){
-  // var domainRemoteDb = myConfig.remoteDbDomain;
-  // var remoteDb = myConfig.database;
   return {
     // remove fields that are not allowed -- we use this on loading records and before saving
     pruneUnallowedFields: function(termObj) {

@@ -1,13 +1,4 @@
 <script>
-	function logout()
-	{
-		localStorage.removeItem('session-user');
-		window.location.href="/";
-	}
-	if(localStorage.getItem("session-user") === null)
-	{
-		window.location.href="/";
-	}
 	function playPause(callingElement)
 	{
 		 if(callingElement.firstChild.paused){
@@ -94,12 +85,15 @@
 									<td class="note"><div  style=" max-height: 62px;overflow-x: hidden;overflow-y:auto;text-align: justify;">{{doc.definition}}</div></td>
 									<td class="user audio" style="width:100px;">
 										<div  id="audio-{{doc._id}}">{{convertAttachment(doc._id)}}</div>
-											<button class="btn btn-primary btn-xs editbtn" id="start_{{doc._id}}" >
+											<button class="btn btn-primary btn-xs editbtn" id="audioAttach_{{doc._id}}" >
 												<span class="glyphicon glyphicon-record"></span>
-											</button>&nbsp;
-											<button class="btn btn-danger btn-xs editbtn disabled one" id="stop_{{doc._id}}">
+											</button>
+<!--
+											
+											<button class="btn btn-danger btn-xs editbtn one" style="display:none;" id="stop_{{doc._id}}">
 												<span class="glyphicon glyphicon-stop"></span>
 											</button>
+-->
 									</td>
 									<td class="verif">
 										<div  ng-show="doc.verified || doc.doc.ambiguous">

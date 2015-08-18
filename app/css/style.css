@@ -351,13 +351,13 @@ background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
  table.filter td.checkboxes {width: 200px;}
 
 }
-/*=======================LARGE DEVICES WIDE SCREENS=========================================
+/*=======================LARGE DEVICES WIDE SCREENS=========================================*/
 @media only screen and (min-width : 1200px)
 {
 	.addtext {
-		margin-top: 119px;
+		margin-top: 180px;
 	}
-}*/
+}
 /*=======================LARGE DEVICES WIDE SCREENS=========================================
 @media only screen and (min-width : 1200px)
 {

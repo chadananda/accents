@@ -5,52 +5,59 @@ function restore()
 }
 $(document).ready(function(){
 	//mycode for edit page
-	  $(document).on("click", "#start:not(.disabled)", function(){
-    elem = $(this);
-    Fr.voice.record($("#live").is(":checked"), function(){
-      elem.addClass("disabled");
-      $("#live").addClass("disabled");
-      $(".one").removeClass("disabled");      
-    });
-  });
-  $(document).on("click", "#stop:not(.disabled)", function(){
-    Fr.voice.export(function(url){
-		var audioText="<a onclick='playPause(this);'><audio id='audio' src="+url+" onended='endaudio(this);'></audio><span class='glyphicon glyphicon-play'></span></a>";
+	$(document).on("click","#audioAttach",function(){
+		if($(this).children().hasClass("glyphicon glyphicon-record")){			
+			$(this).children('span').removeClass("glyphicon-record");
+			$(this).children('span').addClass("glyphicon glyphicon-stop");			
+			setTimeout(function(){
+				alert("Start Recording Your Voice!");
+				Fr.voice.record($("#live").is(":checked"), function(){
+				});
+			},250);			
+		} 
+		else{
+			$(this).children('span').removeClass("glyphicon-stop");
+			$(this).children('span').addClass("glyphicon glyphicon-record");
+			 Fr.voice.export(function(url){
+				var audioText="<a onclick='playPause(this);'><audio id='audio' src="+url+" onended='endaudio(this);'></audio><span class='glyphicon glyphicon-play'></span></a>";
+				document.getElementById("allrecords").innerHTML=audioText;				
+				$("#deleteAudio").css("display","block");
+			}, "URL");			
+		}
+	});
+	$(document).on("click","#deleteAudio",function(){
+		var audioText="<a id='playButton' class='disabled'><span class='glyphicon glyphicon-play'></span></a>";
 		document.getElementById("allrecords").innerHTML=audioText;
-    }, "URL");
-    restore();
-  }); 
+		$("#deleteAudio").css("display","none");
+	});
   //mycode for edit page ends here
 
 	//mycode for allterms page
-	 $(document).on("click", "button[id^='start_']:not(.disabled)", function(){
+	$(document).on("click","button[id^='audioAttach_']:not(.disabled)",function(){
 		var id=$(this).attr('id');
-		 var idArr=id.split("_");
+		var idArr=id.split("_");
 		docId=idArr[1];
-		elem = $(this);
-		Fr.voice.record($("#live").is(":checked"), function(){
-		  elem.addClass("disabled");
-		  $("#live").addClass("disabled");
-		  $("button[id^='stop_"+docId+"']").removeClass("disabled");      
-		});
+		if($(this).children().hasClass("glyphicon glyphicon-record")){			
+			$(this).children('span').removeClass("glyphicon-record");
+			$(this).children('span').addClass("glyphicon glyphicon-stop");	
+			setTimeout(function(){	
+				alert("Start Recording Your Voice!");	
+				Fr.voice.record($("#live").is(":checked"), function(){
+				});
+			},250);			
+		} 
+		else{
+			$(this).children('span').removeClass("glyphicon-stop");
+			$(this).children('span').addClass("glyphicon glyphicon-record");
+			 Fr.voice.export(function(url){
+				var audioText="<button onclick='playPause(this);' class='btn btn-danger btn-xs remove' style='margin-left: 10px;padding-right:3px;'><audio id='audioPlay_"+docId+"' src="+url+"  onended='endaudio(this);'></audio><span class='glyphicon glyphicon-play'></span></button>";		
+				document.getElementById("audio-"+docId).innerHTML=audioText;
+				var scope = angular.element($("#main-container")).scope(); 
+				setTimeout(function(){ scope.saveAudioAll(docId);},1200);
+			}, "URL");
+			
+		}
 	});
-	 $(document).on("click", "button[id^='stop_']:not(.disabled)", function(){
-		 
-		var id=$(this).attr('id');
-		 var idArr=id.split("_");
-		docId=idArr[1];
-		 
-    Fr.voice.export(function(url){
-		var audioText="<button onclick='playPause(this);' class='btn btn-danger btn-xs remove'><audio id='audioPlay_"+docId+"' src="+url+"  onended='endaudio(this);'></audio><span class='glyphicon glyphicon-play'></span></button>";		
-		 document.getElementById("audio-"+docId).innerHTML=audioText;
-		 $("#start_"+docId).removeClass("disabled");
-    var scope = angular.element($("#main-container")).scope(); 
-   setTimeout(function(){ scope.saveAudioAll(docId);},1200);
-		
-    }, "URL");
-   
-    restore();
-  }); 
 	//mycode for allterms page ends here
 
 	

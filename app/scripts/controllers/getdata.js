@@ -93,6 +93,7 @@ angular.module('accentsApp')
   $scope.changeTerm=function(){
     var term = $('#term').val();
     if(term!="") {
+		console.log(term);
       // TODO: get cursor position
       // split the word at the cursor position - part1 & part2
       // run customi2html on part1
@@ -193,7 +194,7 @@ angular.module('accentsApp')
   // DATABASE read all fields into hash cache ($scope.idDocs[id]) instant access by _id
   $scope.refreshAllDocList = function(callback) {
     var termObj;
-    db.allDocs({include_docs: true, attachments: true}, function(err, response) {
+    db.allDocs({include_docs: true}, function(err, response) {
       if (err) return console.log(err);
       // handle result
       if(response.rows) {
@@ -290,7 +291,7 @@ angular.module('accentsApp')
   // get current session user
   $scope.getSessionUser = function() {
     var sessionArray= JSON.parse(localStorage.getItem("session-user"));
-    return sessionArray.username;
+    return localStorage.getItem('username');
   };
 
 
@@ -394,7 +395,7 @@ angular.module('accentsApp')
     $('#updateword').css({ "display":"block" });
     document.getElementById("toptext").innerHTML="Edit:";
     $("#heading-term").html(Utils.ilm2HTML(termObj.term));
-
+	$scope.search.doc.term=termObj.term.trim();
     $scope.refreshFilteredMatches(termObj);
 
     // TODO: add audio state
@@ -544,13 +545,12 @@ var username = localStorage.getItem('username');
           $scope.saveAudio(termId);
         }
   }
-        else setTimeout(function() {
-          var familyTerms = crudFunctions.getWordFamilyTerms(WordFamily, $scope);
-          angular.forEach(familyTerms, function(fam) {
-            $scope.saveAudio(fam._id);
-          });
-          console.log(familyTerms);
-        },1000);
+        //~ else setTimeout(function() {
+          //~ var familyTerms = crudFunctions.getWordFamilyTerms(WordFamily, $scope);
+          //~ angular.forEach(familyTerms, function(fam) {
+            //~ $scope.saveAudio(fam._id);
+          //~ });
+        //~ },1000);
 
 
          // clean up word family

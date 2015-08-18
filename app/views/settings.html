@@ -1,16 +1,5 @@
-<script>
-	function logout()
-	{
-		localStorage.removeItem('session-user');
-		window.location.href="/";
-	}
-	//~ if(localStorage.getItem("session-user") === null)
-	//~ {
-		//~ window.location.href="/";
-	//~ }                                                            
-</script>
-<div class="col-lg-12 clearfix mb10 p0 pt10 pb30 addtext mt30 mr10" ng-controller="getdataCtrl" ng-init="settingsInit()">
-	<h3 class="pl15 pr15">Utilities</h3>
+<div class="addtext row" ng-controller="getdataCtrl" ng-init="settingsInit()">
+	<h2 class="pl15 pr15" style="font-weight:bold;">Utilities</h2>
 	<div class="panel-box">
 		<div class="row mb10">
 			<div class="col-sm-8 col-xs-8">
@@ -71,43 +60,8 @@
 				</div>
 			</div>
 		</div>
-		
-<!--
-		<div class="row mb10">
-			<div class="col-sm-10 col-xs-10">
-				<button class="btn btn-warning btn-block" ng-click="changeVerify()">
-					<span class="glyphicon glyphicon-compressed" style="float: left !important;margin-left: 2% !important;"></span>
-					Compress Records
-				</button>
-			</div>
-			<div class="col-sm-2 col-xs-2" >
-				<button type="button" class="btn btn-warning btn-circle"  ng-click="slideShow('fourthBox');">
-					<span class="glyphicon glyphicon-question-sign" style="color:white;"></span>
-				</button>
-			</div>
-		</div>
-		<div class="row" id="fourthBox" style="display:none;">
-			<div class="col-sm-10 col-xs-10">
-				<div class="well fourth-well">
-					<h4>Compress Records</h4>
-					<p>
-						<ul>
-							<li>Set all fields with an <b>original</b> entry to <b>verified</b>.</li>
-							<li>
-								If a word-family group contains more than one verified record, set each to <b>ambiguous</b>
-								<ul>
-								<li>For all word families with at least one ambiguous record, mark all other records in that word family as ambiguous</li>
-								</ul>
-							</li>
-							<li>For each word family containing just one verified record, delete non-verified records -- appending their <b>reference</b> values to the <b>reference</b> field of the one remaining verified record. (Comma + space delimited)</li>										
-						</ul>
-					</p>
-				</div>
-			</div>
-		</div>
--->
 		<h5 class="blankalert"> {{message}}</h5>
-	</div> 
+	</div>
 </div>
 
 
