@@ -18,7 +18,8 @@ angular.module('accentsApp')
     'Karma'
   ];
   var db = new PouchDB(myConfig.database, {auto_compaction: true});
-
+  $scope.search={};
+  $scope.search.doc={};
   $scope.open = function (page) {
     var modalInstance = $modal.open({
       animation: true,
@@ -93,7 +94,6 @@ angular.module('accentsApp')
   $scope.changeTerm=function(){
     var term = $('#term').val();
     if(term!="") {
-		console.log(term);
       // TODO: get cursor position
       // split the word at the cursor position - part1 & part2
       // run customi2html on part1
@@ -387,7 +387,9 @@ angular.module('accentsApp')
             display.innerHTML="<a onclick='playPause(this);'><audio src='"+url+"' onended='endaudio(this);'"+
               " ></audio><span class='glyphicon glyphicon-play'></span></a>";
           });
+       $('#deleteAudio').css({ "display":"block" });
     }
+    
     // set edit mode
     $('#addword').css({ "display":"none" });
     $('#Button2').css({ "display":"block" });
@@ -400,9 +402,18 @@ angular.module('accentsApp')
 
     // TODO: add audio state
   };
-
-  $scope.deleteAttachment = function(attachmentId, docId) {
-    //var db = new PouchDB(myConfig.url);
+$scope.deleteAudio=function(docId){
+	 if(typeof($scope.idDocs[docId]._attachments)!="undefined") {
+      var keys = Object.keys($scope.idDocs[docId]._attachments);
+      var attachmentId = keys[0];
+      $scope.deleteAttachment(attachmentId,docId,function(){
+		  $("#audio-"+docId).css("display","none");
+		  $("#deleteAudio-"+docId).addClass("ng-hide");
+		});
+      
+    }
+};
+  $scope.deleteAttachment = function(attachmentId, docId,callback) {
     var rev = $scope.idDocs[docId]._rev;
     db.removeAttachment(docId,attachmentId, rev, function(err, res) {
       if (err) { return console.log(err); }
@@ -410,16 +421,14 @@ angular.module('accentsApp')
       if(res){
         $scope.idDocs[docId]._rev = res.rev;
         var display=document.getElementById(attachmentId);
-        display.innerHTML="";
+        if(display)
+			display.innerHTML="";
         db.get(docId, {attachments: true}).then(function (doc) {
           $scope.idDocs[docId]=doc;
         });
-        //~ var attachments=$scope.idDocs[docId]._attachments;
-        //~ delete attachments[attachmentId];
-        //~ console.log(attachments[attachmentId]);
-        //~ $scope.idDocs[docId]._attachments=attachments;
-        console.log($scope.idDocs[docId]);
+        if(callback) callback();
       }
+     
     });
   };
 
@@ -460,17 +469,16 @@ var username = localStorage.getItem('username');
 		if(username) {  
   // load data cache
   $scope.refreshAllDocList(function(){
-	  console.log(username);
     $(".pagination").css("display","block");
-    $("#spinnernew").hide();
-    if(sessionStorage.length>0  && sessionStorage.data) {
-      // get previous term id
-      var arrayDoc=JSON.parse(docData.getFormData());
-      var id=JSON.stringify(arrayDoc[0]['id']);
-      id=id.replace(/"/g,'');
-      // load form with previous term
-      var termObj = $scope.getTermObj(id);
-      $scope.setFormTerm(termObj);
+    if(sessionStorage.length>0  && sessionStorage.data){
+		// get previous term id
+		var arrayDoc=JSON.parse(docData.getFormData());
+		var id=JSON.stringify(arrayDoc[0]['id']);
+		id=id.replace(/"/g,'');      
+		$scope = angular.element($(".addtext")).scope();  
+		// load form with previous term
+		var termObj = $scope.getTermObj(id);
+		$scope.setFormTerm(termObj);
     }
   });
 }
@@ -601,6 +609,7 @@ var username = localStorage.getItem('username');
     var rev=$scope.idDocs[docId]._rev;
     var src=element.attr('src');
     $scope.getAudioBlob(src,docId, attachmentId,rev,type);
+    $scope.refreshAllDocList();
     crudFunctions.refreshOldDocsList($scope);
     if(callback) callback();
   };

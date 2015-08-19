@@ -20,6 +20,10 @@ angular.module('accentsApp')
   $scope.settingsInit = function() {
     var remoteDbUrl = localStorage.getItem('remoteDbUrl');
     if(remoteDbUrl) $scope.remoteDbUrl = remoteDbUrl;
+    $scope.refreshAllDocList(function(){
+		console.log("complete");
+		$("#main-container").loader('hide');
+		});
   };
   //===========Calling Utility Functions============//
   $scope.i2html = function(text) {
@@ -36,49 +40,7 @@ angular.module('accentsApp')
 
   //===========Replicate local db to remote db entered===============//
   $scope.replicateToRemote=function(){
-
-    // this works but needs replaced with cookie-based authentication
-    // so that we are not sending password out over the request
-
-    var remoteDbUrl = document.getElementById("remoteDbUrl").value
-     localStorage.setItem('remoteDbUrl', remoteDbUrl);
-    var protocol = 'http://'; // default
-    var username = localStorage['username'];
-    var userpass = localStorage['userpass'];
-    if (!remoteDbUrl || !username || !userpass) return;
-    // if remoteDBUrl has a protocol then cut it off
-    //~ if (remoteDbUrl.indexOf('://')>-1) {
-      //~ protocol = remoteDbUrl.substr(0, remoteDbUrl.indexof('://')+3);
-      //~ remoteDbUrl = remoteDbUrl.substr(remoteDbUrl.indexof('://')+3);
-    //~ }
-  //  var remote = protocol + username +':'+ userpass +'@'+ remoteDbUrl;
-  var remote = remoteDbUrl;
-    // pull down all changes
-    console.log ('Replicating from remote');
-    db.replicate.from(remote)
-      .on('change', function (info) { console.log("Sync progress: ", info);  })
-      .on('complete', function (info) { console.log("Sync complete: ", info); })
-      .on('denied', function (info) { console.log("Sync denied: ", info); })
-      .on('error', function (err) { console.log("Sync failed: ", err);  })
-      .then(function(){
-        // clean up and compact
-        console.log ('Cleaning up and compressing all word families...');
-      //  crudFunctions.cleanAllWordFamilies($scope);
-        // push up all changes
-        console.log ('Replicating to remote');
-        db.replicate.to(remote)
-          .on('change', function (info) { console.log("Sync progress: ", info); })
-          .on('complete', function (info) { console.log("Sync complete: ", info); })
-          .on('denied', function (info) { console.log("Sync denied: ", info); })
-          .on('error', function (err) { console.log("Sync failed: ", err); });
-      });
-  /*
-  }).catch(function (err) {
-    // some error
-    console.log('$scope.replicateToRemote(): ', err);
-  });
-*/
-
+	crudFunctions.replicateDB($scope);
   };
 
   //==================For slide toggle of help divs====================//

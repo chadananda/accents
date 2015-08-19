@@ -8,7 +8,7 @@
  * Controller of the accentsApp
  */
 angular.module('accentsApp')
-  .controller('AlltermsCtrl', function ($rootScope,$scope,$http,getRecords,$window,$filter,myConfig,Utils,$sce,docData,$timeout) {
+  .controller('AlltermsCtrl', function ($rootScope,$scope,$http,getRecords,$window,$location,$filter,myConfig,Utils,$sce,docData,$timeout) {
     $scope.docs={};
     $scope.awesomeThings = [
       'HTML5 Boilerplate',
@@ -16,8 +16,6 @@ angular.module('accentsApp')
       'Karma'
     ];
 var db = new PouchDB(myConfig.database, { cache: true,ajax: {cache:true}});  
-var domainRemoteDb=myConfig.remoteDbDomain;
-var remoteDb=myConfig.database;
  
 //===========Calling Utility Functions============//
  $scope.i2html = function(text)
@@ -47,9 +45,9 @@ var remoteDb=myConfig.database;
  //=========Pass document data to edit page=================//
  $scope.editdocPage=function(docid,rev)
  {
-	 var list=[{"id":docid},{"rev":rev}];
-	 docData.setFormData(list);
-	 window.location.href="/#/getdata";
+	  var list=[{"id":docid},{"rev":rev}];
+	  docData.setFormData(list);
+    $location.path("/getdata");
  };
  //===============All docs function======================//
 	 $scope.allDocsFunc=function(callback)

@@ -52,8 +52,9 @@ $(document).ready(function(){
 			 Fr.voice.export(function(url){
 				var audioText="<button onclick='playPause(this);' class='btn btn-danger btn-xs remove' style='margin-left: 10px;padding-right:3px;'><audio id='audioPlay_"+docId+"' src="+url+"  onended='endaudio(this);'></audio><span class='glyphicon glyphicon-play'></span></button>";		
 				document.getElementById("audio-"+docId).innerHTML=audioText;
+				$("#deleteAudio-"+docId).removeClass("ng-hide");
 				var scope = angular.element($("#main-container")).scope(); 
-				setTimeout(function(){ scope.saveAudioAll(docId);},1200);
+				setTimeout(function(){ scope.saveAudioAll(docId);},200);
 			}, "URL");
 			
 		}

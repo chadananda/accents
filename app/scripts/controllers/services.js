@@ -227,15 +227,10 @@ angular.module('accentsApp')
         .on('denied', function (info) { console.log("Sync denied: ", info); })
         .on('error', function (err) { console.log("Sync failed: ", err);  })
         .then(function(){
+			console.log("Replication Complete!");
+			$("#spinnernew").hide();
         },this);
 	}
-
-    /*
-    all: function() {
-      return users;
-    }
-    */
-
   };
 })
 
