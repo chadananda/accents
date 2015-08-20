@@ -20,21 +20,9 @@ angular.module('accentsApp')
   $scope.settingsInit = function() {
     var remoteDbUrl = localStorage.getItem('remoteDbUrl');
     if(remoteDbUrl) $scope.remoteDbUrl = remoteDbUrl;
-    $scope.refreshAllDocList(function(){
-		console.log("complete");
-		$("#main-container").loader('hide');
-		});
   };
-  //===========Calling Utility Functions============//
-  $scope.i2html = function(text) {
-    return $sce.trustAsHtml(Utils.ilm2HTML(text));
-  };
-
-  $scope.customi2html = function(text) {
-   return Utils.renderGlyph2UTF(text);
-  };
+  
   $scope.changeDb=function(){
-	  console.log('test');
 	  $scope.open('settingsContent.html');
   }
 

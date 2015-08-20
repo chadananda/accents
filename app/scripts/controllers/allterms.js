@@ -49,51 +49,25 @@ var db = new PouchDB(myConfig.database, { cache: true,ajax: {cache:true}});
 	  docData.setFormData(list);
     $location.path("/getdata");
  };
- //===============All docs function======================//
-	 $scope.allDocsFunc=function(callback)
-	 {
-		 $scope.attachments={};				 
-		db.allDocs({
-			  include_docs: true
-			}, function(err, response) {
-			  if (err) { return console.log(err); }
-			  // handle result
-			  if(response.rows)
-				{
-					$scope.docs=response.rows;
-					$scope.count=response.total_rows;
-				}	
-				if(callback) callback($scope.count);
-			});
-			
-		
-	 };
+
+	 setTimeout(function(){
    $scope.$watch("search.doc.term",function(v)
 	{
+		$scope.docs=$rootScope.idDocs;
 		$scope.searchterm=v;
-		if(v!="")
-		{
-			
+		if(typeof(v)!="undefined"){
 			$scope.partialitems = $filter('newfilter')($scope.docs,v);
 			if($scope.partialitems.length!=null)
 			{
 				var count=$scope.partialitems.length;
 			}
-			else
-			{
-				var count=2989;
-			}
-			 $("#spinnernew").show();
-			 $scope.showAllData=false;
-			 $scope.allDocsFunc(function(data){
-					console.log("xount"+data);				 
-					$scope.showAllData=true;  
-					$("#spinnernew").hide();
-				});
-			 
 			$scope.paginationFunc(count);
-		}	
-	});
+		}
+		else{
+				$scope.partialitems = $filter('newfilter')($scope.docs,v);
+				$scope.paginationFunc(count);
+			}	
+	});},1000);
 	$scope.checkValue=function(searchterm)	{
 		angular.forEach($scope.users, function(value , key){
 		
@@ -204,7 +178,6 @@ var db = new PouchDB(myConfig.database, { cache: true,ajax: {cache:true}});
 .filter('newfilter',['Utils',function(Utils){
 	return function(items,search)
 	{
-		//console.log(items);
 		var filtered = [];
 		if(search)
 		{
@@ -230,7 +203,6 @@ var db = new PouchDB(myConfig.database, { cache: true,ajax: {cache:true}});
 		{
 			filtered= items;
 		}
-		
 		return filtered;
 	}
 	 

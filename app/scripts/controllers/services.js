@@ -17,6 +17,13 @@ angular.module('accentsApp')
 //======Factory for crud functions=======//
 .factory('crudFunctions', function(myConfig, Utils){
   return {
+	  //===========Calling Utility Functions============//
+		i2html : function(text) {
+			return $sce.trustAsHtml(Utils.ilm2HTML(text));
+		},
+		customi2html : function(text) {
+			return Utils.renderGlyph2UTF(text);
+		},
     // remove fields that are not allowed -- we use this on loading records and before saving
     pruneUnallowedFields: function(termObj) {
       var fields = Object.keys(termObj);

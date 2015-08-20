@@ -17,7 +17,8 @@ angular.module('accentsApp')
     'AngularJS',
     'Karma'
   ];
-  var db = new PouchDB(myConfig.database, {auto_compaction: true});
+  var db = new PouchDB(myConfig.database,{auto_compaction:true});
+//var db = new PouchDB("http://127.0.0.1:5987/accents/"); 
   $scope.search={};
   $scope.search.doc={};
   $scope.open = function (page) {
@@ -71,6 +72,24 @@ angular.module('accentsApp')
 		if(!username) {        
 			$scope.open('myModalContent.html');
 		}
+		else{
+  // load data cache
+  $scope.refreshAllDocList(function(){
+    $(".pagination").css("display","block");
+    if(sessionStorage.length>0  && sessionStorage.data){
+		// get previous term id
+		var arrayDoc=JSON.parse(docData.getFormData());
+		var id=JSON.stringify(arrayDoc[0]['id']);
+		id=id.replace(/"/g,'');      
+		$scope = angular.element($(".addtext")).scope();  
+		// load form with previous term
+		var termObj = $scope.getTermObj(id);
+		$scope.setFormTerm(termObj);
+    }
+  });
+
+		}
+	
   }
 
   //===========Calling Utility Functions============//
@@ -190,44 +209,52 @@ angular.module('accentsApp')
       });
     }
   };
-
   // DATABASE read all fields into hash cache ($scope.idDocs[id]) instant access by _id
   $scope.refreshAllDocList = function(callback) {
-    var termObj;
-    db.allDocs({include_docs: true}, function(err, response) {
-      if (err) return console.log(err);
-      // handle result
-      if(response.rows) {
-        $scope.idDocs = {}; // clear termObj cache
-        response.rows.forEach(function(doc) {
-          if (doc.doc.type === 'term') {
-            // make a copy of the object rather than reference so we can compare later
-            termObj = JSON.parse(JSON.stringify(doc.doc));
-            // clean up fields
-            termObj.wordfamily = crudFunctions.genWordFamily(termObj.term); // in case it is not there already
-            termObj.original = termObj.original || ''; // default blank string
-            termObj.definition = termObj.definition || ''; // default blank
-            termObj.ref = crudFunctions.scrubField(termObj.ref, true);
-            termObj.verified = termObj.verified || termObj.original.length;
-            // remove any extra fields
-            termObj = crudFunctions.pruneUnallowedFields(termObj);
-            // if object has been modified by these load rules, save modifications
-            if (JSON.stringify(termObj) != JSON.stringify(doc.doc)) {
-              console.log('Updating record: ', doc.doc,termObj);
-              $scope.termCRUD('update',  termObj);
-            }
-            // add to termObj cach
-            $scope.idDocs[termObj['_id']] = termObj;
-          }
-        });
-        // for the time being, we can use this to refresh $scope.docs
-        crudFunctions.refreshOldDocsList($scope);
-        $(".tab-content").show();
-        $("#main-container").loader('hide');
-        $scope.$apply();
-        if (callback) callback();
+	 // console.log("refresh function called");
+	  // alert("caller is " + arguments.callee.caller.toString());
+		var termObj;
+		$rootScope.loadRecords=false;
+		db.allDocs({include_docs: true}, function(err, response){
+			if (err) return console.log(err);
+			// handle result
+			if(response.rows){				
+				$scope.idDocs = {}; // clear termObj cache
+				response.rows.forEach(function(doc){
+					if (doc.doc.type === 'term') {
+					// make a copy of the object rather than reference so we can compare later
+					termObj = JSON.parse(JSON.stringify(doc.doc));
+					// clean up fields
+					termObj.wordfamily = crudFunctions.genWordFamily(termObj.term); // in case it is not there already
+					termObj.original = termObj.original || ''; // default blank string
+					termObj.definition = termObj.definition || ''; // default blank
+					termObj.ref = crudFunctions.scrubField(termObj.ref, true);
+					termObj.verified = termObj.verified || termObj.original.length;
+					// remove any extra fields
+					termObj = crudFunctions.pruneUnallowedFields(termObj);
+					// if object has been modified by these load rules, save modifications
+					if (JSON.stringify(termObj) != JSON.stringify(doc.doc)){
+						console.log('Updating record: ', doc.doc,termObj);
+						$scope.termCRUD('update',  termObj);
+					}
+					// add to termObj cach
+					$scope.idDocs[termObj['_id']] = termObj;
+				}
+			});
+			$rootScope.idDocs=$scope.idDocs;
+			// for the time being, we can use this to refresh $scope.docs
+			crudFunctions.refreshOldDocsList($scope);			
+			$rootScope.loadRecords=true;
+			$(".tab-content").show();    
+			$("#main-container").loader('hide');   
+			$("#spinnernew").hide();
+			$scope.$apply();
+			if (callback) callback();        
       }
+      //console.log("refresh function completed");
     });
+    
+    	  
   };
 
   // compresses array of matching terms into one, returns termObj
@@ -465,23 +492,7 @@ $scope.deleteAudio=function(docId){
     return {whole: whole, partial: partial};
   };
   /********* end of CRUD DRY Utils *************/
-var username = localStorage.getItem('username');
-		if(username) {  
-  // load data cache
-  $scope.refreshAllDocList(function(){
-    $(".pagination").css("display","block");
-    if(sessionStorage.length>0  && sessionStorage.data){
-		// get previous term id
-		var arrayDoc=JSON.parse(docData.getFormData());
-		var id=JSON.stringify(arrayDoc[0]['id']);
-		id=id.replace(/"/g,'');      
-		$scope = angular.element($(".addtext")).scope();  
-		// load form with previous term
-		var termObj = $scope.getTermObj(id);
-		$scope.setFormTerm(termObj);
-    }
-  });
-}
+
   //==Delete Record from the partial or whole word searches========//
   $scope.deletedoc = function(id) {
     if(confirm('Are you SURE you want to delete this term?')) {
@@ -711,7 +722,9 @@ var username = localStorage.getItem('username');
       if (el) el.innerHTML = "";
     }
   };
-
+$rootScope.$on("$routeChangeSuccess", function(args){
+	$scope.init();
+	});
 })
 
 

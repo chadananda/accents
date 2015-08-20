@@ -17,7 +17,7 @@
 	}
 	$(".tab-content").hide();
 </script>
-<div ng-controller="getdataCtrl">
+<div ng-controller="AlltermsCtrl">
 	<div class="row addtext">
 
 <table class='filter'><tr><td class='label'>
@@ -58,7 +58,7 @@
 	</div>
 	<div class="col-lg-12 clearfix  mb10 p0 mt10" ngCloak><!--mt30-->
 		<div role="tabpanel">
-			<img id="spinnernew" ng-src="images/loading.gif"  style="margin-left: 28%;text-align: center;width:29%;display:none;">
+			<img id="spinnernew" ng-src="images/loading.gif"  style="margin-left: 28%;text-align: center;width:29%;">
 			<div class="tab-content">
 				<div role="tabpanel" class="tab-pane active" id="home">
 					<h3>Matching Terms: {{(docs |newfilter:customi2html(search.doc.term)|checkfilter:this).length}}</h3>
