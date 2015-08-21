@@ -10,7 +10,7 @@ $(document).ready(function(){
 			$(this).children('span').removeClass("glyphicon-record");
 			$(this).children('span').addClass("glyphicon glyphicon-stop");			
 			setTimeout(function(){
-				alert("Start Recording Your Voice!");
+				//alert("Start Recording Your Voice!");
 				Fr.voice.record($("#live").is(":checked"), function(){
 				});
 			},250);			
@@ -40,8 +40,9 @@ $(document).ready(function(){
 		if($(this).children().hasClass("glyphicon glyphicon-record")){			
 			$(this).children('span').removeClass("glyphicon-record");
 			$(this).children('span').addClass("glyphicon glyphicon-stop");	
+			$("div[id^='audio-"+docId+"'] :button").attr("disabled", true);
 			setTimeout(function(){	
-				alert("Start Recording Your Voice!");	
+				//alert("Start Recording Your Voice!");	
 				Fr.voice.record($("#live").is(":checked"), function(){
 				});
 			},250);			

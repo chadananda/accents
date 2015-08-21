@@ -23,7 +23,7 @@ angular.module('accentsApp')
   };
   
   $scope.changeDb=function(){
-	  $scope.open('settingsContent.html');
+	 $scope.open('settingsContent.html');
   }
 
   //===========Replicate local db to remote db entered===============//

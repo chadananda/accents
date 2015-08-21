@@ -115,6 +115,8 @@ background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
 .red{
 	color:red;
 }
+
+.modal-body { background-color: #333333;}
 /*=====================================ALL MOBILE VIEW===================================================*/
 @media only screen and (min-width : 0px) and (max-width:499px)
 {

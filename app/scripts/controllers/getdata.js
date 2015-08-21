@@ -17,6 +17,15 @@ angular.module('accentsApp')
     'AngularJS',
     'Karma'
   ];
+     $scope.data = { progress : 0 };
+    (function progress(){
+        if($scope.data.progress < 100){
+            $timeout(function(){
+                $scope.data.progress += 10;
+                progress();
+            },100);
+        }
+    })();
   var db = new PouchDB(myConfig.database,{auto_compaction:true});
 //var db = new PouchDB("http://127.0.0.1:5987/accents/"); 
   $scope.search={};
@@ -56,6 +65,10 @@ angular.module('accentsApp')
 					return false;
 				}
 		  }
+		  $scope.cancel = function () {
+			$modalInstance.dismiss('cancel');
+			}
+
 		  
     },
       resolve: {
@@ -707,7 +720,6 @@ $scope.deleteAudio=function(docId){
     if(typeof($scope.idDocs[docId]._attachments)!="undefined") {
       var keys = Object.keys($scope.idDocs[docId]._attachments);
       var attachmentId = keys[0];
-      //var db = new PouchDB(myConfig.url);
       db.getAttachment(docId, attachmentId, {rev: rev}, function(err,blob) {
         var url = URL.createObjectURL(blob);
         var display="<button onclick='playPause(this);' class='btn btn-danger btn-xs remove' style='margin-left: 10px;padding-right:3px;'>"+
@@ -719,7 +731,7 @@ $scope.deleteAudio=function(docId){
     }
     else {
       var el = document.getElementById("audio-"+docId);
-      if (el) el.innerHTML = "";
+      if (el) el.innerHTML = el.innerHTML;
     }
   };
 $rootScope.$on("$routeChangeSuccess", function(args){

@@ -38,7 +38,7 @@
     <div class="container"  ng-controller="getdataCtrl"   >
 	<script type="text/ng-template" id="myModalContent.html">
         <div class="modal-header">
-            <h3 class="modal-title">Authentication Details</h3>
+            <h3 class="modal-title">Database Credentials</h3>
         </div>
         <form ng-submit="submitDbData()">
 			<div class="modal-body">           
@@ -56,13 +56,14 @@
 					</div>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-info pull-right login-btn mt20" ng-click="submitDbData()">Submit</button>
+				<button type="button" class="btn btn-info" ng-click="submitDbData()">Sync Data</button>
+				<button type="button" class="btn btn-info" data-dismiss="modal" ng-click="cancel()">Close</button>
 			</div>        
 		</form>
     </script>
     <script type="text/ng-template" id="settingsContent.html">
         <div class="modal-header">
-            <h3 class="modal-title">Authentication Details</h3>
+            <h3 class="modal-title">Database Credentials</h3>
         </div>
         <form ng-submit="submitDbData()">
 			<div class="modal-body">           
@@ -80,7 +81,8 @@
 					</div>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-info pull-right login-btn mt20" ng-click="replicateRemote()">Replicate</button>
+				<button type="button" class="btn btn-info" ng-click="replicateRemote()">Sync Data</button>
+				<button type="button" class="btn btn-info" data-dismiss="modal" ng-click="cancel()">Close</button>
 			</div>        
 		</form>
     </script>

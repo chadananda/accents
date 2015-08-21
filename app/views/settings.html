@@ -1,16 +1,43 @@
 <script>
-	$("#main-container").loader('show','<img src="images/loading-x.gif">');
+	//$("#main-container").loader('show','<img src="images/loading-x.gif">');
 </script>
+<style>
+	.progress { 
+  height: 3em;
+  i { line-height: 3.5em; }
+}
+
+.progress-bar { 
+  transition: width 1s ease-in-out; 
+}
+</style>
 <div class="addtext row" ng-controller="getdataCtrl" ng-init="settingsInit()">
 	<h2 class="pl15 pr15" style="font-weight:bold;">Utilities</h2>
 	<div class="panel-box">
 		<div class="row mb10">
-			<div class="col-sm-8 col-xs-8">
-				<h4><label>{{remoteDbUrl}}</label></h4>
+			<div class="col-sm-10 col-xs-10">
+				<div class="col-sm-8 col-xs-8">
+					<h4><label>{{remoteDbUrl}}</label></h4>
+				</div>	
+				<div class="col-sm-4 col-xs-4 text-right">					
+					<button type="button" class="btn btn-primary" ng-click="changeDb();" >Edit</button>
+					<button type="button" class="btn btn-primary" ng-click="replicateToRemote();" >Replicate</button>
+				</div>					
 			</div>
-			<div class="col-sm-4 col-xs-4" >
-				<button type="button" class="btn btn-primary" ng-click="changeDb();" >Edit</button>
-				<button type="button" class="btn btn-primary" ng-click="replicateToRemote();" >Replicate</button>
+			<div class="col-sm-2 col-xs-2" >
+				<button type="button" class="btn btn-primary btn-circle" id="sencondClick" ng-click="slideShow('secondBox');">
+				<span class="glyphicon glyphicon-question-sign" style="color:white;"></span>
+				</button>
+			</div>
+		</div>		
+		<div class="row" id="secondBox" style="display:none;">
+			<div class="col-sm-10 col-xs-10">
+				<div class="well first-well">
+					<h4>Replicate Database</h4>
+					<p>
+						Replicate Database
+					</p>
+				</div>
 			</div>
 		</div>
 		<div class="row mb10">
@@ -64,8 +91,13 @@
 				</div>
 			</div>
 		</div>
-		<h5 class="blankalert"> {{message}}</h5>
+		<h5 class="blankalert">{{message}}</h5>
 	</div>
+<!--
+	<div class="col-md-5">
+		<progressbar value="data.progress" class="progress-striped active">{{data.progress}}</progressbar>
+	</div>
+-->
 </div>
 
 

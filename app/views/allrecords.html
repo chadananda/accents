@@ -84,22 +84,13 @@
 									<td class="orig" style="font-size: 16px;" >{{doc.original}}</td>
 									<td class="note"><div  style=" max-height: 62px;overflow-x: hidden;overflow-y:auto;text-align: justify;">{{doc.definition}}</div></td>
 									<td class="user audio" style="width:100px;">
-										<div  id="audio-{{doc._id}}">{{convertAttachment(doc._id)}}</div>
+										<div id="audio-{{doc._id}}">{{convertAttachment(doc._id)}}</div>
 											<button class="btn btn-primary btn-xs editbtn" id="audioAttach_{{doc._id}}" >
 												<span class="glyphicon glyphicon-record"></span>
 											</button>
-<!--
-											{{doc._attachments}}
--->
 											<button id="deleteAudio-{{doc._id}}" ng-show="doc._attachments" class="btn btn-danger btn-xs editbtn" ng-click="deleteAudio(doc._id)" >
 												<span class="glyphicon glyphicon-trash"></span>
 											</button>
-<!--
-											
-											<button class="btn btn-danger btn-xs editbtn one" style="display:none;" id="stop_{{doc._id}}">
-												<span class="glyphicon glyphicon-stop"></span>
-											</button>
--->
 									</td>
 									<td class="verif">
 										<div  ng-show="doc.verified || doc.doc.ambiguous">
