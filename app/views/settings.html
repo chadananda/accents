@@ -1,16 +1,6 @@
 <script>
 	//$("#main-container").loader('show','<img src="images/loading-x.gif">');
 </script>
-<style>
-	.progress { 
-  height: 3em;
-  i { line-height: 3.5em; }
-}
-
-.progress-bar { 
-  transition: width 1s ease-in-out; 
-}
-</style>
 <div class="addtext row" ng-controller="getdataCtrl" ng-init="settingsInit()">
 	<h2 class="pl15 pr15" style="font-weight:bold;">Utilities</h2>
 	<div class="panel-box">
@@ -91,13 +81,35 @@
 				</div>
 			</div>
 		</div>
-		<h5 class="blankalert">{{message}}</h5>
+		<h2 class="blankalert">{{message}}</h2>
 	</div>
+
+
+	
+	<div class="col-md-8 col-md-offset-2" id="progressbar" style="display:none;height:150px;top:20px;">
+		{{downloadMessage}}
+		<progressbar value="data.progress" class="progress-striped active"><b>{{data.progress}}%</b></progressbar>
+	</div>
+
+
+
+	
 <!--
-	<div class="col-md-5">
-		<progressbar value="data.progress" class="progress-striped active">{{data.progress}}</progressbar>
-	</div>
+	<script type="text/ng-template" id="progressbarModal.html" >
+        <div class="modal-header">
+            <h3 class="modal-title">Database Credentials</h3>
+        </div>
+        <form ng-submit="submitDbData()">
+			<div class="modal-body">           
+					<progressbar value="varnew" class="progress-striped active" ><b>{{varnew}}%</b></progressbar>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-info" data-dismiss="modal" ng-click="cancel()">Close</button>
+			</div>        
+		</form>
+    </script>
 -->
+
 </div>
 
 

@@ -17,16 +17,18 @@ angular.module('accentsApp')
     'AngularJS',
     'Karma'
   ];
-     $scope.data = { progress : 0 };
-    (function progress(){
-        if($scope.data.progress < 100){
-            $timeout(function(){
-                $scope.data.progress += 10;
-                progress();
-            },100);
-        }
-    })();
-  var db = new PouchDB(myConfig.database,{auto_compaction:true});
+
+	var db = new PouchDB(myConfig.database,{auto_compaction:true});
+	$scope.data = { progress : 0 };
+	crudFunctions.dbInfo(db,$scope,function(){
+		$scope.updateseq=$scope.dbInfoValue.update_seq; //9163
+	});
+	
+	$scope.dbInfoValue={};
+	$scope.progressbar=function(){
+		crudFunctions.progress($scope);
+	}
+	
 //var db = new PouchDB("http://127.0.0.1:5987/accents/"); 
   $scope.search={};
   $scope.search.doc={};
@@ -56,7 +58,8 @@ angular.module('accentsApp')
 				  localStorage.setItem('userpass', $scope.userpass);
 				  localStorage.setItem('username', $scope.username);
 				  localStorage.setItem('remoteDbUrl', $scope.dbUrl);
-				  crudFunctions.replicateDB($scope);	
+				  //$modalInstance.dismiss('cancel');
+				  crudFunctions.replicateDB(scope);	
 			  }	 
 			  else{	
 					alert("Please Enter DB Url!");
@@ -74,8 +77,12 @@ angular.module('accentsApp')
       resolve: {
         items: function () {
           return $scope.items;
-        }
-      }
+        },
+         scope:function(){
+				return $scope;
+			}
+      },
+       scope:$scope
     });
 
   };

@@ -33,7 +33,36 @@ angular.module('accentsApp')
       }
       return termObj;
     },
-
+    // function get info about the db
+    dbInfo:function(db,scope,callback){
+		db.info(function(err,response){
+			if(err) console.log(err);
+				scope.dbInfoValue=response;	
+				if(callback)callback();
+		});
+	},
+	 // function get info about the remote db
+    dbremoteInfo:function(db,scope,callback){
+		var db = new PouchDB(db, {auto_compaction: true});
+		db.info(function(err,response){
+			if(err) console.log(err);
+				scope.dbInfoValue=response;	
+				if(callback)callback();
+		});
+	},
+    // function to increment the progress bar
+	progressFunc:function(scope){
+		 var self = this;       
+	
+	if(scope.varnew < 100){
+            setTimeout(function(){
+                scope.varnew+= 10;
+                scope.$apply();
+                 console.log(scope.varnew);
+                 self.progressFunc(scope);
+           },100);
+        }       
+    },
      // returns array of allowable term fields (so we can adjust this on one place)
     termAllowedFields: function() {
       return ['definition', 'original', 'source', 'term', 'user', 'wordfamily', 'ref',
@@ -43,7 +72,6 @@ angular.module('accentsApp')
     // returns unique array of all word families
     getAllWordFamilies: function(scope) {
       var result = {};
-      console.log(scope.idDocs);
       // loop through entire cache and grab unique word families
       Object.keys(scope.idDocs).forEach(function(id) {
         result[scope.idDocs[id].wordfamily] = 1; // faster than removing duplicates with an array
@@ -166,11 +194,43 @@ angular.module('accentsApp')
       scope.docs = Object.keys(scope.idDocs).map(function(key){ return scope.idDocs[key]; });
       scope.count = scope.docs.length;
     },
-
-
+    callModal:function(scope,modal){
+		var self=this;
+		scope.varnew=0;
+		var modalInstance = modal.open({
+                    templateUrl: 'progressbarModal.html',
+                    controller: ModalInstanceCtrl,
+                    resolve: {
+                        progress: function() {
+                            scope.progressFunc(scope);
+                        }
+                    },
+                     scope: scope   
+                });
+			 var ModalInstanceCtrl = function ($scope, $modalInstance, progress,scope) {
+				 scope.progress();
+				  $scope.cancel = function () {
+					$modalInstance.dismiss('cancel');
+					}
+			 };
+	},
     // full replication
     replicateDB: function(scope) {
+		
+		var self=this;	
+		console.log(scope);
+		scope.data.progress=0;
+		scope.downloadMessage="Downloading Progress";
+		var scope= angular.element($(".addtext")).scope();  		
+		var db = new PouchDB(myConfig.database, {auto_compaction: true});		
+		self.dbInfo(db,scope,function(){
+			scope.updateseq=scope.dbInfoValue.update_seq;
+		});		
+		
       var remoteDbUrl = localStorage.getItem('remoteDbUrl');
+      self.dbremoteInfo(remoteDbUrl,scope,function(){
+			scope.updateseqRemote=scope.dbInfoValue.update_seq;
+		});	
       var protocol = 'http://'; // default
       var username = localStorage.getItem('username');
       var userpass = localStorage.getItem('userpass');
@@ -188,24 +248,64 @@ angular.module('accentsApp')
 	   var remote = PouchDB(remote, 
 					{withCredentials:true, cookieAuth: {username:username, password:userpass}});
 					localStorage.setItem('remoteDbUrl', remoteDbUrl);
-      var db = new PouchDB(myConfig.database, {auto_compaction: true});
+      
 
       // pull down all changes
       console.log ('Replicating data from remote', remoteDbUrl);
       db.replicate.from(remote)
-        .on('change', function (info) { console.log("Sync progress: ", info);  })
+        .on('change', function (info) { console.log("Sync progress: ", info);
+				var updateSeq=scope.updateseqRemote;	
+				console.log(updateSeq);
+				var lastSeq=info.last_seq;
+				var Tdiff=100-(Math.ceil(((updateSeq-lastSeq)/updateSeq)*100));	
+				setTimeout(function(){					
+					scope.data.progress=Tdiff;
+					if(scope.data.progress>100)
+						scope.data.progress=100;
+					if (scope.$root.$$phase != '$apply' && scope.$root.$$phase != '$digest') {
+							scope.$apply();
+						}
+					},50);	
+			  })
         .on('complete', function (info) { console.log("Sync complete: ", info); })
         .on('denied', function (info) { console.log("Sync denied: ", info); })
-        .on('error', function (err) { console.log("Sync failed: ", err);  })
+        .on('error', function (err) { console.log("Sync failed: ", err);
+			$("#progressbar").css('display','none');
+			$(".panel-box").css('display','block');
+			alert("Sync Failed with following errors:"+err.message);			
+			  })
         .then(function(){
           // clean up and compact
           console.log ('Cleaning up and compressing all word families...');
-          //this.cleanAllWordFamilies(scope);
+			self.cleanAllWordFamilies(scope);
           // push up all changes
           console.log ('Replicating to remote');
+          scope.downloadMessage="Uploading Progress";
+          scope.data.progress=0;
           db.replicate.to(remote)
-            .on('change', function (info) { console.log("Sync progress: ", info); })
-            .on('complete', function (info) { alert("Sync complete: ", info); })
+            .on('change', function (info) 
+            { 
+				console.log("Sync progress: ", info); 
+				var updateSeq=scope.updateseq;	
+				var lastSeq=info.last_seq;
+				var Tdiff=100-(Math.ceil(((updateSeq-lastSeq)/updateSeq)*100));	
+				setTimeout(function(){					
+					scope.data.progress=Tdiff;
+					console.log(scope.data.progress);
+					console.log("scope progress");
+					if(scope.data.progress>100)
+						scope.data.progress=100;
+					if (scope.$root.$$phase != '$apply' && scope.$root.$$phase != '$digest') {
+							scope.$apply();
+						}
+					},50);	
+			})
+            .on('complete', function (info) { alert("Sync complete"); 
+						setTimeout(function(){
+							$("#progressbar").css('display','none');
+							 $(".panel-box").css('display','block');
+						},100);
+				})
             .on('denied', function (info) { console.log("Sync denied: ", info); })
             .on('error', function (err) { console.log("Sync failed: ", err); });
         },this);

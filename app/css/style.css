@@ -46,7 +46,7 @@ body{background:url('../images/bodybg.png') repeat; }
 .modalDialog  .modal-footer{padding:0px 15px 15px 15px; border:none; text-align:center;}
 .modalDialog  .modal-footer button{min-width:100px;}
 .modalDialog .modal-body{padding: 15px 15px}
-.blankalert{color:#FF6464; padding:20px; display:none;}
+.blankalert{color:#FF6464; padding:20px;}
 
 /*-------------------------login-----------------------------------*/
 #loginPage{max-width:600px; width:100%; margin:80px auto; background:#333; padding:20px; color:#fff; box-shadow:0px 6px 8px -6px #000;  border: 3px solid #767676;}

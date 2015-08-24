@@ -9,13 +9,15 @@
  */
 angular.module('accentsApp')
   .controller('SettingsCtrl',
-    function ($rootScope,$scope,$http,getRecords,$window,$filter,myConfig,Utils,$sce,docData,crudFunctions) {
+    function ($rootScope,$scope,$http,getRecords,$window,$filter,myConfig,Utils,$sce,docData,crudFunctions,$modal) {
     $scope.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',
       'Karma'
     ];
   var db = new PouchDB(myConfig.database, {auto_compaction: true});
+  $scope.data = { progress : 0 };
+  $scope.varnew=0;
   //===========init function for settings page======//
   $scope.settingsInit = function() {
     var remoteDbUrl = localStorage.getItem('remoteDbUrl');
@@ -28,9 +30,28 @@ angular.module('accentsApp')
 
   //===========Replicate local db to remote db entered===============//
   $scope.replicateToRemote=function(){
-	crudFunctions.replicateDB($scope);
+	  $(".panel-box").css('display','none');
+	  crudFunctions.replicateDB($scope);
+	  $("#progressbar").css('display','block');
+	//crudFunctions.replicateDB($scope);
+		 //~ var modalInstance = $modal.open({
+      //~ animation: true,
+      //~ templateUrl:'progressbarModal.html' ,
+      //~ controller: function dialogController($scope, $modalInstance,scope) {
+		  //~ console.log($scope);
+		   //~ //$scope.progressFunc();   
+		   //~ crudFunctions.replicateDB(scope); 
+		//~ },
+		//~ resolve:{
+			//~ scope:function(){
+				//~ return $scope;
+			//~ }
+		//~ },
+		//~ scope:$scope
+	//~ 
+	//~ });
+	
   };
-
   //==================For slide toggle of help divs====================//
   $scope.slideShow=function(calledId)  {
     $( "#"+calledId ).slideToggle("3000");

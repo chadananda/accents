@@ -16,7 +16,7 @@ angular.module('accentsApp')
       'Karma'
     ];
 var db = new PouchDB(myConfig.database, { cache: true,ajax: {cache:true}});  
- 
+ $scope.totalRows=0;
 //===========Calling Utility Functions============//
  $scope.i2html = function(text)
  {
@@ -65,6 +65,7 @@ var db = new PouchDB(myConfig.database, { cache: true,ajax: {cache:true}});
 		}
 		else{
 				$scope.partialitems = $filter('newfilter')($scope.docs,v);
+				var count=$scope.partialitems.length;
 				$scope.paginationFunc(count);
 			}	
 	});},1000);
@@ -111,7 +112,6 @@ var db = new PouchDB(myConfig.database, { cache: true,ajax: {cache:true}});
 		$scope.items = [];
 		$scope.totalRows=count;
 		for (var i=0; i<$scope.totalRows; i++) {
-
 		$scope.items.push({ id: i, name: "name "+ i, description: "description " + i });
 		}
 	}
@@ -201,7 +201,10 @@ var db = new PouchDB(myConfig.database, { cache: true,ajax: {cache:true}});
 		}
 		else
 		{
-			filtered= items;
+			angular.forEach(items, function(item) 
+			{
+				filtered.push(item);
+			});
 		}
 		return filtered;
 	}
