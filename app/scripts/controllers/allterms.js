@@ -8,140 +8,130 @@
  * Controller of the accentsApp
  */
 angular.module('accentsApp')
-  .controller('AlltermsCtrl', function ($rootScope,$scope,$http,getRecords,$window,$location,$filter,myConfig,Utils,$sce,docData,$timeout) {
-    $scope.docs={};
+  .controller('AlltermsCtrl',
+    function ($rootScope,$scope,$http,getRecords,$window,$location,$filter,myConfig,Utils,$sce,docData,$timeout) {
+    $scope.docs = {};
     $scope.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',
       'Karma'
     ];
-var db = new PouchDB(myConfig.database, { cache: true,ajax: {cache:true}});  
- $scope.totalRows=0;
-//===========Calling Utility Functions============//
- $scope.i2html = function(text)
- {
-	return $sce.trustAsHtml(Utils.ilm2HTML(text));
- }
- $scope.customi2html=function(text)
- {
-	 return Utils.renderGlyph2UTF(text);
- }
+
+  var db = new PouchDB(myConfig.database, {cache: true, ajax: {cache:true}});
+  $scope.totalRows=0;
+  //===========Calling Utility Functions============//
+
+  $scope.i2html = function(text)  {
+   return $sce.trustAsHtml(Utils.ilm2HTML(text));
+  }
+
+  $scope.customi2html=function(text) {
+    return Utils.renderGlyph2UTF(text);
+  }
+
   //============On key up of the term textbox change the term=========//
- $( "#term" ).keyup(function() {
-	 var term = $('#term').val();
-	 
-	 if(term!="")
-		{
-			var changedTerm=$scope.customi2html(term);
-			$("#term").val(changedTerm);
-			$("#heading-term").html(changedTerm);
-			  sessionStorage.setItem('term',term);
-		}
-		else
-		{
-			sessionStorage.setItem('term',"");
-		}
-});
- //=========Pass document data to edit page=================//
- $scope.editdocPage=function(docid,rev)
- {
-	  var list=[{"id":docid},{"rev":rev}];
-	  docData.setFormData(list);
+  $( "#term" ).keyup(function() {
+    var term = $('#term').val();
+    if(term!="") {
+      var changedTerm=$scope.customi2html(term);
+      $("#term").val(changedTerm);
+      $("#heading-term").html(changedTerm);
+      sessionStorage.setItem('term', term);
+    }
+    else sessionStorage.setItem('term', '');
+
+  });
+
+  //=========Pass document data to edit page=================//
+  $scope.editdocPage=function(docid,rev) {
+    var list=[{"id": docid}, {"rev": rev}];
+    docData.setFormData(list);
     $location.path("/getdata");
- };
-
-	 setTimeout(function(){
-   $scope.$watch("search.doc.term",function(v)
-	{
-		$scope.docs=$rootScope.idDocs;
-		$scope.searchterm=v;
-		if(typeof(v)!="undefined"){
-			$scope.partialitems = $filter('newfilter')($scope.docs,v);
-			if($scope.partialitems.length!=null)
-			{
-				var count=$scope.partialitems.length;
-			}
-			$scope.paginationFunc(count);
-		}
-		else{
-				$scope.partialitems = $filter('newfilter')($scope.docs,v);
-				var count=$scope.partialitems.length;
-				$scope.paginationFunc(count);
-			}	
-	});},1000);
-	$scope.checkValue=function(searchterm)	{
-		angular.forEach($scope.users, function(value , key){
-		
-			angular.forEach(value, function(val , key){
-				if(searchterm)
-				{
-					var indexval=searchterm.indexOf(key);
-					if(indexval!=-1)
-					{
-							var totallength=key.length;
-							searchterm=searchterm.replace(key,val);
-							var elem = document.getElementById('term');
-							  if(typeof elem !== 'undefined' && elem !== null) {
-								document.getElementById('term').value = searchterm;
-							  }
-					}
-				}
-		});
-		});
-	};
-	//////////////////////////Delete data/////////////////////////////////////        
-	$scope.deletedoc = function(id,rev) {
-		if($window.confirm('Are you SURE you want to delete?')){			
-		db.remove(id,rev, function(err, response) {
-			if (err) { return console.log(err); }
-			// handle response
-			$("#spinner").show();
-			console.log(status);
-			$scope.message='Record Deleted Successfully';
-		  });   
-		}  
-	};  
-	//=================Sorting function=======================//
-	$scope.customSort=function(items){
-		items.sort();
-		return items;
-	}
-    $scope.paginationFunc=function(count){
-		$scope.itemsPerPage = 50;
-		$scope.currentPage = 0;
-		$scope.items = [];
-		$scope.totalRows=count;
-		for (var i=0; i<$scope.totalRows; i++) {
-		$scope.items.push({ id: i, name: "name "+ i, description: "description " + i });
-		}
-	}
-	$scope.range = function(total) {
-		var  rangeSize= (Math.floor(total/100))+1;
-		if(rangeSize>5)
-		{
-		  rangeSize=5
-		}
-		else
-		{
-		  rangeSize=rangeSize;
-		}
-		var ret = [];
-		var start;
-
-		start = $scope.currentPage;
-		if ( start > $scope.pageCount()-rangeSize ) {
-		  start = $scope.pageCount()-rangeSize+1;
-		}
-
-		for (var i=start; i<start+rangeSize; i++) {
-		  ret.push(i);
-		}
-		return ret;
   };
+
+  setTimeout(function() {
+    $scope.$watch("search.doc.term", function(v) {
+      var count = 0;
+      $scope.docs = $rootScope.idDocs; // <<-- is .docs an array?
+      $scope.searchterm=v;
+      if(typeof(v)!="undefined"){
+        $scope.partialitems = $filter('newfilter')($scope.docs,v);
+        if($scope.partialitems.length != null) {
+          count = $scope.partialitems.length;
+          $scope.paginationFunc(count);
+        }
+        // was here
+      }
+      else {
+        $scope.partialitems = $filter('newfilter')($scope.docs,v);
+        count = $scope.partialitems.length;
+        $scope.paginationFunc(count);
+      }
+    });
+  },1000);
+
+  $scope.checkValue=function(searchterm)  {
+    angular.forEach($scope.users, function(value , key){
+      angular.forEach(value, function(val , key){
+        if(searchterm) {
+          var indexval=searchterm.indexOf(key);
+          if(indexval!=-1) {
+            var totallength=key.length;
+            searchterm=searchterm.replace(key,val);
+            var elem = document.getElementById('term');
+            if(typeof elem !== 'undefined' && elem !== null) {
+              document.getElementById('term').value = searchterm;
+            }
+          }
+        }
+      });
+    });
+  };
+
+  //////////////////////////Delete data/////////////////////////////////////
+  $scope.deletedoc = function(id, rev) {
+    if($window.confirm('Are you SURE you want to delete?')){
+
+    // WHY IS THIS NOT USING OUR CRUD TOOLS? IT WILL GET THE CACHE OUT OF SYNC!!
+
+    db.remove(id, rev, function(err, response) {
+      if (err) { return console.log(err); }
+      // handle response
+      $("#spinner").show();
+      console.log(status);
+      $scope.message='Record Deleted Successfully';
+      });
+    }
+  };
+  //=================Sorting function=======================//
+  $scope.customSort = function(items) {
+    items.sort();
+    return items;
+  };
+
+  $scope.paginationFunc = function(count) {
+    $scope.itemsPerPage = 50;
+    $scope.currentPage = 0;
+    $scope.items = [];
+    $scope.totalRows=count;
+    for (var i=0; i<$scope.totalRows; i++) {
+      $scope.items.push({ id: i, name: "name "+ i, description: "description " + i });
+    }
+  };
+
+  $scope.range = function(total) {
+    var rangeSize= (Math.floor(total/100))+1;
+    if(rangeSize>5) rangeSize = 5;
+    var ret = [];
+    var start;
+    start = $scope.currentPage;
+    if (start > $scope.pageCount()-rangeSize) start = $scope.pageCount()-rangeSize+1;
+    for (var i=start; i<start+rangeSize; i++) ret.push(i);
+    return ret;
+  };
+
   $scope.prevPage = function() {
-    if ($scope.currentPage > 0) {
-      $scope.currentPage--;
-    }	
+    if ($scope.currentPage > 0) $scope.currentPage--;
   };
 
   $scope.prevPageDisabled = function() {
@@ -153,9 +143,7 @@ var db = new PouchDB(myConfig.database, { cache: true,ajax: {cache:true}});
   };
 
   $scope.nextPage = function() {
-    if ($scope.currentPage < $scope.pageCount()) {
-      $scope.currentPage++;
-    }
+    if ($scope.currentPage < $scope.pageCount()) $scope.currentPage++;
   };
 
   $scope.nextPageDisabled = function() {
@@ -166,85 +154,69 @@ var db = new PouchDB(myConfig.database, { cache: true,ajax: {cache:true}});
     $scope.currentPage = n;
   };
 
-    
-  })
+
+})
+
+
+
 .filter('offset', function() {
-  return function(input, start) {	 
-   if (!input || !input.length) { return; }
-        start = +start; //parse to int
-        return input.slice(start);
+  return function(input, start) {
+    if (!input || !input.length) { return; }
+    start = +start; //parse to int
+    return input.slice(start);
   };
 })
+
 .filter('newfilter',['Utils',function(Utils){
-	return function(items,search)
-	{
-		var filtered = [];
-		if(search)
-		{
-			angular.forEach(items, function(item) 
-			{
-				var string=item.term;
-				if(string)
-				{
-					string= string.replace("_","");
-					string=Utils.dotUndersRevert(string);
-					search=search.toLowerCase();
-					search= search.replace("_","");
-					search=Utils.dotUndersRevert(search);
-					if( ((string.toLowerCase().indexOf(search.toLowerCase())) !=-1))					
-					{          
-						filtered.push(item);
-					}
-				}
-			});
-			
-		}
-		else
-		{
-			angular.forEach(items, function(item) 
-			{
-				filtered.push(item);
-			});
-		}
-		return filtered;
-	}
-	 
+  return function(items, search) {
+    var filtered = [];
+    if(search) {
+      angular.forEach(items, function(item) {
+        var string=item.term;
+        if(string) {
+          string= string.replace("_","");
+          string=Utils.dotUndersRevert(string);
+          search=search.toLowerCase();
+          search= search.replace("_","");
+          search=Utils.dotUndersRevert(search);
+          if( ((string.toLowerCase().indexOf(search.toLowerCase())) !=-1)) filtered.push(item);
+        }
+      });
+    }
+    else {
+      angular.forEach(items, function(item) {
+        filtered.push(item);
+      });
+    }
+    return filtered;
+  };
 }])
-.filter("checkfilter",function(){
-	return function(items,scope)
-	{
-		var filtered = [];
-		var checked=document.getElementById("verifiedCheckbox");
-		var audioChecked=document.getElementById("noaudioCheckbox");
-		if(checked.checked)
-		{
-			angular.forEach(items, function(item) 
-			{
-				if(!item.verified)
-					filtered.push(item);
-			});
-		}
-		else if(audioChecked.checked)
-		{
-			angular.forEach(items, function(item) 
-			{
-				//~ var attachmentArr=scope.attachments[item._id];
-				if(!item._attachments){
-					filtered.push(item);
-				}
-				//console.log(JSON.stringify(item._id));
-			});
-		}
-		else
-		{
-			angular.forEach(items, function(item) 
-			{
-					filtered.push(item);
-			});
-		}	
-		return filtered;
-	}
-})
+
+
+.filter("checkfilter",function() {
+  return function(items, scope) {
+    var filtered = [];
+    var checked=document.getElementById("verifiedCheckbox");
+    var audioChecked=document.getElementById("noaudioCheckbox");
+    if(checked.checked) {
+      angular.forEach(items, function(item) {
+        if(!item.verified) filtered.push(item);
+      });
+    }
+    else if(audioChecked.checked) {
+      angular.forEach(items, function(item) {
+        //~ var attachmentArr=scope.attachments[item._id];
+        if(!item._attachments) filtered.push(item);
+      });
+    }
+    else {
+      angular.forEach(items, function(item) {
+        filtered.push(item);
+      });
+    }
+    return filtered;
+  };
+});
 
 
 

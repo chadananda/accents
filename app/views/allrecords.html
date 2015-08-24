@@ -61,8 +61,11 @@
 			<img id="spinnernew" ng-src="images/loading.gif"  style="margin-left: 28%;text-align: center;width:29%;">
 			<div class="tab-content">
 				<div role="tabpanel" class="tab-pane active" id="home">
-					<h3>Matching Terms: {{(docs |newfilter:customi2html(search.doc.term)|checkfilter:this).length}}</h3>
-					<input type="hidden" value="{{(docs | filter:search).length}}" name="totalRows" ng-model="rowxount" id="totalRows"/>
+					<h3>Matching Terms: {{(docs |newfilter:customi2html(search.doc.term)|checkfilter:this).length}} </h3>
+					<!--<input type="hidden" value="{{(docs | filter:search).length}}" name="totalRows" ng-model="rowxount" id="totalRows"/> -->
+
+          <input type="hidden" value="{{(docs |newfilter:customi2html(search.doc.term)|checkfilter:this).length}} " name="totalRows" ng-model="rowxount" id="totalRows"/>
+
 					<!----------------TABLE---------------------->
 					<div class="table-responsive tablecontainer mt10" >
 						<table class="table  table-bordered ">
