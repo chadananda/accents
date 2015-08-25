@@ -9,7 +9,7 @@
  */
 angular.module('accentsApp')
   .controller('AlltermsCtrl',
-    function ($rootScope,$scope,$http,getRecords,$window,$location,$filter,myConfig,Utils,$sce,docData,$timeout) {
+    function ($rootScope,$scope,$http,getRecords,$window,$location,$filter,myConfig,Utils,$sce,docData,crudFunctions) {
     $scope.docs = {};
     $scope.awesomeThings = [
       'HTML5 Boilerplate',
@@ -90,16 +90,13 @@ angular.module('accentsApp')
 
   //////////////////////////Delete data/////////////////////////////////////
   $scope.deletedoc = function(id, rev) {
-    if($window.confirm('Are you SURE you want to delete?')){
-
-    // WHY IS THIS NOT USING OUR CRUD TOOLS? IT WILL GET THE CACHE OUT OF SYNC!!
-
-    db.remove(id, rev, function(err, response) {
-      if (err) { return console.log(err); }
-      // handle response
-      $("#spinner").show();
-      console.log(status);
-      $scope.message='Record Deleted Successfully';
+     if(confirm('Are you SURE you want to delete this term?')) {
+      var termObj = $scope.getTermObj(id);
+      $scope.termCRUD('delete', termObj, function() {
+        // clean & compact the word family
+        crudFunctions.cleanWordFamily(termObj,$scope);
+        // refresh global list and filtered matches
+        $scope.refreshFilteredMatches(termObj);
       });
     }
   };
@@ -110,7 +107,7 @@ angular.module('accentsApp')
   };
 
   $scope.paginationFunc = function(count) {
-    $scope.itemsPerPage = 50;
+    $scope.itemsPerPage = 20;
     $scope.currentPage = 0;
     $scope.items = [];
     $scope.totalRows=count;
@@ -120,7 +117,7 @@ angular.module('accentsApp')
   };
 
   $scope.range = function(total) {
-    var rangeSize= (Math.floor(total/100))+1;
+    var rangeSize= (Math.floor(total/$scope.itemsPerPage))+1;
     if(rangeSize>5) rangeSize = 5;
     var ret = [];
     var start;

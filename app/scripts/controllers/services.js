@@ -215,13 +215,12 @@ angular.module('accentsApp')
 			 };
 	},
     // full replication
-    replicateDB: function(scope) {
-		
+    replicateDB: function(scope) {		
 		var self=this;	
-		console.log(scope);
+		var scope= angular.element($(".addtext")).scope(); 
 		scope.data.progress=0;
 		scope.downloadMessage="Downloading Progress";
-		var scope= angular.element($(".addtext")).scope();  		
+		 		
 		var db = new PouchDB(myConfig.database, {auto_compaction: true});		
 		self.dbInfo(db,scope,function(){
 			scope.updateseq=scope.dbInfoValue.update_seq;
@@ -255,7 +254,6 @@ angular.module('accentsApp')
       db.replicate.from(remote)
         .on('change', function (info) { console.log("Sync progress: ", info);
 				var updateSeq=scope.updateseqRemote;	
-				console.log(updateSeq);
 				var lastSeq=info.last_seq;
 				var Tdiff=100-(Math.ceil(((updateSeq-lastSeq)/updateSeq)*100));	
 				setTimeout(function(){					

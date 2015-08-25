@@ -10,7 +10,6 @@
  */
 angular
   .module('accentsApp', [
-    'ngAnimate',
     'ngCookies',
     'ngResource',
     'ngRoute',

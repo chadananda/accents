@@ -20,6 +20,7 @@ angular.module('accentsApp')
 
 	var db = new PouchDB(myConfig.database,{auto_compaction:true});
 	$scope.data = { progress : 0 };
+	$scope.currentPage = 0;
 	crudFunctions.dbInfo(db,$scope,function(){
 		$scope.updateseq=$scope.dbInfoValue.update_seq; //9163
 	});
@@ -57,9 +58,11 @@ angular.module('accentsApp')
 			  if($scope.dbUrl){
 				  localStorage.setItem('userpass', $scope.userpass);
 				  localStorage.setItem('username', $scope.username);
-				  localStorage.setItem('remoteDbUrl', $scope.dbUrl);
-				  //$modalInstance.dismiss('cancel');
-				  crudFunctions.replicateDB(scope);	
+				  localStorage.setItem('remoteDbUrl', $scope.dbUrl);				   
+				  $modalInstance.dismiss('cancel');
+				  $(".panel-box").css('display','none');
+				  $("#progressbar").css('display','block');
+				  crudFunctions.replicateDB($scope);	
 			  }	 
 			  else{	
 					alert("Please Enter DB Url!");
@@ -88,6 +91,11 @@ angular.module('accentsApp')
   };
 
   $scope.init = function() {
+	  //~ localStorage.clear();
+	  //~ db.destroy(function(err,res){
+		  //~ if(err)console.log(err);
+		  //~ console.log(res);
+	  //~ });
 		var username = localStorage.getItem('username');
 		if(!username) {        
 			$scope.open('myModalContent.html');
@@ -180,7 +188,7 @@ angular.module('accentsApp')
     if (action==='add') action = 'post';
     if (['put','post', 'delete'].indexOf(action) < 0) return console.log('Invalid CRUD: '+action);
 
-    console.log('termCRUD', action, termObj);
+    //console.log('termCRUD', action, termObj);
 
     // general field fixes:
     if (!termObj.term) return console.log('Error: Requires term field: ', termObj);
@@ -689,6 +697,7 @@ $scope.deleteAudio=function(docId){
     var search=$scope.customi2html(term);
     var matchlist = $scope.getMatchLists(search);
     return  matchlist.partial;
+   
   };
 
   $scope.groupfiltercount=function(term){
@@ -698,6 +707,7 @@ $scope.deleteAudio=function(docId){
     angular.forEach(matchlist.partial,function(item){
       sum+=item.length;
     });
+     $scope.paginationFunc(sum);
     return  sum;
   };
 
@@ -744,6 +754,52 @@ $scope.deleteAudio=function(docId){
 $rootScope.$on("$routeChangeSuccess", function(args){
 	$scope.init();
 	});
+	
+	$scope.paginationFunc = function(count) {
+    $scope.itemsPerPage = 20;
+    
+    $scope.items = [];
+    $scope.totalRows=count;
+    for (var i=0; i<$scope.totalRows; i++) {
+      $scope.items.push({ id: i, name: "name "+ i, description: "description " + i });
+    }
+  };
+
+  $scope.range = function(total) {
+    var rangeSize= (Math.floor(total/$scope.itemsPerPage))+1;
+    if(rangeSize>5) rangeSize = 5;
+    var ret = [];
+    var start;
+    start = $scope.currentPage;
+    if (start > $scope.pageCount()-rangeSize) start = $scope.pageCount()-rangeSize+1;
+    for (var i=start; i<start+rangeSize; i++) ret.push(i);
+    return ret;
+  };
+
+  $scope.prevPage = function() {
+    if ($scope.currentPage > 0) $scope.currentPage--;
+  };
+
+  $scope.prevPageDisabled = function() {
+    return $scope.currentPage === 0 ? "disabled" : "";
+  };
+
+  $scope.pageCount = function() {
+    return Math.ceil($scope.items.length/$scope.itemsPerPage)-1;
+  };
+
+  $scope.nextPage = function() {
+    if ($scope.currentPage < $scope.pageCount()) $scope.currentPage++;
+  };
+
+  $scope.nextPageDisabled = function() {
+    return $scope.currentPage === $scope.pageCount() ? "disabled" : "";
+  };
+
+  $scope.setPage = function(n) {
+    $scope.currentPage = n;
+  };
+
 })
 
 

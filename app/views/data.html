@@ -110,9 +110,9 @@
 							</button>
 							&nbsp;
 							<div class="otherData">
-								<div class="notesClass" ng-show="t.original!=''">{{t.original}}&nbsp;</div>
-								<div class="notesClass" ng-show="t.ref!=''"> {{t.ref}}&nbsp;</div>
-								<div class="notesClass" ng-show="t.definition!=''"> {{t.definition}}&nbsp;</div>
+								<div class="notesClass" ng-if="t.original!=''">{{t.original}}&nbsp;</div>
+								<div class="notesClass" ng-if="t.ref!=''"> {{t.ref}}&nbsp;</div>
+								<div class="notesClass" ng-if="t.definition!=''"> {{t.definition}}&nbsp;</div>
 							</div>
 						</div>
 					</div>
@@ -121,11 +121,11 @@
 					<h5 class="mb10 ">
 						<span class="mr5 ">{{groupfiltercount(search.doc.term)}}</span>Partial Matches
 					</h5>
-					<div ng-repeat="key in objectKeys(groupfilter(search.doc.term))" class="searchGroup"  ng-click="getAllRecords('{{key}}')">
+					<div  ng-repeat="key in objectKeys(groupfilter(search.doc.term)) | orderBy:key | offset: currentPage*itemsPerPage | limitTo: itemsPerPage track by key" class="searchGroup"  ng-click="getAllRecords('{{key}}')">
 						<span class="glyphicon glyphicon-play mr5 openPanel" id="sideIcon-{{key}}"></span>
 						<u ng-bind-html="i2html(customi2html(key))"></u>
-						<span ng-show="groupfilter(search.doc.term)[key].length!=1">({{groupfilter(search.doc.term)[key].length}})</span>
-						<span  ng-show="groupfilter(search.doc.term)[key].length==1">
+						<span ng-if="groupfilter(search.doc.term)[key].length!=1">({{groupfilter(search.doc.term)[key].length}})</span>
+						<span  ng-if="groupfilter(search.doc.term)[key].length==1">
 							<span class="glyphicon glyphicon-ok-circle ml10" ng-if="groupfilter(search.doc.term)[key][0].verified==true"   style="margin-left: 5px;"></span>
 							<span class="glyphicon glyphicon-question-sign" ng-if="groupfilter(search.doc.term)[key][0].ambiguous==true"  style="margin-left: 5px;"></span>
 							<button  ng-click="editdoc(groupfilter(search.doc.term)[key][0]._id,groupfilter(search.doc.term)[key][0]._rev);" class="btn btn-primary btn-xs editbtn mb10" type="button"  style="margin-left: 10px;">
@@ -148,6 +148,22 @@
 								</button>
 							</div>
 						</div>
+					</div>
+				</div>
+				<!-- code to render a large video block-->
+				<div ng-if="search.doc.term">
+					<div class="pagination"  ng-if="(groupfiltercount(search.doc.term))>itemsPerPage">
+						<ul>
+							<li ng-class="prevPageDisabled()">
+								<a href ng-click="prevPage()">« Prev</a>
+							</li>
+							<li ng-repeat="n in range(groupfiltercount(search.doc.term))" ng-class="{active: n == currentPage}" ng-click="setPage(n)">
+								<a >{{n+1}}</a>
+							</li>
+							<li ng-class="nextPageDisabled()">
+								<a href ng-click="nextPage()">Next »</a>
+							</li>
+						</ul>
 					</div>
 				</div>
 			</div>
