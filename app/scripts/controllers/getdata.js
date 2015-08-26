@@ -354,7 +354,6 @@ angular.module('accentsApp')
   $scope.clearEditForm = function() {
     // clear all fields except for reference field
     document.getElementById("keyid").value="";
-    //document.getElementById("keyrev").value="";
     if(typeof($scope.addform)!="undefined") $scope.addform.$setPristine();
     document.getElementById("term").value="";
     document.getElementById("original").value="";
@@ -366,6 +365,8 @@ angular.module('accentsApp')
     // switch form to add state
     document.getElementById("toptext").innerHTML="Add:";
     document.getElementById("heading-term").innerHTML="";
+    $("#playButton").addClass("disabled");
+    $("#deleteAudio").css({"display":"none"});
     $('#Button2').css({ "display":"none" });
     $('#Button3').css({ "display":"none" });
     $('#updateword').css({ "display":"none" });
@@ -590,22 +591,21 @@ $scope.deleteAudio=function(docId){
         if(typeof($scope.idDocs[termId])!="undefined"){
           //if the records are recorded
           $scope.saveAudio(termId);
-        }
-  }
-        //~ else setTimeout(function() {
-          //~ var familyTerms = crudFunctions.getWordFamilyTerms(WordFamily, $scope);
-          //~ angular.forEach(familyTerms, function(fam) {
-            //~ $scope.saveAudio(fam._id);
-          //~ });
-        //~ },1000);
-
-
+			}
+		}
          // clean up word family
         setTimeout(function(){
           crudFunctions.cleanWordFamily(termObj,$scope);
-        },1000);
-        // clear form
-        $scope.clearEditForm();
+           db.get(termObj._id).then(function (doc) {
+			  // handle doc
+			   $scope.idDocs[termObj._id]=doc;
+			   $scope.convertAttachment(termObj._id);
+			   $scope.clearEditForm();	    
+			}).catch(function (err) {
+			  console.log(err);
+			});
+        },1000);     
+        
         $scope.$apply();
 
     });
@@ -621,9 +621,20 @@ $scope.deleteAudio=function(docId){
         $scope.saveAudio(termObj._id);
       }
       // clean up word family
-      setTimeout(function() {crudFunctions.cleanWordFamily(termObj,$scope);}, 2000);
-      // clear form
-      $scope.clearEditForm();
+      setTimeout(function() {crudFunctions.cleanWordFamily(termObj,$scope);
+		   db.get(termObj._id).then(function (doc) {
+			  // handle doc
+			   $scope.idDocs[termObj._id]=doc;
+			   $scope.convertAttachment(termObj._id);
+			   $scope.clearEditForm();
+			 //
+			}).catch(function (err) {
+			  console.log(err);
+			});
+			   
+		  }, 2000);
+     
+    
     });
   };
   // Saving audio function for edit page
@@ -636,7 +647,6 @@ $scope.deleteAudio=function(docId){
   var display = document.getElementById('display');
     var src = element.attr('src');
     $scope.getAudioBlob(src,docId, attachmentId,rev,type);
-  crudFunctions.refreshOldDocsList($scope);
     if (callback) callback();
   };
   // Saving audio function for all terms page
@@ -648,8 +658,6 @@ $scope.deleteAudio=function(docId){
     var rev=$scope.idDocs[docId]._rev;
     var src=element.attr('src');
     $scope.getAudioBlob(src,docId, attachmentId,rev,type);
-    $scope.refreshAllDocList();
-    crudFunctions.refreshOldDocsList($scope);
     if(callback) callback();
   };
   // Get the audio blob from audio url
@@ -668,7 +676,8 @@ $scope.deleteAudio=function(docId){
       });
       }
     };
-    xhr.send();
+    xhr.send(); 
+   
   };
   // Search data
   $scope.getnames = function(searchval) {
@@ -751,8 +760,8 @@ $scope.deleteAudio=function(docId){
       if (el) el.innerHTML = el.innerHTML;
     }
   };
-$rootScope.$on("$routeChangeSuccess", function(args){
-	$scope.init();
+	$rootScope.$on("$routeChangeSuccess", function(args){
+		$scope.init();
 	});
 	
 	$scope.paginationFunc = function(count) {

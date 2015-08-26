@@ -289,8 +289,6 @@ angular.module('accentsApp')
 				var Tdiff=100-(Math.ceil(((updateSeq-lastSeq)/updateSeq)*100));	
 				setTimeout(function(){					
 					scope.data.progress=Tdiff;
-					console.log(scope.data.progress);
-					console.log("scope progress");
 					if(scope.data.progress>100)
 						scope.data.progress=100;
 					if (scope.$root.$$phase != '$apply' && scope.$root.$$phase != '$digest') {

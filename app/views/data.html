@@ -77,7 +77,7 @@
 					<button type="submit" class="btn btn-warning pull-right mt20 " id="addword" ng-click="adddata(docs);">
 						<span class="glyphicon glyphicon-plus mr5"></span>Add Term
 					</button>
-					<button type="submit" class="btn btn-warning pull-right mt20 " id="updateword" ng-click="updatedata(docs);"  style="display:none;">
+					<button type="submit" class="btn btn-warning pull-right mt20 mr20 " id="updateword" ng-click="updatedata(docs);"  style="display:none;">
 						<span class="glyphicon glyphicon-edit mr5"></span>Update
 					</button>
 					<button type="submit" class="btn btn-danger pull-right mt20 mr20" id="Button2" style="display:none;" ng-click="deletedata(docs);" >
@@ -101,7 +101,7 @@
 							<span ng-bind-html="i2html(customi2html(t.term))"></span>
 							<span class="glyphicon glyphicon-ok-circle ml10" ng-if="t.verified==true"  style="margin-left: 5px;"></span>
 							<span class="glyphicon glyphicon-question-sign" ng-if="t.ambiguous==true"  style="margin-left: 5px;"></span>
-							<div class="notesClass" ng-show="t._attachments!=''" id="audio-{{t._id}}">{{convertAttachment(t._id)}}</div>
+							<div class="notesClass"  id="audio-{{t._id}}">{{convertAttachment(t._id)}}</div>
 							<button  ng-click="editdoc(t._id,t._rev);" class="btn btn-primary btn-xs editbtn mb10" type="button" style="margin-left: 10px;">
 								<span class="glyphicon glyphicon-edit"></span>
 							</button>

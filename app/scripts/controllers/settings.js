@@ -33,24 +33,6 @@ angular.module('accentsApp')
 	  $(".panel-box").css('display','none');
 	  crudFunctions.replicateDB($scope);
 	  $("#progressbar").css('display','block');
-	//crudFunctions.replicateDB($scope);
-		 //~ var modalInstance = $modal.open({
-      //~ animation: true,
-      //~ templateUrl:'progressbarModal.html' ,
-      //~ controller: function dialogController($scope, $modalInstance,scope) {
-		  //~ console.log($scope);
-		   //~ //$scope.progressFunc();   
-		   //~ crudFunctions.replicateDB(scope); 
-		//~ },
-		//~ resolve:{
-			//~ scope:function(){
-				//~ return $scope;
-			//~ }
-		//~ },
-		//~ scope:$scope
-	//~ 
-	//~ });
-	
   };
   //==================For slide toggle of help divs====================//
   $scope.slideShow=function(calledId)  {

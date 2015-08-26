@@ -6,12 +6,28 @@
 	<div class="panel-box">
 		<div class="row mb10">
 			<div class="col-sm-10 col-xs-10">
-				<div class="col-sm-8 col-xs-8">
-					<h4><label>{{remoteDbUrl}}</label></h4>
+				<div class="col-sm-8 col-xs-7">
+					<h4 class="remoteUrl"><label>{{remoteDbUrl}}</label></h4>
 				</div>	
-				<div class="col-sm-4 col-xs-4 text-right">					
-					<button type="button" class="btn btn-primary" ng-click="changeDb();" >Edit</button>
-					<button type="button" class="btn btn-primary" ng-click="replicateToRemote();" >Replicate</button>
+				<div class="col-sm-4 col-xs-3 text-right">	
+					<!--Button for mobile view-->
+					<div class="visible-xs-block">
+						<button type="button" class="btn btn-primary btn-xs" ng-click="changeDb();" title="Edit" >
+							<span class="glyphicon glyphicon-pencil"></span>
+						</button>
+						<button type="button" class="btn btn-primary btn-xs" ng-click="replicateToRemote();"  title="Replicate"  >
+							<span class="glyphicon glyphicon-book"></span>
+						</button>
+					</div>				
+					<!--Button for other view-->
+					<div class="hidden-xs">
+						<button type="button" class="btn btn-primary" ng-click="changeDb();" title="Edit" >
+							Edit
+						</button>
+						<button type="button" class="btn btn-primary" ng-click="replicateToRemote();"  title="Replicate"  >
+							Replicate
+						</button>
+					</div>				
 				</div>					
 			</div>
 			<div class="col-sm-2 col-xs-2" >
@@ -31,7 +47,7 @@
 			</div>
 		</div>
 		<div class="row mb10">
-			<div class="col-sm-10 col-xs-10">
+			<div class="col-sm-10 col-xs-10 cleanup">
 				<button class="btn btn-primary btn-block" ng-click="cleanupAndCompress()">
 					<span class="glyphicon glyphicon-trash" style="float: left !important;margin-left: 2% !important;"></span>
 					Cleanup & Compress Database
