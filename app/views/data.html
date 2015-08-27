@@ -32,22 +32,22 @@
 			<form class="form-inline clearfix" id="addform" name="addform" >
 				<div class="col-md-12">
 					<div class="form-group col-sm-6 ">
-						<input type="text" class="form-control chkval" ng-keyup="changeTerm()"  ng-enter="adddata(docs)" name="term" id="term" style="font-size:20px !important;" ng-model-options="{ debounce: 1000 }" ng-minlength="3" ng-model="search.doc.term" />
+						<input type="text" class="form-control chkval" ng-keyup="changeTerm()"  ng-enter="enterData()" name="term" id="term" style="font-size:20px !important;" ng-model-options="{ debounce: 1000 }" ng-minlength="3" ng-model="search.doc.term" />
 						<input type="hidden" id="keyid"  />
 						<span class="inputexm">Term</span>
 					</div>
 					<div class="form-group posrleative col-sm-6 ">
-						<input type="text" name="reference"  class="form-control chkval" id="reference" ng-model="editdata.ref" value="" ng-model-options="{ debounce: 250 }" ng-enter="adddata(docs)"/>
+						<input type="text" name="reference"  class="form-control chkval" id="reference" ng-model="editdata.ref" value="" ng-model-options="{ debounce: 250 }" ng-enter="enterData()"/>
 						<span class="inputexm">Reference e.g. Iqan pg 72</span>
 					</div>
 				</div>
 				<div class="col-md-12">
 					<div class="form-group posrleative col-sm-6 ">
-						<input type="text" name="original" class="form-control chkval openautochoose"  id="original" ng-model-options="{ debounce: 250 }" ng-enter="adddata(docs)" ng-model="editdata.original" style="font-size:20px !important;" ng-change="checkVerifiedCheckBox()"/>
+						<input type="text" name="original" class="form-control chkval openautochoose"  id="original" ng-model-options="{ debounce: 250 }" ng-enter="enterData()" ng-model="editdata.original" style="font-size:20px !important;" ng-change="checkVerifiedCheckBox()"/>
 						<span class="inputexm">Original</span>
 					</div>
 					<div class="form-group col-sm-6 ">
-						<input type="text" class="form-control chkval" name="definition" ng-model-options="{ debounce: 250 }" ng-model="editdata.definition" ng-enter="adddata(docs)" id="definition" />
+						<input type="text" class="form-control chkval" name="definition" ng-model-options="{ debounce: 250 }" ng-model="editdata.definition" ng-enter="enterData()" id="definition" />
 						<span class="inputexm">Notes</span>
 					</div>
 				</div>
@@ -98,8 +98,11 @@
 					</h5>
 					<div ng-repeat="key in objectKeys(wholeWordFilter(search.doc.term))"  class="col-md-12" >
 						<div ng-repeat="t in wholeWordFilter(search.doc.term)[key]" >
-							<span ng-bind-html="i2html(customi2html(t.term))"></span>
+							<span ng-bind-html="i2html(customi2html(t.term))"  style="font-size: 16px;"></span>
 							<span class="glyphicon glyphicon-ok-circle ml10" ng-if="t.verified==true"  style="margin-left: 5px;"></span>
+							<button ng-if="t.verified==0" ng-click="changeVerified(t._id)" class="btn btn-primary btn-xs editbtn mb10" title="Change to Verified">
+								<span class="glyphicon glyphicon-ok"></span>
+							</button>
 							<span class="glyphicon glyphicon-question-sign" ng-if="t.ambiguous==true"  style="margin-left: 5px;"></span>
 							<div class="notesClass"  id="audio-{{t._id}}">{{convertAttachment(t._id)}}</div>
 							<button  ng-click="editdoc(t._id,t._rev);" class="btn btn-primary btn-xs editbtn mb10" type="button" style="margin-left: 10px;">
@@ -110,7 +113,7 @@
 							</button>
 							&nbsp;
 							<div class="otherData">
-								<div class="notesClass" ng-if="t.original!=''">{{t.original}}&nbsp;</div>
+								<div class="notesClass" ng-if="t.original!=''"  style="font-size: 16px;">{{t.original}}&nbsp;</div>
 								<div class="notesClass" ng-if="t.ref!=''"> {{t.ref}}&nbsp;</div>
 								<div class="notesClass" ng-if="t.definition!=''"> {{t.definition}}&nbsp;</div>
 							</div>
@@ -123,7 +126,7 @@
 					</h5>
 					<div  ng-repeat="key in objectKeys(groupfilter(search.doc.term)) | orderBy:key | offset: currentPage*itemsPerPage | limitTo: itemsPerPage track by key" class="searchGroup"  ng-click="getAllRecords('{{key}}')">
 						<span class="glyphicon glyphicon-play mr5 openPanel" id="sideIcon-{{key}}"></span>
-						<u ng-bind-html="i2html(customi2html(key))"></u>
+						<span ng-bind-html="i2html(customi2html(key))"  style="font-size: 16px;"></span>
 						<span ng-if="groupfilter(search.doc.term)[key].length!=1">({{groupfilter(search.doc.term)[key].length}})</span>
 						<span  ng-if="groupfilter(search.doc.term)[key].length==1">
 							<span class="glyphicon glyphicon-ok-circle ml10" ng-if="groupfilter(search.doc.term)[key][0].verified==true"   style="margin-left: 5px;"></span>

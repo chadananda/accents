@@ -10,45 +10,39 @@
 angular.module('accentsApp')
   .controller('AlltermsCtrl',
     function ($rootScope,$scope,$http,getRecords,$window,$location,$filter,myConfig,Utils,$sce,docData,crudFunctions) {
-    $scope.docs = {};
-    $scope.awesomeThings = [
-      'HTML5 Boilerplate',
-      'AngularJS',
-      'Karma'
-    ];
-
-  var db = new PouchDB(myConfig.database, {cache: true, ajax: {cache:true}});
-  $scope.totalRows=0;
-  //===========Calling Utility Functions============//
-
-  $scope.i2html = function(text)  {
-   return $sce.trustAsHtml(Utils.ilm2HTML(text));
-  }
-
-  $scope.customi2html=function(text) {
-    return Utils.renderGlyph2UTF(text);
-  }
-
-  //============On key up of the term textbox change the term=========//
-  $( "#term" ).keyup(function() {
-    var term = $('#term').val();
-    if(term!="") {
-      var changedTerm=$scope.customi2html(term);
-      $("#term").val(changedTerm);
-      $("#heading-term").html(changedTerm);
-      sessionStorage.setItem('term', term);
-    }
-    else sessionStorage.setItem('term', '');
-
-  });
-
-  //=========Pass document data to edit page=================//
-  $scope.editdocPage=function(docid,rev) {
-    var list=[{"id": docid}, {"rev": rev}];
-    docData.setFormData(list);
-    $location.path("/getdata");
-  };
-
+	//All Variables Declaration
+	$scope.docs = {};
+	$scope.awesomeThings = [
+	  'HTML5 Boilerplate',
+	  'AngularJS',
+	  'Karma'
+	];
+	var db = new PouchDB(myConfig.database, {cache: true, ajax: {cache:true}});
+	$scope.totalRows=0;
+	//===========Calling Utility Functions============//
+	$scope.i2html = function(text)  {
+		return $sce.trustAsHtml(Utils.ilm2HTML(text));
+	}
+	$scope.customi2html=function(text) {
+		return Utils.renderGlyph2UTF(text);
+	}
+	//============On key up of the term textbox change the term=========//
+	$( "#term" ).keyup(function() {
+		var term = $('#term').val();
+		if(term!="") {
+		  var changedTerm=$scope.customi2html(term);
+		  $("#term").val(changedTerm);
+		  $("#heading-term").html(changedTerm);
+		  sessionStorage.setItem('term', term);
+		}
+		else sessionStorage.setItem('term', '');
+	});
+	//=========Pass document data to edit page=================//
+	$scope.editdocPage=function(docid,rev) {
+		var list=[{"id": docid}, {"rev": rev}];
+		docData.setFormData(list);
+		$location.path("/getdata");
+	};
   setTimeout(function() {
     $scope.$watch("search.doc.term", function(v) {
       var count = 0;
@@ -88,7 +82,7 @@ angular.module('accentsApp')
     });
   };
 
-  //////////////////////////Delete data/////////////////////////////////////
+ //===Function to delete document===//
   $scope.deletedoc = function(id, rev) {
      if(confirm('Are you SURE you want to delete this term?')) {
       var termObj = $scope.getTermObj(id);
@@ -100,60 +94,47 @@ angular.module('accentsApp')
       });
     }
   };
-  //=================Sorting function=======================//
-  $scope.customSort = function(items) {
-    items.sort();
-    return items;
-  };
-
-  $scope.paginationFunc = function(count) {
-    $scope.itemsPerPage = 20;
-    $scope.currentPage = 0;
-    $scope.items = [];
-    $scope.totalRows=count;
-    for (var i=0; i<$scope.totalRows; i++) {
-      $scope.items.push({ id: i, name: "name "+ i, description: "description " + i });
-    }
-  };
-
-  $scope.range = function(total) {
-    var rangeSize= (Math.floor(total/$scope.itemsPerPage))+1;
-    if(rangeSize>5) rangeSize = 5;
-    var ret = [];
-    var start;
-    start = $scope.currentPage;
-    if (start > $scope.pageCount()-rangeSize) start = $scope.pageCount()-rangeSize+1;
-    for (var i=start; i<start+rangeSize; i++) ret.push(i);
-    return ret;
-  };
-
-  $scope.prevPage = function() {
-    if ($scope.currentPage > 0) $scope.currentPage--;
-  };
-
-  $scope.prevPageDisabled = function() {
-    return $scope.currentPage === 0 ? "disabled" : "";
-  };
-
-  $scope.pageCount = function() {
-    return Math.ceil($scope.items.length/$scope.itemsPerPage)-1;
-  };
-
-  $scope.nextPage = function() {
-    if ($scope.currentPage < $scope.pageCount()) $scope.currentPage++;
-  };
-
-  $scope.nextPageDisabled = function() {
-    return $scope.currentPage === $scope.pageCount() ? "disabled" : "";
-  };
-
-  $scope.setPage = function(n) {
-    $scope.currentPage = n;
-  };
-
-
+	//===PAGINATION FUNCTIONS START===//
+	//===Function for display of page numbers===//	
+	$scope.paginationFunc = function(count) {
+		$scope.itemsPerPage = 20;
+		$scope.currentPage = 0;
+		$scope.items = [];
+		$scope.totalRows=count;
+		for (var i=0; i<$scope.totalRows; i++) {
+		  $scope.items.push({ id: i, name: "name "+ i, description: "description " + i });
+		}
+	};
+	$scope.range = function(total) {
+		var rangeSize= (Math.floor(total/$scope.itemsPerPage))+1;
+		if(rangeSize>5) rangeSize = 5;
+		var ret = [];
+		var start;
+		start = $scope.currentPage;
+		if (start > $scope.pageCount()-rangeSize) start = $scope.pageCount()-rangeSize+1;
+		for (var i=start; i<start+rangeSize; i++) ret.push(i);
+		return ret;
+	};
+	$scope.prevPage = function() {
+		if ($scope.currentPage > 0) $scope.currentPage--;
+	};
+	$scope.prevPageDisabled = function() {
+		return $scope.currentPage === 0 ? "disabled" : "";
+	};
+	$scope.pageCount = function() {
+		return Math.ceil($scope.items.length/$scope.itemsPerPage)-1;
+	};
+	$scope.nextPage = function() {
+		if ($scope.currentPage < $scope.pageCount()) $scope.currentPage++;
+	};
+	$scope.nextPageDisabled = function() {
+		return $scope.currentPage === $scope.pageCount() ? "disabled" : "";
+	};
+	$scope.setPage = function(n) {
+		$scope.currentPage = n;
+	};
+	//===PAGINATION FUNCTIONS END HERE===//
 })
-
 
 
 .filter('offset', function() {

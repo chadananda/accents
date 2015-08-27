@@ -95,7 +95,10 @@
 											</button>
 									</td>
 									<td class="verif">
-										<div  ng-if="doc.verified || doc.doc.ambiguous">
+										<button ng-if="doc.verified==0" ng-click="changeVerified(doc._id)" class="btn btn-primary btn-xs editbtn mb10" title="Change to Verified">
+											<span class="glyphicon glyphicon-ok"></span>
+										</button>
+										<div  ng-if="doc.verified || doc.doc.ambiguous">											
 											<div ng-if="doc.verified==true" class="verifyy"><span class='glyphicon glyphicon-ok-circle'></span></div>
 											<div ng-if="doc.ambiguous==true" class="verifyy"><span class='glyphicon glyphicon-question-sign'></span></div>
 										</div>

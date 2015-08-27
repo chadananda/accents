@@ -81,11 +81,14 @@ body{background:url('../images/bodybg.png') repeat; }
 .otherData{
     display: inline;
 }
+.debug{
+	border:1px solid red;
+}
 .notesClass {
     display: inline-block;
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap;
+    white-space: nowrap;	
     max-width: 390px;
 }
 .recordButton {
@@ -114,6 +117,11 @@ background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
 }
 .red{
 	color:red;
+}
+.replicateCheckbox{
+	float: left;
+	margin-left: 47px !important;
+	margin-top: 12px;
 }
 
 .modal-body { background-color: #333333;}
@@ -238,7 +246,10 @@ background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
 
  /* checkboxes */
  table.filter td.checkboxes {width: 75px !important;}
-
+	.replicateCheckbox{
+		float: left;
+		margin:0px;
+	}
 }
 
 /*
