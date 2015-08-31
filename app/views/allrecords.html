@@ -28,7 +28,7 @@
 		</div>
 </td><td class='input'>
 		<div class="col-xs-6 col-sm-6 col-md-8 pt20">
-			<input type="text" size="150"  placeholder="Search Transliterated Term" id="term" ng-model-options="{debounce: 200}"  ng-model="search.doc.term" name="term" value="" class="form-control chkval ng-pristine ng-untouched ng-valid">
+			<input type="text" size="150"  placeholder="Search Transliterated Term" id="term" ng-model-options="{debounce: 200}" ng-keyup="changeAllTerm($event)"  ng-model="search.doc.term" name="term" value="" class="form-control chkval ng-pristine ng-untouched ng-valid">
 		</div>
 </td><td class='checkboxes'>
 		<div class="col-xs-3 col-sm-4 col-md-3 allfilters pt10">

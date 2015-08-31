@@ -123,11 +123,19 @@ background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
 	margin-left: 47px !important;
 	margin-top: 12px;
 }
-
+.visibleXs{
+display:none  ;
+}
 .modal-body { background-color: #333333;}
 /*=====================================ALL MOBILE VIEW===================================================*/
 @media only screen and (min-width : 0px) and (max-width:499px)
 {
+	.hiddenXs{
+		display:none !important;
+	}
+	.visibleXs{
+	display:block !important;
+	}
 	.term-top
 	{
 		margin-top: 20px;

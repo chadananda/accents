@@ -138,7 +138,9 @@ angular.module('accentsApp')
 	  db.get(id).then(function (doc) {
           doc=doc;
           if(callback) callback(doc);
-      });
+		}).catch(function (err) {
+			if(callback) callback(err);
+		});
 	}
 	  //===========Calling Utility Functions============//
 	  $scope.i2html = function(text) {
@@ -151,18 +153,21 @@ angular.module('accentsApp')
 		return Utils.dotUndersRevert(text);
 	  }; 
 	//=======Called on ng-keyup of term======//
-	$scope.changeTerm=function(){
-		var term = $('#term').val();
-		if(term!=""){
-		  // TODO: get cursor position
-		  // split the word at the cursor position - part1 & part2
-		  // run customi2html on part1
-		  // then set val to part1+part2 and set the cursor position to part1.length
-		  var changedTerm = $scope.customi2html(term);
-		  $("#term").val(changedTerm);
-		  $("#heading-term").html(Utils.ilm2HTML(changedTerm));
+	$scope.changeTerm=function($event){
+		//to check for the back arrow key
+		if($event.keyCode !=37){
+			var term = $('#term').val();
+			if(term!=""){
+			  // TODO: get cursor position
+			  // split the word at the cursor position - part1 & part2
+			  // run customi2html on part1
+			  // then set val to part1+part2 and set the cursor position to part1.length
+			  var changedTerm = $scope.customi2html(term);
+			  $("#term").val(changedTerm);
+			  $("#heading-term").html(Utils.ilm2HTML(changedTerm));
+			}
+			else $("#heading-term").html("");
 		}
-		else $("#heading-term").html("");
 	 };
 	//=====Check the verified checkbox if user entered original field text=====//
 	$scope.checkVerifiedCheckBox=function() {
@@ -577,10 +582,16 @@ angular.module('accentsApp')
          // clean up word family
         setTimeout(function(){
           crudFunctions.cleanWordFamily(termObj,$scope);
-			$scope.getDocument(docId,function(doc){
-				$scope.idDocs[termObj._id]=doc;
-				$scope.convertAttachment(termObj._id);
-				$scope.clearEditForm();	  
+			$scope.getDocument(termObj._id,function(doc){
+				if(doc.status==404){
+					$scope.clearEditForm();	  
+				}
+				else{
+					$scope.idDocs[termObj._id]=doc;
+					$scope.convertAttachment(termObj._id);
+					$scope.clearEditForm();	  
+				}
+				
 			});			
         },1000);             
         $scope.$apply();

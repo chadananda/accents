@@ -32,7 +32,7 @@
 			<form class="form-inline clearfix" id="addform" name="addform" >
 				<div class="col-md-12">
 					<div class="form-group col-sm-6 ">
-						<input type="text" class="form-control chkval" ng-keyup="changeTerm()"  ng-enter="enterData()" name="term" id="term" style="font-size:20px !important;" ng-model-options="{ debounce: 1000 }" ng-minlength="3" ng-model="search.doc.term" />
+						<input type="text" class="form-control chkval" ng-keyup="changeTerm($event)"  ng-enter="enterData()" name="term" id="term" style="font-size:20px !important;" ng-model-options="{ debounce: 500 }" ng-minlength="3" ng-model="search.doc.term" />
 						<input type="hidden" id="keyid"  />
 						<span class="inputexm">Term</span>
 					</div>

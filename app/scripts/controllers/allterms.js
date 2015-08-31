@@ -27,16 +27,20 @@ angular.module('accentsApp')
 		return Utils.renderGlyph2UTF(text);
 	}
 	//============On key up of the term textbox change the term=========//
-	$( "#term" ).keyup(function() {
-		var term = $('#term').val();
-		if(term!="") {
-		  var changedTerm=$scope.customi2html(term);
-		  $("#term").val(changedTerm);
-		  $("#heading-term").html(changedTerm);
-		  sessionStorage.setItem('term', term);
+	//$( "#term" ).keyup(function() {
+		$scope.changeAllTerm=function($event){
+			//to check for the back arrow key
+			if($event.keyCode !=37){
+				var term = $('#term').val();
+				if(term!="") {
+				  var changedTerm=$scope.customi2html(term);
+				  $("#term").val(changedTerm);
+				  $("#heading-term").html(changedTerm);
+				  sessionStorage.setItem('term', term);
+				}
+				else sessionStorage.setItem('term', '');
 		}
-		else sessionStorage.setItem('term', '');
-	});
+	};
 	//=========Pass document data to edit page=================//
 	$scope.editdocPage=function(docid,rev) {
 		var list=[{"id": docid}, {"rev": rev}];

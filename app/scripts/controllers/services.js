@@ -100,11 +100,12 @@ angular.module('accentsApp')
 		  var verified_count = 0;
 		  var termscount=0;
 		  Object.keys(family).forEach(function(term) {
-			family[term] = scope.compressTerms(family[term]); // takes array of termObj, returns merged termObj
+			family[term] = scope.compressTerms(family[term]); // takes array of termObj, returns merged termObj		
 			if (family[term].verified) verified_count++;
 			termscount++;
-		  });
+		  });		 
 		  if(termscount>1){
+			 
 			// wait a second to allow any CRUD writes to finish - (sloppy, I know)
 			// then set them all to ambiguous or not depending on verified count
 			setTimeout(function() {
