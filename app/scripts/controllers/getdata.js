@@ -316,6 +316,10 @@ angular.module('accentsApp')
           } else if (key == 'ref') {
             // merge with TRUE causes cleanup of PG and PAR
             base[key] = crudFunctions.scrubField(base[key]+','+term[key], true);
+          }else if (key == 'misspelling') {
+            // merge with TRUE causes cleanup of PG and PAR
+            if(!base[key]) base[key]="";
+            base[key] = crudFunctions.scrubField(base[key]+','+term[key], true);
           } else if (['_id','_rev','type','term','ambiguous','wordfamily','_attachments'].indexOf(key)>-1) {
              // skip these, we do not need to merge them
              // we no longer need to merge attachement fields because base has an attachment if any exists
@@ -345,6 +349,7 @@ angular.module('accentsApp')
     document.getElementById("term").value="";
     document.getElementById("original").value="";
     document.getElementById("definition").value="";
+    document.getElementById("misspelling").value="";
     // if multi value reference, keep only the first one
     var ref = document.getElementById("reference").value.split(',').shift().trim();
     $scope.editdata = {ref: ref};
@@ -373,23 +378,25 @@ angular.module('accentsApp')
       sessionStorage.term=sessionTerm;
     }
   };
-  //====Get termObj from form fields (careful to not lose fields not stored in the form)=====//
+  //===Get termObj from form fields (careful to not lose fields not stored in the form)===//
   $scope.getFormTerm = function() {
-    var term = {};
+	var term = {};
     var id=document.getElementById("keyid").value;
     // if objects exists, get object from global list and then override
     if (id && $scope.idDocs[id]) term = $scope.idDocs[id];
-     else term = {term:'', ref:'', definition:'', original:'', verified:false, wordFamily:''};
+	else term = {term:'', ref:'', definition:'', original:'', verified:false, wordFamily:'',misspelling:''};
     // override fields on the form
     term.term = document.getElementById("term").value.trim();
     if ($scope.editdata) {
       if ($scope.editdata.original) term.original = crudFunctions.scrubField($scope.editdata.original);
       if ($scope.editdata.ref) term.ref = crudFunctions.scrubField($scope.editdata.ref, true);
       if ($scope.editdata.definition) term.definition = crudFunctions.scrubField($scope.editdata.definition);
+      if ($scope.editdata.misspelling) term.misspelling = crudFunctions.scrubField($scope.editdata.misspelling);
     }
     term.verified = document.getElementById("verifiedCheckbox").checked;
     if (term.term) term.wordfamily = crudFunctions.genWordFamily(term.term);
     if (!term.user) term.user = $scope.getSessionUser();
+    console.log(term);
     return term;
   };
   // set the form data from a termObj and set to edit mode

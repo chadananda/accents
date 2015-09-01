@@ -54,7 +54,7 @@ angular.module('accentsApp')
 		//Function returns array of allowable term fields (so we can adjust this on one place)===//
 		termAllowedFields: function() {
 			return ['definition', 'original', 'source', 'term', 'user', 'wordfamily', 'ref',
-				'verified', 'ambiguous', 'audio', '_id', '_rev', 'type','_attachments'];
+				'verified', 'ambiguous', 'audio', '_id', '_rev', 'type','_attachments','misspelling'];
 		},
 		//===Function returns unique array of all word families===//
 		getAllWordFamilies: function(scope) {
