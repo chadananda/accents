@@ -619,8 +619,9 @@ angular.module('accentsApp')
 				$scope.idDocs[termObj._id]=doc;
 				$scope.convertAttachment(termObj._id);
 				$scope.clearEditForm(); 
+				$scope.$apply();
 			});   
-		  }, 2000);   
+		  }, 1000);   
     });
   };
   //===Saving audio function for edit page===//
